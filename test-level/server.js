@@ -1,5 +1,7 @@
+// @ts-check
 import { sharedInit } from "./shared.js";
 
+/** @type {import('@dreamlab.gg/core/dist/sdk').InitServer} */
 export const init = async (game) => {
   await sharedInit(game);
 
