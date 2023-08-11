@@ -3,5 +3,5 @@ import Level from "./level.js";
 
 /** @type {import('@dreamlab.gg/core/dist/sdk').InitShared} */
 export const sharedInit = async (game) => {
-  await game.load(Level);
+  await game.spawnMany(Level);
 };
