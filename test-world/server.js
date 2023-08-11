@@ -6,7 +6,7 @@ export const init = async (game) => {
   await sharedInit(game);
 
   await game.spawn({
-    entityFn: "createBouncyBall",
+    entity: "@dreamlab/BouncyBall",
     args: [50], // radius
     transform: { position: [-375, -300] },
     tags: ["net/replicated"],
