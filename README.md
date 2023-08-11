@@ -1,6 +1,6 @@
-# dreamlab-levels
+# dreamlab-worlds
 
-Temporary repository to store user scripts for levels.
+Temporary repository to store user scripts for worlds.
 
 Used in `dreamlab-mp` and `dreamlab-app`
 
