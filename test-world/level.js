@@ -1,4 +1,7 @@
-export default [
+// @ts-check
+
+/** @type {import('@dreamlab.gg/core').LooseSpawnableDefinition[]} */
+export const level = [
   {
     entity: "@dreamlab/Solid",
     args: [1290, 50],

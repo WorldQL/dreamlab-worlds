@@ -1,7 +1,7 @@
 // @ts-check
-import Level from "./level.js";
+import { level } from "./level.js";
 
 /** @type {import('@dreamlab.gg/core/dist/sdk').InitShared} */
 export const sharedInit = async (game) => {
-  await game.spawnMany(Level);
+  await game.spawnMany(...level);
 };
