@@ -18,7 +18,7 @@ export const level = [
 ]
 
 const createHittableMob = createSpawnableEntity(
-  ({ tags, transform, zIndex }) => {
+  ({ uid, tags, transform, zIndex }) => {
     const HIT_CHANNEL = '@dreamlab/Hittable/hit'
     const { position } = transform
 
@@ -57,9 +57,13 @@ const createHittableMob = createSpawnableEntity(
         const netClient = onlyNetClient(game.network)
 
         /** @type {import('@dreamlab.gg/core/dist/network').MessageListenerServer} */
-        const onHitServer = peerID => {
+        const onHitServer = (peerID, _, data) => {
           const network = netServer
           if (!network) throw new Error('missing network')
+
+          if (!('uid' in data)) return
+          if (typeof data.uid !== 'string') return
+          if (data.uid !== uid) return
 
           const player = game.entities
             .filter(isNetPlayer)
@@ -78,7 +82,7 @@ const createHittableMob = createSpawnableEntity(
             // @ts-expect-error `this` is a partial entity
             game.destroy(this)
           } else {
-            network.broadcastCustomMessage(HIT_CHANNEL, { health })
+            network.broadcastCustomMessage(HIT_CHANNEL, { uid, health })
           }
         }
 
@@ -87,9 +91,14 @@ const createHittableMob = createSpawnableEntity(
           const network = netClient
           if (!network) throw new Error('missing network')
 
-          if ('health' in data && typeof data.health === 'number') {
-            health = data.health
-          }
+          if (!('uid' in data)) return
+          if (typeof data.uid !== 'string') return
+          if (data.uid !== uid) return
+
+          if (!('health' in data)) return
+          if (typeof data.health !== 'number') return
+
+          health = data.health
         }
 
         netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
@@ -179,7 +188,7 @@ const createHittableMob = createSpawnableEntity(
           if (dist > hitRadius) return
 
           hitTimer += hitCooldown
-          netClient?.sendCustomMessage(HIT_CHANNEL, {})
+          netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
         } else {
           hitTimer -= delta
           hitTimer = Math.max(hitTimer, 0)
