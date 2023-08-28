@@ -50,11 +50,11 @@ const createHittableMob = createSpawnableEntity(
       },
 
       init({ game }) {
-        game.inputs?.registerInput('@hittable/attack', 'KeyE')
+        game.client?.inputs.registerInput('@hittable/attack', 'KeyE')
         game.physics.register(this, body)
 
-        const netServer = onlyNetServer(game.network)
-        const netClient = onlyNetClient(game.network)
+        const netServer = onlyNetServer(game)
+        const netClient = onlyNetClient(game)
 
         /** @type {import('@dreamlab.gg/core/network').MessageListenerServer} */
         const onHitServer = (peerID, _, data) => {
@@ -178,7 +178,7 @@ const createHittableMob = createSpawnableEntity(
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
-        const inputs = game.inputs
+        const inputs = game.client?.inputs
         const hit = inputs?.getInput('@hittable/attack') ?? false
         if (hit && hitTimer === 0) {
           const player = game.entities.find(isPlayer)
