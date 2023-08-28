@@ -13,6 +13,11 @@
     "noUnusedParameters": true,
     "strict": true,
     "useUnknownInCatchVariables": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+
+    // Modules
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true
   }
 }

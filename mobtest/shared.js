@@ -1,8 +1,8 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { isNetPlayer, isPlayer } from '@dreamlab.gg/core/dist/entities'
-import { cloneTransform, distance, Vec } from '@dreamlab.gg/core/dist/math'
-import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/dist/network'
-import { drawBox, drawCircle } from '@dreamlab.gg/core/dist/utils'
+import { isNetPlayer, isPlayer } from '@dreamlab.gg/core/entities'
+import { cloneTransform, distance, Vec } from '@dreamlab.gg/core/math'
+import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/network'
+import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
@@ -56,7 +56,7 @@ const createHittableMob = createSpawnableEntity(
         const netServer = onlyNetServer(game.network)
         const netClient = onlyNetClient(game.network)
 
-        /** @type {import('@dreamlab.gg/core/dist/network').MessageListenerServer} */
+        /** @type {import('@dreamlab.gg/core/network').MessageListenerServer} */
         const onHitServer = (peerID, _, data) => {
           const network = netServer
           if (!network) throw new Error('missing network')
@@ -86,7 +86,7 @@ const createHittableMob = createSpawnableEntity(
           }
         }
 
-        /** @type {import('@dreamlab.gg/core/dist/network').MessageListenerClient} */
+        /** @type {import('@dreamlab.gg/core/network').MessageListenerClient} */
         const onHitClient = (_, data) => {
           const network = netClient
           if (!network) throw new Error('missing network')
@@ -220,7 +220,7 @@ const createHittableMob = createSpawnableEntity(
   },
 )
 
-/** @type {import('@dreamlab.gg/core/dist/sdk').InitShared} */
+/** @type {import('@dreamlab.gg/core/sdk').InitShared} */
 export const sharedInit = async game => {
   game.register('@dreamlab/Hittable', createHittableMob)
 
