@@ -50,7 +50,7 @@ const createHittableMob = createSpawnableEntity(
       },
 
       init({ game }) {
-        game.client?.inputs.registerInput('@hittable/attack', 'KeyE')
+        //game.client?.inputs.registerInput('@hittable/attack', 'KeyE')
         game.physics.register(this, body)
 
         const netServer = onlyNetServer(game)
@@ -179,7 +179,7 @@ const createHittableMob = createSpawnableEntity(
         Matter.Body.setAngularVelocity(body, 0)
 
         const inputs = game.client?.inputs
-        const hit = inputs?.getInput('@hittable/attack') ?? false
+        const hit = inputs?.getInput('@player/attack') ?? false
         if (hit && hitTimer === 0) {
           const player = game.entities.find(isPlayer)
           if (!player) return
