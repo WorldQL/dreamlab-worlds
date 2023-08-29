@@ -18,6 +18,9 @@
     // Modules
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+
+    // Language and Environment
+    "lib": ["ESNext", "DOM"]
   }
 }
