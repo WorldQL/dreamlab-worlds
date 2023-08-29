@@ -2,6 +2,7 @@
   "root": true,
   "extends": [
     "@luludev/eslint-config/common",
+    "@luludev/eslint-config/browser",
     "@luludev/eslint-config/prettier"
   ],
   "rules": {
