@@ -196,12 +196,13 @@ const createHittableMob = createSpawnableEntity(
       },
 
       onRenderFrame(
-        _,
+        { smooth },
         { game },
         { camera, container, gfxBounds, gfxHittest, gfxHealthAmount },
       ) {
         const debug = game.debug
-        const pos = Vec.add(body.position, camera.offset)
+        const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
+        const pos = Vec.add(smoothed, camera.offset)
 
         container.position = pos
         container.rotation = body.angle
