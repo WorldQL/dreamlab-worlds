@@ -50,7 +50,7 @@ const createHittableMob = createSpawnableEntity(
       },
 
       init({ game }) {
-        //game.client?.inputs.registerInput('@hittable/attack', 'KeyE')
+        // game.client?.inputs.registerInput('@hittable/attack', 'KeyE')
         game.physics.register(this, body)
 
         const netServer = onlyNetServer(game)
@@ -222,16 +222,6 @@ const createHittableMob = createSpawnableEntity(
 
 /** @type {import('@dreamlab.gg/core/sdk').InitShared} */
 export const sharedInit = async game => {
-  
-  if (game.client) {
-    try {
-      console.log(JSON.parse(window.localStorage.getItem('globalPassedPlayerData')));
-    } catch {
-      console.log(console.log("JSON parse error for globalPassedPlayerData"))
-    }
-  }
-  
-
   game.register('@dreamlab/Hittable', createHittableMob)
 
   await game.spawnMany(...level)
