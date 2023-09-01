@@ -223,6 +223,17 @@ const createHittableMob = createSpawnableEntity(
 
 /** @type {import('@dreamlab.gg/core/sdk').InitShared} */
 export const sharedInit = async game => {
+  let globalPassPlayerData = {};
+  
+  if (game.client) {
+    try {
+      globalPassPlayerData = JSON.parse(window.localStorage.getItem('globalPassedPlayerData'));
+    } catch {
+      console.log("JSON parse error for globalPassedPlayerData")
+    }
+  }  
+
+  console.log(globalPassPlayerData)
   game.register('@dreamlab/Hittable', createHittableMob)
 
   await game.spawnMany(...level)
