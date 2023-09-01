@@ -17,13 +17,10 @@ export const level = [
   },
 ]
 
-const createHittableMob = (globalPassPlayerData) => createSpawnableEntity(
+const createHittableMob = createSpawnableEntity(
   ({ uid, tags, transform, zIndex }) => {
     const HIT_CHANNEL = '@dreamlab/Hittable/hit'
     const { position } = transform
-
-    console.log(globalPassPlayerData)
-    let weapon = -1
 
     const width = 130
     const height = width * 2
@@ -53,7 +50,7 @@ const createHittableMob = (globalPassPlayerData) => createSpawnableEntity(
       },
 
       init({ game }) {
-        game.client?.inputs.registerInput('@weapon/change', 'KeyQ')
+        // game.client?.inputs.registerInput('@hittable/attack', 'KeyE')
         game.physics.register(this, body)
 
         const netServer = onlyNetServer(game)
@@ -101,7 +98,6 @@ const createHittableMob = (globalPassPlayerData) => createSpawnableEntity(
           if (!('health' in data)) return
           if (typeof data.health !== 'number') return
 
-          console.log(data.name)
           health = data.health
         }
 
@@ -178,7 +174,7 @@ const createHittableMob = (globalPassPlayerData) => createSpawnableEntity(
         ctrHealth.destroy({ children: true })
       },
 
-      onPhysicsStep({ delta }, { game, netClient, netServer }) {
+      onPhysicsStep({ delta }, { game, netClient }) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
@@ -197,16 +193,16 @@ const createHittableMob = (globalPassPlayerData) => createSpawnableEntity(
           hitTimer -= delta
           hitTimer = Math.max(hitTimer, 0)
         }
-        
       },
 
       onRenderFrame(
-        _,
+        { smooth },
         { game },
         { camera, container, gfxBounds, gfxHittest, gfxHealthAmount },
       ) {
         const debug = game.debug
-        const pos = Vec.add(body.position, camera.offset)
+        const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
+        const pos = Vec.add(smoothed, camera.offset)
 
         container.position = pos
         container.rotation = body.angle
@@ -227,19 +223,7 @@ const createHittableMob = (globalPassPlayerData) => createSpawnableEntity(
 
 /** @type {import('@dreamlab.gg/core/sdk').InitShared} */
 export const sharedInit = async game => {
+  game.register('@dreamlab/Hittable', createHittableMob)
 
-   let globalPassPlayerData = {};
-  
-  if (game.client) {
-    try {
-      globalPassPlayerData = JSON.parse(window.localStorage.getItem('globalPassedPlayerData'));
-    } catch {
-      console.log("JSON parse error for globalPassedPlayerData")
-    }
-  }  
-
-  game.register('@dreamlab/Hittable', createHittableMob(globalPassPlayerData));
-
-  await game.spawnMany(...level);
+  await game.spawnMany(...level)
 }
-
