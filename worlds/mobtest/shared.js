@@ -57,7 +57,7 @@ const createHittableMob = createSpawnableEntity(
         const netClient = onlyNetClient(game)
 
         /** @type {import('@dreamlab.gg/core/network').MessageListenerServer} */
-        const onHitServer = (peerID, _, data) => {
+        const onHitServer = ({ peerID }, _, data) => {
           const network = netServer
           if (!network) throw new Error('missing network')
 
