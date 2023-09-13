@@ -220,7 +220,10 @@ const createHittableMob = createSpawnableEntity(
           game.physics.engine.world.bodies,
           potentialCollisionArea,
         )
-        const hasCollision = bodiesInArea.some(b => b !== body)
+
+        const hasCollision = bodiesInArea.some(b => {
+          return b !== body && b.label !== 'player'
+        })
 
         if (hasCollision) {
           direction = -direction
