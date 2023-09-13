@@ -15,6 +15,22 @@ export const level = [
       rotation: 0,
     },
   },
+  {
+    entity: '@dreamlab/Solid',
+    args: [5_000, 50],
+    transform: {
+      position: { x: -2_500, y: 295 },
+      rotation: 90,
+    },
+  },
+  {
+    entity: '@dreamlab/Solid',
+    args: [5_000, 50],
+    transform: {
+      position: { x: 2_500, y: 295 },
+      rotation: 90,
+    },
+  },
 ]
 
 const createHittableMob = createSpawnableEntity(
@@ -36,6 +52,8 @@ const createHittableMob = createSpawnableEntity(
     const maxHealth = 10
     let health = maxHealth
 
+    let direction = 1
+
     return {
       get tags() {
         return tags
@@ -50,7 +68,6 @@ const createHittableMob = createSpawnableEntity(
       },
 
       init({ game }) {
-        // game.client?.inputs.registerInput('@hittable/attack', 'KeyE')
         game.physics.register(this, body)
 
         const netServer = onlyNetServer(game)
@@ -73,7 +90,7 @@ const createHittableMob = createSpawnableEntity(
           const dist = distance(player.position, body.position)
           if (dist > hitRadius) return
 
-          const direction = body.position.x > player.position.x ? 1 : -1
+          direction = body.position.x > player.position.x ? 1 : -1
           const force = 0.5 * direction
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
@@ -178,6 +195,39 @@ const createHittableMob = createSpawnableEntity(
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
+        const speed = 2
+        const collisionCheckDistance = speed + 10
+
+        const sideCheckHeight = height / 4
+        const potentialCollisionArea = {
+          min: {
+            x:
+              direction === 1
+                ? body.position.x + width / 2
+                : body.position.x - width / 2 - collisionCheckDistance,
+            y: body.position.y - sideCheckHeight / 2,
+          },
+          max: {
+            x:
+              direction === 1
+                ? body.position.x + width / 2 + collisionCheckDistance
+                : body.position.x - width / 2,
+            y: body.position.y + sideCheckHeight / 2,
+          },
+        }
+
+        const bodiesInArea = Matter.Query.region(
+          game.physics.engine.world.bodies,
+          potentialCollisionArea,
+        )
+        const hasCollision = bodiesInArea.some(b => b !== body)
+
+        if (hasCollision) {
+          direction = -direction
+        } else {
+          Matter.Body.translate(body, { x: speed * direction, y: 0 })
+        }
+
         const inputs = game.client?.inputs
         const hit = inputs?.getInput('@player/attack') ?? false
         if (hit && hitTimer === 0) {
@@ -223,17 +273,6 @@ const createHittableMob = createSpawnableEntity(
 
 /** @type {import('@dreamlab.gg/core/sdk').InitShared} */
 export const sharedInit = async game => {
-  let globalPassPlayerData = {};
-  
-  if (game.client) {
-    try {
-      globalPassPlayerData = JSON.parse(window.localStorage.getItem('globalPassedPlayerData'));
-    } catch {
-      console.log("JSON parse error for globalPassedPlayerData")
-    }
-  }  
-
-  console.log(globalPassPlayerData)
   game.register('@dreamlab/Hittable', createHittableMob)
 
   await game.spawnMany(...level)
