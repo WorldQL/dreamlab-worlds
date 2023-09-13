@@ -7,7 +7,7 @@ export const init = async game => {
   game.spawn({
     entity: '@dreamlab/Hittable',
     args: [],
-    transform: { position: [0, -100] },
+    transform: { position: [0, 400] },
     tags: ['net/replicated'],
   })
 }

@@ -8,15 +8,15 @@ import { Container, Graphics } from 'pixi.js'
 
 export const level = [
   {
-    entity: '@dreamlab/Solid',
-    args: [5_000, 50],
+    entity: '@dreamlab/Solid', // spawn floor
+    args: [1_000, 50],
     transform: {
       position: { x: 0, y: 295 },
       rotation: 0,
     },
   },
   {
-    entity: '@dreamlab/Solid',
+    entity: '@dreamlab/Solid', // left wall
     args: [5_000, 50],
     transform: {
       position: { x: -2_500, y: 295 },
@@ -24,10 +24,34 @@ export const level = [
     },
   },
   {
-    entity: '@dreamlab/Solid',
+    entity: '@dreamlab/Solid', // right wall
     args: [5_000, 50],
     transform: {
       position: { x: 2_500, y: 295 },
+      rotation: 90,
+    },
+  },
+  {
+    entity: '@dreamlab/Solid', // first mob floor
+    args: [3_000, 50],
+    transform: {
+      position: { x: 0, y: 1_000 },
+      rotation: 0,
+    },
+  },
+  {
+    entity: '@dreamlab/Solid', // first floor wall left
+    args: [100, 50],
+    transform: {
+      position: { x: -1_500, y: 1_000 },
+      rotation: 90,
+    },
+  },
+  {
+    entity: '@dreamlab/Solid', // first floor wall right
+    args: [100, 50],
+    transform: {
+      position: { x: 1_500, y: 1_000 },
       rotation: 90,
     },
   },
@@ -198,7 +222,7 @@ const createHittableMob = createSpawnableEntity(
         const speed = 2
         const collisionCheckDistance = speed + 10
 
-        const sideCheckHeight = height / 4
+        const sideCheckHeight = height - 10 // minus 10 pixels so that it doesnt detect the floor
         const potentialCollisionArea = {
           min: {
             x:
