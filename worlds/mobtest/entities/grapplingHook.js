@@ -94,6 +94,7 @@ export const createGrapplingHook = createSpawnableEntity(
 
       init({ game }) {
         game.physics.register(this, body)
+        game.client?.inputs.registerInput('@dreamlab/hook', 'ShiftLeft')
 
         return { game, body }
       },
@@ -154,7 +155,7 @@ export const createGrapplingHook = createSpawnableEntity(
         if (!playerBody) return
 
         const inputs = game.client?.inputs
-        const isCrouching = inputs?.getInput('@player/crouch') ?? false
+        const isCrouching = inputs?.getInput('@dreamlab/hook') ?? false
 
         if (isCrouching && cursorPosition) {
           if (body.render.visible === false) {
