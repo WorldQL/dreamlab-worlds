@@ -62,15 +62,14 @@ export const createGrapplingHook = createSpawnableEntity(
   ({ tags, transform, zIndex }, spriteSource) => {
     const { position } = transform
 
-    const PLAYER_CATEGORY = 0x0001
     const HOOK_CATEGORY = 0x0004
 
     const body = Matter.Bodies.circle(position.x, position.y, 10, {
       label: 'grapplingHook',
-      render: { visible: true },
+      render: { visible: false },
       collisionFilter: {
         category: HOOK_CATEGORY,
-        mask: PLAYER_CATEGORY,
+        mask: 0x0000, 
       },
 
       frictionAir: 0.2,
@@ -158,6 +157,11 @@ export const createGrapplingHook = createSpawnableEntity(
         const isCrouching = inputs?.getInput('@player/crouch') ?? false
 
         if (isCrouching && cursorPosition) {
+          if (body.render.visible === false) {
+            Matter.Body.setPosition(body, playerBody.position);
+            body.render.visible = true;
+          }
+
           const reachedTarget = distance(body.position, cursorPosition) <= 1
 
           if (!reachedTarget) {
@@ -177,7 +181,9 @@ export const createGrapplingHook = createSpawnableEntity(
             )
             Matter.Body.applyForce(playerBody, playerBody.position, pullForce)
           }
-        }
+        } else if (!isCrouching) {
+            body.render.visible = false;
+          }
       },
 
       onRenderFrame(
@@ -189,14 +195,19 @@ export const createGrapplingHook = createSpawnableEntity(
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
         const pos = Vec.add(smoothed, camera.offset)
 
-        container.position = pos
-        container.rotation = body.angle
-
-        const alpha = debug.value ? 0.5 : 0
-        gfxBounds.alpha = alpha
-
-        if (sprite) {
-          sprite.position = pos
+        if (body.render.visible) {
+            gfxBounds.visible = true
+            container.position = pos
+            container.rotation = body.angle
+    
+            const alpha = debug.value ? 0.5 : 0
+            gfxBounds.alpha = alpha
+    
+            if (sprite) {
+              sprite.position = pos
+            }
+        } else {
+            gfxBounds.visible = false
         }
       },
     }
