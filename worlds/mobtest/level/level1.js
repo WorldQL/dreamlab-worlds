@@ -79,4 +79,14 @@ export const level = [
       rotation: 0,
     },
   },
+  {
+    entity: '@dreamlab/Elevator',
+    args: [],
+    transform: { position: [-2_375, 1_475] },
+  },
+  {
+    entity: '@dreamlab/Elevator',
+    args: [],
+    transform: { position: [2_375, 1_475] },
+  }
 ]

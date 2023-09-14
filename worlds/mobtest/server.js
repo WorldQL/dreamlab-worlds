@@ -10,16 +10,4 @@ export const init = async game => {
     transform: { position: [0, 400] },
     tags: ['net/replicated'],
   })
-  game.spawn({
-    entity: '@dreamlab/Elevator',
-    args: [],
-    transform: { position: [2_375, 1_475] },
-    tags: ['net/replicated'],
-  })
-  game.spawn({
-    entity: '@dreamlab/Elevator',
-    args: [],
-    transform: { position: [-2_375, 1_475] },
-    tags: ['net/replicated'],
-  })
 }
