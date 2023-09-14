@@ -11,18 +11,18 @@ export const createElevator = createSpawnableEntity(
     const width = 150
     const height = 1_000
     const body = Matter.Bodies.rectangle(
-        position.x,
-        position.y,
-        width,
-        height,
-        {
-          label: 'solid',
-          render: { visible: false },
-  
-          isStatic: true,
-          friction: 0,
-        },
-      )
+      position.x,
+      position.y,
+      width,
+      height,
+      {
+        label: 'solid',
+        render: { visible: false },
+
+        isStatic: true,
+        friction: 0,
+      },
+    )
 
     return {
       get tags() {
@@ -89,7 +89,7 @@ export const createElevator = createSpawnableEntity(
 
         const player = entitiesInArea.find(ev => ev.label === 'player')
         if (player) {
-            Matter.Body.applyForce(player, player.position, { x: 0, y: -0.5 });
+          Matter.Body.applyForce(player, player.position, { x: 0, y: -0.5 })
         }
       },
 
