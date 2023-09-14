@@ -6,11 +6,20 @@ export const level = [
     transform: { position: [0, 0] },
   },
   {
-    entity: '@dreamlab/Platform', // spawn floor
-    args: [1_000, 50, '/worlds/mobtest/assets/img/platform22.png'],
+    entity: '@dreamlab/Solid', // spawn floor
+    args: [1_000, 50],
     zIndex: 50,
     transform: {
       position: { x: 0, y: 295 },
+      rotation: 0,
+    },
+  },
+  {
+    entity: '@dreamlab/Freeform', // spawn floor
+    args: [1_000, 250, '/worlds/mobtest/assets/img/platform5.png'],
+    zIndex: 50,
+    transform: {
+      position: { x: 0, y: 395 },
       rotation: 0,
     },
   },
@@ -40,9 +49,9 @@ export const level = [
   },
   {
     entity: '@dreamlab/Freeform', // bottom mob floor
-    args: [3_000, 50, '/worlds/mobtest/assets/img/platform5.png'],
+    args: [3_000, 500, '/worlds/mobtest/assets/img/platform5.png'],
     transform: {
-      position: { x: 0, y: 1_000 },
+      position: { x: 0, y: 1_200 },
       rotation: 0,
     },
   },
