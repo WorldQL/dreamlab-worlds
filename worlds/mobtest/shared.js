@@ -1,6 +1,7 @@
 import { createBackground } from './entities/background.js'
 import { createElevator } from './entities/elevator.js'
 import { createFreeform } from './entities/freeform.js'
+import { createGrapplingHook } from './entities/grapplingHook.js'
 import { createHittableMob } from './entities/mobs/basic.js'
 import { createPlatform } from './entities/platform.js'
 import { balls } from './level/ball-floor.js'
@@ -14,6 +15,7 @@ export const sharedInit = async game => {
   game.register('@dreamlab/Background', createBackground)
   game.register('@dreamlab/Platform', createPlatform)
   game.register('@dreamlab/Freeform', createFreeform)
+  game.register('@dreamlab/Hook', createGrapplingHook)
 
   await game.spawnMany(...level1, ...balls, ...level2)
 }

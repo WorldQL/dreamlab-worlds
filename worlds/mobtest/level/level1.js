@@ -71,4 +71,12 @@ export const level = [
       rotation: 90,
     },
   },
+  {
+    entity: '@dreamlab/Hook',
+    args: [50, 50],
+    transform: {
+      position: { x: 0, y: 0 },
+      rotation: 0,
+    },
+  },
 ]
