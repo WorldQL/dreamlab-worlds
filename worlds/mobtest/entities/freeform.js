@@ -4,16 +4,14 @@ import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import { Container, Graphics } from 'pixi.js'
 
-export const createBackground = createSpawnableEntity(
+export const createFreeform = createSpawnableEntity(
   (
     { tags, transform, zIndex },
     width,
     height,
-    textureURL,
-    parallaxX,
-    parallaxY,
+    spriteSource,
   ) => {
-    const { position } = transform
+    const { position, rotation } = transform
 
     return {
       get position() {
@@ -43,8 +41,8 @@ export const createBackground = createSpawnableEntity(
         const graphics = new Graphics()
         graphics.zIndex = zIndex
         const sprite =
-          typeof textureURL === 'string'
-            ? createSprite(textureURL, {
+          typeof spriteSource === 'string'
+            ? createSprite(spriteSource, {
                 width: Number(width),
                 height: Number(height),
                 zIndex,
@@ -79,30 +77,19 @@ export const createBackground = createSpawnableEntity(
 
       onPhysicsStep() {},
 
-      onRenderFrame(_, { game }, { camera, container, graphics, sprite }) {
-        const debug = game.debug;
-        
-        const zoomAdjustedParallaxX = Number(parallaxX) * camera.zoomScale;
-        const zoomAdjustedParallaxY = Number(parallaxY) * camera.zoomScale;
-        
-        const parallaxPos = Vec.create(
-          position.x + (camera.offset.x * zoomAdjustedParallaxX),
-          position.y + (camera.offset.y * zoomAdjustedParallaxY)
-        );
-    
-        container.position = parallaxPos;
-        
-        if (sprite) {
-          sprite.scale.set(1 / camera.zoomScale, 1 / camera.zoomScale);
+      onRenderFrame(_, { game }, { camera, graphics, sprite }) {
+        const debug = game.debug
+        const pos = Vec.add(position, camera.offset)
 
-          sprite.position = parallaxPos;
+        graphics.position = pos
+        graphics.angle = rotation
+        graphics.alpha = debug.value ? 0.5 : 0
+
+        if (sprite) {
+          sprite.position = pos
+          sprite.angle = rotation
         }
-    
-        const alpha = debug.value ? 0.5 : 0;
-        graphics.alpha = alpha;
-    }
-    
-      
+      },
     }
   },
 )
