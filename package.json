@@ -7,7 +7,7 @@
     "fmt": "npm run format"
   },
   "devDependencies": {
-    "@dreamlab.gg/core": "file:../dreamlab-core",
+    "@dreamlab.gg/core": "^0.0.36",
     "@luludev/eslint-config": "^0.4.2",
     "eslint": "^8.48.0",
     "prettier": "^3.0.2"
