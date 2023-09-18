@@ -48,5 +48,5 @@ export const level1 = [
       position: { x: 1_500, y: 1_000 },
       rotation: 90,
     },
-  }
+  },
 ]
