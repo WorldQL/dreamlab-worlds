@@ -19,5 +19,5 @@
 
     "outDir": "dist"
   },
-  "include": ["esm.d.ts", "client.tsx"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

@@ -1,8 +1,8 @@
 // WIP
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
-import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
-import { drawBox } from '@dreamlab.gg/core/utils'
+import { cloneTransform, Vec } from '@dreamlab.gg/core/dist/math'
+import { drawBox } from '@dreamlab.gg/core/dist/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 

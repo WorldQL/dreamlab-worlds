@@ -1,7 +1,7 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { Camera } from '@dreamlab.gg/core/dist/entities'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
-import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import { cloneTransform, Vec } from '@dreamlab.gg/core/dist/math'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
