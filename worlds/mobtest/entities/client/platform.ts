@@ -1,25 +1,36 @@
+// WIP
 import { createSpawnableEntity } from '@dreamlab.gg/core'
+import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
-export const createElevator = createSpawnableEntity(
-  ({ tags, transform, zIndex }) => {
+export const createPlatform = createSpawnableEntity(
+  (
+    { tags, transform, zIndex },
+    width: number,
+    height: number,
+    spriteSource: string,
+  ) => {
     const { position } = transform
 
-    const width = 150
-    const height = 1_000
+    const PLAYER_CATEGORY = 0x0001
+    const PLATFORM_CATEGORY = 0x0002
+
     const body = Matter.Bodies.rectangle(
       position.x,
       position.y,
       width,
       height,
       {
-        label: 'solid',
-        render: { visible: false },
-
+        label: 'platform',
+        render: { visible: true },
         isStatic: true,
+        collisionFilter: {
+          category: PLATFORM_CATEGORY,
+          mask: PLAYER_CATEGORY,
+        },
         friction: 0,
       },
     )
@@ -47,17 +58,28 @@ export const createElevator = createSpawnableEntity(
         const container = new Container()
         container.sortableChildren = true
         container.zIndex = zIndex
-
         const gfxBounds = new Graphics()
-        drawBox(gfxBounds, { width, height }, { stroke: '#00f' })
+        gfxBounds.zIndex = zIndex
+        const sprite = createSprite(spriteSource, {
+          width,
+          height,
+          zIndex,
+        })
 
-        container.addChild(gfxBounds)
+        if (sprite) {
+          container.addChild(sprite)
+        } else {
+          drawBox(gfxBounds, { width, height }, { stroke: '#00f' })
+          container.addChild(gfxBounds)
+        }
+
         stage.addChild(container)
 
         return {
           camera,
           container,
           gfxBounds,
+          sprite,
         }
       },
 
@@ -73,27 +95,28 @@ export const createElevator = createSpawnableEntity(
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
-        const entitiesInArea = Matter.Query.region(
-          game.physics.engine.world.bodies,
-          Matter.Bounds.create([
-            {
-              x: body.position.x - width / 2,
-              y: body.position.y - height / 2,
-            },
-            {
-              x: body.position.x + width / 2,
-              y: body.position.y + height / 2,
-            },
-          ]),
-        )
+        const playerBody = Matter.Composite.allBodies(
+          game.physics.engine.world,
+        ).find(b => b.label === 'player')
 
-        const player = entitiesInArea.find(ev => ev.label === 'player')
-        if (player) {
-          Matter.Body.applyForce(player, player.position, { x: 0, y: -0.5 })
-        }
+        if (!playerBody) return
+
+        const collisions = Matter.Query.collides(body, [playerBody])
+
+        const inputs = game.client?.inputs
+        const isCrouching = inputs?.getInput('@player/crouch') ?? false
+
+        body.collisionFilter.mask =
+          collisions.length > 0 && isCrouching ? 0x0000 : PLAYER_CATEGORY
+
+        body.isSensor = Boolean(collisions.length > 0 && isCrouching)
       },
 
-      onRenderFrame({ smooth }, { game }, { camera, container, gfxBounds }) {
+      onRenderFrame(
+        { smooth },
+        { game },
+        { camera, container, gfxBounds, sprite },
+      ) {
         const debug = game.debug
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
         const pos = Vec.add(smoothed, camera.offset)
@@ -103,6 +126,10 @@ export const createElevator = createSpawnableEntity(
 
         const alpha = debug.value ? 0.5 : 0
         gfxBounds.alpha = alpha
+
+        if (sprite) {
+          sprite.position = pos
+        }
       },
     }
   },

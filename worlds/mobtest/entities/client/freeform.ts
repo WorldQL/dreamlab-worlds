@@ -7,9 +7,9 @@ import { Container, Graphics } from 'pixi.js'
 export const createFreeform = createSpawnableEntity(
   (
     { tags, transform, zIndex },
-    width,
-    height,
-    spriteSource,
+    width: number,
+    height: number,
+    spriteSource: string,
   ) => {
     const { position, rotation } = transform
 
@@ -40,23 +40,16 @@ export const createFreeform = createSpawnableEntity(
         container.zIndex = zIndex
         const graphics = new Graphics()
         graphics.zIndex = zIndex
-        const sprite =
-          typeof spriteSource === 'string'
-            ? createSprite(spriteSource, {
-                width: Number(width),
-                height: Number(height),
-                zIndex,
-              })
-            : undefined
+        const sprite = createSprite(spriteSource, {
+          width,
+          height,
+          zIndex,
+        })
 
         if (sprite) {
           container.addChild(sprite)
         } else {
-          drawBox(
-            graphics,
-            { width: Number(width), height: Number(height) },
-            { stroke: '#00f' },
-          )
+          drawBox(graphics, { width, height }, { stroke: '#00f' })
           container.addChild(graphics)
         }
 

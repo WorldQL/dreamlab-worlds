@@ -7,11 +7,11 @@ import { Container, Graphics } from 'pixi.js'
 export const createBackground = createSpawnableEntity(
   (
     { tags, transform, zIndex },
-    width,
-    height,
-    textureURL,
-    parallaxX,
-    parallaxY,
+    width: number,
+    height: number,
+    textureURL: string,
+    parallaxX: number,
+    parallaxY: number,
   ) => {
     const { position } = transform
 
@@ -42,23 +42,16 @@ export const createBackground = createSpawnableEntity(
         container.zIndex = zIndex
         const graphics = new Graphics()
         graphics.zIndex = zIndex
-        const sprite =
-          typeof textureURL === 'string'
-            ? createSprite(textureURL, {
-                width: Number(width),
-                height: Number(height),
-                zIndex,
-              })
-            : undefined
+        const sprite = createSprite(textureURL, {
+          width: width,
+          height: height,
+          zIndex,
+        })
 
         if (sprite) {
           container.addChild(sprite)
         } else {
-          drawBox(
-            graphics,
-            { width: Number(width), height: Number(height) },
-            { stroke: '#00f' },
-          )
+          drawBox(graphics, { width, height }, { stroke: '#00f' })
           container.addChild(graphics)
         }
 
@@ -80,29 +73,27 @@ export const createBackground = createSpawnableEntity(
       onPhysicsStep() {},
 
       onRenderFrame(_, { game }, { camera, container, graphics, sprite }) {
-        const debug = game.debug;
-        
-        const zoomAdjustedParallaxX = Number(parallaxX) * camera.zoomScale;
-        const zoomAdjustedParallaxY = Number(parallaxY) * camera.zoomScale;
-        
-        const parallaxPos = Vec.create(
-          position.x + (camera.offset.x * zoomAdjustedParallaxX),
-          position.y + (camera.offset.y * zoomAdjustedParallaxY)
-        );
-    
-        container.position = parallaxPos;
-        
-        if (sprite) {
-          sprite.scale.set(1 / camera.zoomScale, 1 / camera.zoomScale);
+        const debug = game.debug
 
-          sprite.position = parallaxPos;
+        const zoomAdjustedParallaxX = parallaxX * camera.zoomScale
+        const zoomAdjustedParallaxY = parallaxY * camera.zoomScale
+
+        const parallaxPos = Vec.create(
+          position.x + camera.offset.x * zoomAdjustedParallaxX,
+          position.y + camera.offset.y * zoomAdjustedParallaxY,
+        )
+
+        container.position = parallaxPos
+
+        if (sprite) {
+          sprite.scale.set(1 / camera.zoomScale, 1 / camera.zoomScale)
+
+          sprite.position = parallaxPos
         }
-    
-        const alpha = debug.value ? 0.5 : 0;
-        graphics.alpha = alpha;
-    }
-    
-      
+
+        const alpha = debug.value ? 0.5 : 0
+        graphics.alpha = alpha
+      },
     }
   },
 )

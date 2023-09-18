@@ -10,7 +10,7 @@ export const balls = [
   },
   {
     entity: '@dreamlab/Freeform', // bottom floor
-    args: [5_000, 500, "/worlds/mobtest/assets/img/platform11.png"],
+    args: [5_000, 500, '/worlds/mobtest/assets/img/platform11.png'],
     transform: {
       position: { x: 0, y: 2_050 },
       rotation: 0,

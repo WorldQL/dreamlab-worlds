@@ -80,13 +80,13 @@ export const level = [
     },
   },
   {
-    entity: '@dreamlab/Elevator',
+    entity: '@dreamlab/Ladder',
     args: [],
     transform: { position: [-2_375, 1_475] },
   },
   {
-    entity: '@dreamlab/Elevator',
+    entity: '@dreamlab/Ladder',
     args: [],
     transform: { position: [2_375, 1_475] },
-  }
+  },
 ]

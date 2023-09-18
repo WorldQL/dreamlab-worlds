@@ -1,65 +1,36 @@
-/*
-
-W I P
-
-*/
-
 import { createSpawnableEntity } from '@dreamlab.gg/core'
+import { Camera } from '@dreamlab.gg/core/dist/entities'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
-/**
- * Subtract two vectors.
- *
- * @typedef {object} Vector
- * @property {number} x - The X component of the vector.
- * @property {number} y - The Y component of the vector.
- * @param {Vector} v1 - First vector.
- * @param {Vector} v2 - Second vector.
- * @returns {Vector} - Resulting vector after subtraction.
- */
+interface Vector {
+  x: number
+  y: number
+}
 
-function subtract(v1, v2) {
+const subtract = (v1: Vector, v2: Vector): Vector => {
   return { x: v1.x - v2.x, y: v1.y - v2.y }
 }
 
-/**
- * Calculate distance between two vectors.
- *
- * @param {Vector} v1 - First vector.
- * @param {Vector} v2 - Second vector.
- * @returns {number} - Distance between two vectors.
- */
-function distance(v1, v2) {
+const distance = (v1: Vector, v2: Vector): number => {
   return Math.sqrt((v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2)
 }
 
-/**
- * @type {Vector | undefined}
- */
-let cursorPosition
+let cursorPosition: Vector | undefined
 
-const onPointerOut = () => {
+const onPointerOut = (): void => {
   cursorPosition = undefined
 }
 
-/**
- * Update cursorPosition when pointer moves.
- *
- * @param {PointerEvent} ev
- */
-const onPointerMove = (
-  ev,
-  /** @type {import("@dreamlab.gg/core/dist/network-faff88d5").C} */ camera,
-) => {
+const onPointerMove = (ev: PointerEvent, camera: Camera): void => {
   const screenPosition = Vec.create(ev.offsetX, ev.offsetY)
   cursorPosition = camera.localToWorld(screenPosition)
 }
 
 export const createGrapplingHook = createSpawnableEntity(
-  ({ tags, transform, zIndex }, spriteSource) => {
+  ({ tags, transform, zIndex }, spriteSource: string) => {
     const { position } = transform
 
     const HOOK_CATEGORY = 0x0004
@@ -69,7 +40,7 @@ export const createGrapplingHook = createSpawnableEntity(
       render: { visible: false },
       collisionFilter: {
         category: HOOK_CATEGORY,
-        mask: 0x0000, 
+        mask: 0x0000,
       },
 
       frictionAir: 0.2,
@@ -105,10 +76,7 @@ export const createGrapplingHook = createSpawnableEntity(
         container.zIndex = zIndex
         const gfxBounds = new Graphics()
         gfxBounds.zIndex = zIndex
-        const sprite =
-          typeof spriteSource === 'string'
-            ? createSprite(spriteSource)
-            : undefined
+        const sprite = createSprite(spriteSource)
 
         if (sprite) {
           container.addChild(sprite)
@@ -159,8 +127,8 @@ export const createGrapplingHook = createSpawnableEntity(
 
         if (isCrouching && cursorPosition) {
           if (body.render.visible === false) {
-            Matter.Body.setPosition(body, playerBody.position);
-            body.render.visible = true;
+            Matter.Body.setPosition(body, playerBody.position)
+            body.render.visible = true
           }
 
           const reachedTarget = distance(body.position, cursorPosition) <= 1
@@ -183,8 +151,8 @@ export const createGrapplingHook = createSpawnableEntity(
             Matter.Body.applyForce(playerBody, playerBody.position, pullForce)
           }
         } else if (!isCrouching) {
-            body.render.visible = false;
-          }
+          body.render.visible = false
+        }
       },
 
       onRenderFrame(
@@ -197,18 +165,18 @@ export const createGrapplingHook = createSpawnableEntity(
         const pos = Vec.add(smoothed, camera.offset)
 
         if (body.render.visible) {
-            gfxBounds.visible = true
-            container.position = pos
-            container.rotation = body.angle
-    
-            const alpha = debug.value ? 0.5 : 0
-            gfxBounds.alpha = alpha
-    
-            if (sprite) {
-              sprite.position = pos
-            }
+          gfxBounds.visible = true
+          container.position = pos
+          container.rotation = body.angle
+
+          const alpha = debug.value ? 0.5 : 0
+          gfxBounds.alpha = alpha
+
+          if (sprite) {
+            sprite.position = pos
+          }
         } else {
-            gfxBounds.visible = false
+          gfxBounds.visible = false
         }
       },
     }
