@@ -1,8 +1,8 @@
 // WIP
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { createSprite } from '@dreamlab.gg/core/dist/textures'
-import { cloneTransform, Vec } from '@dreamlab.gg/core/dist/math'
-import { drawBox } from '@dreamlab.gg/core/dist/utils'
+import { createSprite } from '@dreamlab.gg/core/textures'
+import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
@@ -11,7 +11,7 @@ export const createPlatform = createSpawnableEntity(
     { tags, transform, zIndex },
     width: number,
     height: number,
-    spriteSource: string,
+    spriteSource?: string,
   ) => {
     const { position } = transform
 
@@ -60,11 +60,13 @@ export const createPlatform = createSpawnableEntity(
         container.zIndex = zIndex
         const gfxBounds = new Graphics()
         gfxBounds.zIndex = zIndex
-        const sprite = createSprite(spriteSource, {
-          width,
-          height,
-          zIndex,
-        })
+        const sprite = spriteSource
+          ? createSprite(spriteSource, {
+              width,
+              height,
+              zIndex,
+            })
+          : undefined
 
         if (sprite) {
           container.addChild(sprite)

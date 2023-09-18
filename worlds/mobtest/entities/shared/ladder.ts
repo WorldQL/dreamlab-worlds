@@ -1,6 +1,6 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { cloneTransform, Vec } from '@dreamlab.gg/core/dist/math'
-import { drawBox } from '@dreamlab.gg/core/dist/utils'
+import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
@@ -19,6 +19,7 @@ export const createLadder = createSpawnableEntity(
         label: 'solid',
         render: { visible: false },
 
+        isSensor: false,
         isStatic: true,
         friction: 0,
       },

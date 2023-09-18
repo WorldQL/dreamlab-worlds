@@ -49,14 +49,6 @@ export const level1 = [
       rotation: 90,
     },
   },
-  // {
-  //   entity: '@dreamlab/Hook',
-  //   args: [],
-  //   transform: {
-  //     position: { x: 0, y: 0 },
-  //     rotation: 0,
-  //   },
-  // },
   {
     entity: '@dreamlab/Ladder',
     args: [],

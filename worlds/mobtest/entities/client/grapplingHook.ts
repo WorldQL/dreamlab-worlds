@@ -1,7 +1,9 @@
+// wip
+// - sprites are in wrong position, show be same position as the graphic
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { Camera } from '@dreamlab.gg/core/dist/entities'
-import { createSprite } from '@dreamlab.gg/core/dist/textures'
-import { cloneTransform, Vec } from '@dreamlab.gg/core/dist/math'
+import { Camera } from '@dreamlab.gg/core/entities'
+import { createSprite } from '@dreamlab.gg/core/textures'
+import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
@@ -30,7 +32,12 @@ const onPointerMove = (ev: PointerEvent, camera: Camera): void => {
 }
 
 export const createGrapplingHook = createSpawnableEntity(
-  ({ tags, transform, zIndex }, spriteSource: string) => {
+  (
+    { tags, transform, zIndex },
+    width: number,
+    height: number,
+    spriteSource?: string,
+  ) => {
     const { position } = transform
 
     const HOOK_CATEGORY = 0x0004
@@ -76,7 +83,13 @@ export const createGrapplingHook = createSpawnableEntity(
         container.zIndex = zIndex
         const gfxBounds = new Graphics()
         gfxBounds.zIndex = zIndex
-        const sprite = createSprite(spriteSource)
+        const sprite = spriteSource
+          ? createSprite(spriteSource, {
+              width,
+              height,
+              zIndex,
+            })
+          : undefined
 
         if (sprite) {
           container.addChild(sprite)
@@ -155,16 +168,10 @@ export const createGrapplingHook = createSpawnableEntity(
         }
       },
 
-      onRenderFrame(
-        { smooth },
-        { game },
-        { camera, container, gfxBounds, sprite },
-      ) {
-        const debug = game.debug
-        const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
-        const pos = Vec.add(smoothed, camera.offset)
-
+      onRenderFrame(_, { game }, { camera, container, gfxBounds, sprite }) {
         if (body.render.visible) {
+          const debug = game.debug
+          const pos = Vec.add(body.position, camera.offset)
           gfxBounds.visible = true
           container.position = pos
           container.rotation = body.angle
@@ -173,10 +180,17 @@ export const createGrapplingHook = createSpawnableEntity(
           gfxBounds.alpha = alpha
 
           if (sprite) {
+            gfxBounds.visible = false
+
+            sprite.visible = true
             sprite.position = pos
+            sprite.rotation = body.angle
           }
         } else {
           gfxBounds.visible = false
+          if (sprite) {
+            sprite.visible = false
+          }
         }
       },
     }
