@@ -19,5 +19,5 @@
 
     "outDir": "dist"
   },
-  "include": ["**/*.ts", "**/*.tsx", "entities/shared/ladder.ts"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

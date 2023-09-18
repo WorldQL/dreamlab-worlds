@@ -14,7 +14,6 @@ export const init = async game => {
   game.register('@dreamlab/Freeform', createFreeform)
   game.register('@dreamlab/Hook', createGrapplingHook)
 
-  // levels & shared entities
   await sharedInit(game)
   await game.spawnMany(...images, ...map1)
 }

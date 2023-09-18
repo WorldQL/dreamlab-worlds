@@ -16,7 +16,7 @@ export const createLadder = createSpawnableEntity(
       width,
       height,
       {
-        label: 'solid',
+        label: 'ladder',
         render: { visible: false },
 
         isSensor: false,
@@ -90,14 +90,13 @@ export const createLadder = createSpawnableEntity(
 
         const player = entitiesInArea.find(ev => ev.label === 'player')
         if (player) {
-          Matter.Body.applyForce(player, player.position, { x: 0, y: -0.25 })
+          Matter.Body.applyForce(player, player.position, { x: 0, y: -0.1 })
         }
       },
 
-      onRenderFrame({ smooth }, { game }, { camera, container, gfxBounds }) {
+      onRenderFrame(_, { game }, { camera, container, gfxBounds }) {
         const debug = game.debug
-        const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
-        const pos = Vec.add(smoothed, camera.offset)
+        const pos = Vec.add(position, camera.offset)
 
         container.position = pos
         container.rotation = body.angle
