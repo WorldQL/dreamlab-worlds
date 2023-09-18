@@ -5,25 +5,10 @@ import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
 export const createLadder = createSpawnableEntity(
-  ({ tags, transform, zIndex }) => {
+  ({ tags, transform, zIndex }, width: number, height: number) => {
     const { position } = transform
 
-    const width = 150
-    const height = 1_000
-    const body = Matter.Bodies.rectangle(
-      position.x,
-      position.y,
-      width,
-      height,
-      {
-        label: 'ladder',
-        render: { visible: false },
-
-        isSensor: false,
-        isStatic: true,
-        friction: 0,
-      },
-    )
+    const body = Matter.Bodies.rectangle(position.x, position.y, width, height)
 
     return {
       get tags() {
@@ -34,7 +19,7 @@ export const createLadder = createSpawnableEntity(
         return cloneTransform(transform)
       },
 
-      isInBounds() {
+      isInBounds(position) {
         return Matter.Query.point([body], position).length > 0
       },
 

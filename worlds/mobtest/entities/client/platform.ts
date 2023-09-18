@@ -44,7 +44,7 @@ export const createPlatform = createSpawnableEntity(
         return cloneTransform(transform)
       },
 
-      isInBounds() {
+      isInBounds(position) {
         return Matter.Query.point([body], position).length > 0
       },
 
