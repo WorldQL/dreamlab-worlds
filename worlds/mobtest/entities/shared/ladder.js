@@ -90,7 +90,7 @@ export const createLadder = createSpawnableEntity(
 
         const player = entitiesInArea.find(ev => ev.label === 'player')
         if (player) {
-          Matter.Body.applyForce(player, player.position, { x: 0, y: -0.1 })
+          Matter.Body.applyForce(player, player.position, { x: 0, y: -0.2 })
         }
       },
 
