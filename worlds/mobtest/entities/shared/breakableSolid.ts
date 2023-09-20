@@ -119,59 +119,56 @@ export const createBreakableSolid = createSpawnableEntity(
       },
 
       onPhysicsStep(_, { game }) {
-        const entitiesInAreaLeft = Matter.Query.region(
-          game.physics.engine.world.bodies,
-          Matter.Bounds.create([
-            {
-              x: bodyLeft.position.x - halfWidth / 4,
-              y: bodyLeft.position.y - height / 2,
-            },
-            {
-              x: bodyLeft.position.x + halfWidth / 4,
-              y: bodyLeft.position.y + height / 2,
-            },
-          ]),
+        const getEntitiesInAreaOfBody = (
+          body: Matter.Body,
+          halfW: number,
+          h: number,
+        ) => {
+          return Matter.Query.region(
+            game.physics.engine.world.bodies,
+            Matter.Bounds.create([
+              { x: body.position.x - halfW / 4, y: body.position.y - h / 2 },
+              { x: body.position.x + halfW / 4, y: body.position.y + h / 2 },
+            ]),
+          )
+        }
+
+        const hasAttacker = (entities: any[]) => {
+          return entities.some(
+            (ev: { label: string }) =>
+              ev.label === 'player' || ev.label === 'weapon',
+          )
+        }
+
+        const entitiesInAreaLeft = getEntitiesInAreaOfBody(
+          bodyLeft,
+          halfWidth,
+          height,
+        )
+        const entitiesInAreaRight = getEntitiesInAreaOfBody(
+          bodyRight,
+          halfWidth,
+          height,
         )
 
-        const entitiesInAreaRight = Matter.Query.region(
-          game.physics.engine.world.bodies,
-          Matter.Bounds.create([
-            {
-              x: bodyRight.position.x - halfWidth / 4,
-              y: bodyRight.position.y - height / 2,
-            },
-            {
-              x: bodyRight.position.x + halfWidth / 4,
-              y: bodyRight.position.y + height / 2,
-            },
-          ]),
-        )
-
-        const attackerLeft = entitiesInAreaLeft.find(
-          ev => ev.label === 'player' || ev.label === 'weapon',
-        )
-        const attackerRight = entitiesInAreaRight.find(
-          ev => ev.label === 'player' || ev.label === 'weapon',
-        )
-
-        if ((attackerLeft || attackerRight) && !isBroken) {
+        if (
+          (hasAttacker(entitiesInAreaLeft) ||
+            hasAttacker(entitiesInAreaRight)) &&
+          !isBroken
+        ) {
           isBroken = true
-
-          Matter.Body.setStatic(bodyLeft, false)
-          Matter.Body.setStatic(bodyRight, false)
-          Matter.Body.applyForce(
-            bodyLeft,
-            { x: bodyLeft.position.x - halfWidth / 2, y: bodyLeft.position.y },
-            { x: -0.05, y: 0 },
-          )
-          Matter.Body.applyForce(
-            bodyRight,
-            {
-              x: bodyRight.position.x + halfWidth / 2,
-              y: bodyRight.position.y,
-            },
-            { x: 0.05, y: 0 },
-          )
+          ;[bodyLeft, bodyRight].forEach(body => {
+            Matter.Body.setStatic(body, false)
+            const forceDirection = body === bodyLeft ? -0.05 : 0.05
+            Matter.Body.applyForce(
+              body,
+              {
+                x: body.position.x + halfWidth * forceDirection,
+                y: body.position.y,
+              },
+              { x: forceDirection, y: 0 },
+            )
+          })
         }
       },
 
