@@ -1,4 +1,5 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
+import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, toRadians, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
@@ -80,10 +81,23 @@ export const createBreakableSolid = createSpawnableEntity(
         container.sortableChildren = true
         container.zIndex = zIndex
 
-        const gfxBoundsLeft = new Graphics()
-        const gfxBoundsRight = new Graphics()
+        let gfxBoundsLeft, gfxBoundsRight
 
-        if (!spriteSource) {
+        if (spriteSource) {
+          gfxBoundsLeft = createSprite(spriteSource, {
+            width: halfWidth,
+            height,
+          })
+          gfxBoundsRight = createSprite(spriteSource, {
+            width: halfWidth,
+            height,
+          })
+
+          gfxBoundsLeft.anchor.set(0.5, 0.5)
+          gfxBoundsRight.anchor.set(0.5, 0.5)
+        } else {
+          gfxBoundsLeft = new Graphics()
+          gfxBoundsRight = new Graphics()
           drawBox(
             gfxBoundsLeft,
             { width: halfWidth, height },
@@ -94,12 +108,10 @@ export const createBreakableSolid = createSpawnableEntity(
             { width: halfWidth, height },
             { stroke: '#964B00' },
           )
-
-          container.addChild(gfxBoundsLeft, gfxBoundsRight)
-          stage.addChild(container)
-        } else {
-          // handle sprites
         }
+
+        container.addChild(gfxBoundsLeft, gfxBoundsRight)
+        stage.addChild(container)
 
         return {
           camera,
@@ -183,9 +195,11 @@ export const createBreakableSolid = createSpawnableEntity(
         gfxBoundsLeft.rotation = bodyLeft.angle
         gfxBoundsRight.rotation = bodyRight.angle
 
-        const alpha = debug.value ? 0.5 : 0
-        gfxBoundsLeft.alpha = alpha
-        gfxBoundsRight.alpha = alpha
+        if (!spriteSource) {
+          const alpha = debug.value ? 0.5 : 0
+          gfxBoundsLeft.alpha = alpha
+          gfxBoundsRight.alpha = alpha
+        }
       },
     }
   },
