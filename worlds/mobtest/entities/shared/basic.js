@@ -176,27 +176,29 @@ export const createHittableMob = createSpawnableEntity(
       },
 
       onPhysicsStep({ delta }, { game, netClient }) {
+        const { position: bodyPosition } = body
+        const halfWidth = width / 2
+
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
         const speed = 2
         const collisionCheckDistance = speed + 10
+        const sideCheckHeight = height - 10
 
-        const sideCheckHeight = height - 10 // minus 10 pixels so that it doesnt detect the floor
+        const baseX =
+          direction === 1
+            ? bodyPosition.x + halfWidth
+            : bodyPosition.x - halfWidth
+
         const potentialCollisionArea = {
           min: {
-            x:
-              direction === 1
-                ? body.position.x + width / 2
-                : body.position.x - width / 2 - collisionCheckDistance,
-            y: body.position.y - sideCheckHeight / 2,
+            x: baseX - (direction === 1 ? 0 : collisionCheckDistance),
+            y: bodyPosition.y - sideCheckHeight / 2,
           },
           max: {
-            x:
-              direction === 1
-                ? body.position.x + width / 2 + collisionCheckDistance
-                : body.position.x - width / 2,
-            y: body.position.y + sideCheckHeight / 2,
+            x: baseX + (direction === 1 ? collisionCheckDistance : 0),
+            y: bodyPosition.y + sideCheckHeight / 2,
           },
         }
 
@@ -204,7 +206,6 @@ export const createHittableMob = createSpawnableEntity(
           game.physics.engine.world.bodies,
           potentialCollisionArea,
         )
-
         const collidingBody = bodiesInArea.find(b => b !== body)
 
         if (collidingBody) {
@@ -223,14 +224,13 @@ export const createHittableMob = createSpawnableEntity(
           const player = game.entities.find(isPlayer)
           if (!player) return
 
-          const dist = distance(player.position, body.position)
+          const dist = distance(player.position, bodyPosition)
           if (dist > hitRadius) return
 
           hitTimer += hitCooldown
           netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
         } else {
-          hitTimer -= delta
-          hitTimer = Math.max(hitTimer, 0)
+          hitTimer = Math.max(hitTimer - delta, 0)
         }
       },
 
