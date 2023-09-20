@@ -8,7 +8,13 @@ export const createLadder = createSpawnableEntity(
   ({ tags, transform, zIndex }, width: number, height: number) => {
     const { position } = transform
 
-    const body = Matter.Bodies.rectangle(position.x, position.y, width, height)
+    const body = Matter.Bodies.rectangle(
+      position.x,
+      position.y,
+      width,
+      height,
+      { isStatic: true },
+    )
 
     return {
       get tags() {
