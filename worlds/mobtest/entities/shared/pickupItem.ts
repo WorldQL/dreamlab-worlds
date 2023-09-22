@@ -127,8 +127,8 @@ export const createPickupItem = createSpawnableEntity(
               image: createSprite(spriteSource).texture,
               animationName, // animation type i.e "greatsword", "bow"
               itemOptions: {
-                anchorX: undefined,
-                anchorY: undefined,
+                anchorX: 0.5,
+                anchorY: 0.5,
                 hand: 'right',
               },
             }
