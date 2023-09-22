@@ -1,5 +1,6 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
+import { Item } from '@dreamlab.gg/core/dist/managers'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
@@ -120,13 +121,16 @@ export const createPickupItem = createSpawnableEntity(
             // }
 
             // *** Creating an item
-            const newItem = {
+            const newItem: Item = {
               id: 'goldbow123', // maybe we use cuid()
               displayName: itemDisplayName,
               image: createSprite(spriteSource).texture,
-              handlePointX: undefined, // hmmm maybe leave undefined? hard to describe what they should put here
-              handlePointY: undefined,
               animationName, // animation type i.e "greatsword", "bow"
+              itemOptions: {
+                anchorX: undefined,
+                anchorY: undefined,
+                hand: 'right',
+              },
             }
 
             // *** Adding the item to inventory
