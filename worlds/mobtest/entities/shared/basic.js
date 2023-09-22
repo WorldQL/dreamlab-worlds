@@ -223,7 +223,6 @@ export const createHittableMob = createSpawnableEntity(
         if (hit && hitTimer === 0) {
           const player = game.entities.find(isPlayer)
           if (!player) return
-
           const dist = distance(player.position, bodyPosition)
           if (dist > hitRadius) return
 

@@ -70,18 +70,13 @@ export const createFreeform = createSpawnableEntity(
 
       onPhysicsStep() {},
 
-      onRenderFrame(_, { game }, { camera, graphics, sprite }) {
+      onRenderFrame(_, { game }, { camera, container }) {
         const debug = game.debug
         const pos = Vec.add(position, camera.offset)
 
-        graphics.position = pos
-        graphics.angle = rotation
-        graphics.alpha = debug.value ? 0.5 : 0
-
-        if (sprite) {
-          sprite.position = pos
-          sprite.angle = rotation
-        }
+        container.position = pos
+        container.angle = rotation
+        container.alpha = debug.value ? 0.5 : 0
       },
     }
   },

@@ -10,6 +10,14 @@ export const level = [
     },
   },
   {
+    entity: '@dreamlab/PickupItem',
+    args: [200, 200, "/worlds/mobtest/assets/img/bow.png", "Gold Bow", "bow"],
+    transform: {
+      position: { x: 1_000, y: 400 },
+      rotation: 0,
+    },
+  },
+  {
     entity: '@dreamlab/Solid', // left spawn wall
     args: [250, 50],
     transform: {
@@ -25,14 +33,14 @@ export const level = [
       rotation: 90,
     },
   },
-  {
-    entity: '@dreamlab/BreakableSolid', // right spawn wall
-    args: [400, 50],
-    transform: {
-      position: { x: 475, y: -25 },
-      rotation: 90,
-    },
-  },
+//   {
+//     entity: '@dreamlab/BreakableSolid', // right spawn wall
+//     args: [400, 50],
+//     transform: {
+//       position: { x: 475, y: -25 },
+//       rotation: 90,
+//     },
+//   },
   {
     entity: '@dreamlab/BreakableSolid', // right spawn wall
     args: [400, 50],

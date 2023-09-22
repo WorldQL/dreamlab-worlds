@@ -1,16 +1,19 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
+import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
-export const createLadder = createSpawnableEntity(
+export const createPickupItem = createSpawnableEntity(
   (
     { tags, transform, zIndex },
     width: number,
     height: number,
     spriteSource: string,
+    itemDisplayName: string,
+    animationName: string,
   ) => {
     const { position } = transform
 
@@ -19,8 +22,13 @@ export const createLadder = createSpawnableEntity(
       position.y,
       width,
       height,
-      { isStatic: true },
+      { isStatic: true, render: { visible: true } },
     )
+
+    let pickedUp = false
+    let time = 0
+    const floatHeight = 5
+    const rotationSpeed = 0.01
 
     return {
       get tags() {
@@ -80,6 +88,7 @@ export const createLadder = createSpawnableEntity(
       },
 
       onPhysicsStep(_, { game }) {
+        if (pickedUp) return
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
@@ -97,26 +106,59 @@ export const createLadder = createSpawnableEntity(
           ]),
         )
 
-        const player = entitiesInArea.find(ev => ev.label === 'player')
-        if (player) {
-          Matter.Body.applyForce(player, player.position, { x: 0, y: -0.2 })
+        const playerCollided = entitiesInArea.find(ev => ev.label === 'player')
+        if (playerCollided) {
+          const player = game.entities.find(isPlayer)
+          if (player) {
+            const inventory = player.inventory
+            // *** Getting all inventory items
+            // const items = player.inventoryItems
+
+            // *** Removing all items
+            // for (const item of items) {
+            //   player.removeInventoryItem(item)
+            // }
+
+            // *** Creating an item
+            const newItem = {
+              id: 'goldbow123', // maybe we use cuid()
+              displayName: itemDisplayName,
+              image: createSprite(spriteSource).texture,
+              handlePointX: undefined, // hmmm maybe leave undefined? hard to describe what they should put here
+              handlePointY: undefined,
+              animationName, // animation type i.e "greatsword", "bow"
+            }
+
+            // *** Adding the item to inventory
+            inventory.addItem(newItem)
+            // *** Setting the current held item
+            inventory.setCurrentItem(newItem)
+            pickedUp = true
+            Matter.World.remove(game.physics.engine.world, body)
+          }
         }
       },
 
       onRenderFrame(_, { game }, { camera, container, gfxBounds, sprite }) {
-        const debug = game.debug
+        if (pickedUp) {
+          if (gfxBounds.visible) gfxBounds.visible = false
+          if (sprite) sprite.visible = false
+          return
+        }
+
+        time += 0.05
+
+        const yOffset = Math.sin(time) * floatHeight
         const pos = Vec.add(position, camera.offset)
+        pos.y += yOffset
+
+        container.rotation += rotationSpeed
 
         container.position = pos
-        container.rotation = body.angle
 
+        const debug = game.debug
         const alpha = debug.value ? 0.5 : 0
         gfxBounds.alpha = alpha
-
-        if (sprite) {
-          sprite.position = pos
-          sprite.angle = body.angle
-        }
       },
     }
   },
