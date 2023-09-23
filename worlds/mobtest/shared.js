@@ -5,6 +5,7 @@ import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/network'
 import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
+import { createTestBall } from './testBall.js'
 
 export const level = [
   {
@@ -224,6 +225,7 @@ const createHittableMob = createSpawnableEntity(
 /** @type {import('@dreamlab.gg/core/sdk').InitShared} */
 export const sharedInit = async game => {
   game.register('@dreamlab/Hittable', createHittableMob)
+  game.register('testBall', createTestBall)
 
   await game.spawnMany(...level)
 }
