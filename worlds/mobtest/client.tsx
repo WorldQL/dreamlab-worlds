@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useRef } from 'https://esm.sh/react@18.2.0'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import { Texture, Sprite, Renderer } from 'pixi.js'
-import type { InitClient } from '@dreamlab.gg/core/sdk'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 
 interface Item {
@@ -92,32 +91,30 @@ const App: FC<AppProps> = ({ items, currentItemIndex }) => (
   </div>
 )
 
-export const init: InitClient = async game => {
-  const uiContainer = document.createElement('div')
-  game.client.ui.add(uiContainer)
+const setupInventory = (game: {
+  entities: any[]
+  client: { ui: { add: (arg0: HTMLDivElement) => void } }
+}) => {
+  const player = game.entities.find(isPlayer)
+  if (player) {
+    const inventory = player.inventory
+    const items = inventory.getItems()
+    const currentItemIndex = items.indexOf(inventory.currentItem())
 
-  const setupReactApp = () => {
-    const player = game.entities.find(isPlayer)
-    if (player) {
-      console.log('hello?')
-      const inventory = player.inventory
-      const items = inventory.getItems()
-      const currentItemIndex = items.indexOf(inventory.currentItem())
-
-      const reactRoot = createRoot(uiContainer)
-      reactRoot.render(
-        <App items={items} currentItemIndex={currentItemIndex} />,
-      )
-
-      return true
-    }
-    return false
+    const uiContainer = document.createElement('div')
+    game.client.ui.add(uiContainer)
+    const reactRoot = createRoot(uiContainer)
+    reactRoot.render(<App items={items} currentItemIndex={currentItemIndex} />)
   }
+}
 
-  const intervalId = setInterval(() => {
-    const isSetupSuccessful = setupReactApp()
-    if (isSetupSuccessful) {
-      clearInterval(intervalId)
-    }
-  }, 100)
+const onPlayerInstantiate = (game: any) => {
+  game.events.common.addListener('onInstantiate', (entity: unknown) => {
+    if (!isPlayer(entity)) return
+    setupInventory(game)
+  })
+}
+
+export const initializeGameUI = (game: any) => {
+  onPlayerInstantiate(game)
 }
