@@ -116,9 +116,7 @@ export const createPickupItem = createSpawnableEntity(
             //const items = inventory.getItems()
 
             // *** Removing all items
-            // for (const item of items) {
-            //   inventory.removeItem(item)
-            // }
+            // inventory.clear()
 
             // *** Creating an item
             const newItem: Item = {

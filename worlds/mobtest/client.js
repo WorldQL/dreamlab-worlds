@@ -9,7 +9,6 @@ import { map1 } from './level/client/map1.js'
 
 /** @type {import('@dreamlab.gg/core/sdk').InitClient} */
 export const init = async game => {
-  await initReactClient(game)
   // entities
   game.register('@dreamlab/Background', createBackground)
   game.register('@dreamlab/Freeform', createFreeform)
@@ -19,4 +18,5 @@ export const init = async game => {
   await sharedInit(game)
   await game.spawn(...map1)
   // await game.spawn(...images)
+  await initReactClient(game)
 }
