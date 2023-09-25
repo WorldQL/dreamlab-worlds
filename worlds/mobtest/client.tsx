@@ -24,14 +24,14 @@ const HotbarItem: FC<HotbarItemProps> = ({ item, isSelected }) => {
   useEffect(() => {
     if (ref.current && item.image) {
       const sprite = new Sprite(item.image)
-      sprite.width = 90
-      sprite.height = 90
+      sprite.width = 60
+      sprite.height = 60
       sprite.x = 0
       sprite.y = 0
 
       const app = new Application({
-        width: 90,
-        height: 90,
+        width: 60,
+        height: 60,
         view: ref.current,
         background: '#fff',
       })
@@ -44,17 +44,21 @@ const HotbarItem: FC<HotbarItemProps> = ({ item, isSelected }) => {
     }
   }, [item.image])
 
-  return (
-    <canvas
-      ref={ref}
-      width='90'
-      height='90'
-      style={{
-        border: isSelected ? '2px solid blue' : '1px solid gray',
-        marginRight: '4px',
-      }}
-    />
-  )
+  const styles = {
+    border: isSelected
+      ? '3px solid cyan'
+      : '2px solid rgba(255, 255, 255, 0.2)',
+    marginRight: '10px',
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+    borderRadius: '8px',
+    transition: 'transform 0.2s',
+    transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+    '&:hover': {
+      transform: 'scale(1.05)',
+    },
+  }
+
+  return <canvas ref={ref} width='60' height='60' style={styles} />
 }
 
 interface HotbarProps {
@@ -66,18 +70,19 @@ const Hotbar: FC<HotbarProps> = ({ items, currentItemIndex }) => (
   <div
     style={{
       position: 'absolute',
-      bottom: '20px',
+      bottom: '30px',
       left: '50%',
       transform: 'translateX(-50%)',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      padding: '6px',
-      background: '#2c2c2c',
-      borderRadius: '4px',
+      padding: '10px',
+      background: 'linear-gradient(145deg, #292929, #1c1c1c)',
+      borderRadius: '16px',
+      boxShadow: '0px 6px 16px rgba(0, 0, 0, 0.2)',
     }}
   >
-    {items.map((item, index) => (
+    {items.slice(0, 4).map((item, index) => (
       <HotbarItem
         key={item.id}
         item={item}
