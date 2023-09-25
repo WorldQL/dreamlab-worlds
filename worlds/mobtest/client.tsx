@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef } from 'https://esm.sh/react@18.2.0'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
-import { Texture, Sprite, Renderer } from 'pixi.js'
+import { Texture, Application, Sprite } from 'pixi.js'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 
 interface Item {
@@ -15,24 +15,25 @@ interface HotbarItemProps {
 
 const HotbarItem: FC<HotbarItemProps> = ({ item, isSelected }) => {
   const ref = useRef<HTMLCanvasElement | null>(null)
-  const sprite = new Sprite(item.image)
 
   useEffect(() => {
-    if (ref.current && item.image.valid) {
-      const renderer = new Renderer({
+    if (ref.current && item.image) {
+      const sprite = new Sprite(item.image)
+      sprite.width = 40
+      sprite.height = 40
+      sprite.x = 0
+      sprite.y = 0
+
+      const app = new Application({
         width: 40,
         height: 40,
         view: ref.current,
       })
 
-      const renderSprite = () => {
-        renderer.render(sprite)
-      }
-
-      requestAnimationFrame(renderSprite)
+      app.stage.addChild(sprite)
 
       return () => {
-        renderer.destroy()
+        app.destroy()
       }
     }
   }, [item.image])
