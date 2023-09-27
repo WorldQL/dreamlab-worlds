@@ -14,14 +14,12 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
   useEffect(() => {
     if (ref.current) {
       if (slot && slot.texture) {
-        console.log(slot)
         const canvas = ref.current
         const sprite = new Sprite(slot.texture)
         sprite.width = 50
         sprite.height = 50
 
         if (!appRef.current) {
-          console.log('IN')
           appRef.current = new Application({
             width: 50,
             height: 50,
@@ -39,7 +37,6 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
 
     return () => {
       if (appRef.current) {
-        console.log('DESTROY')
         appRef.current.destroy(true)
         appRef.current = null
       }

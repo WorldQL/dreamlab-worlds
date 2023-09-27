@@ -25,16 +25,13 @@ const App: React.FC<{ game: any; player: any }> = ({ game, player }) => {
 
   useEffect(() => {
     const playerItems = player.inventory.getItems()
-
     const flatData = [...data.flat()]
-
     playerItems.forEach((item: InventorySlot, index: any) => {
       flatData[index] = item
     })
 
     const updatedData = []
     while (flatData.length) updatedData.push(flatData.splice(0, 9))
-
     setData(updatedData)
   }, [player])
 
