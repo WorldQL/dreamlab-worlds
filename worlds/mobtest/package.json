@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc -w"
   },
   "author": "",
   "devDependencies": {
