@@ -1,4 +1,4 @@
-import { initializeGameUI } from './dist/client.js'
+import { initializeGameUI } from './dist/inventory.js'
 import { sharedInit } from './shared.js'
 import { createBackground } from './dist/entities/client/background.js'
 import { createFreeform } from './dist/entities/client/freeform.js'
@@ -18,5 +18,6 @@ export const init = async game => {
   await sharedInit(game)
   await game.spawn(...map1)
   // await game.spawn(...images)
-  await initializeGameUI(game)
+
+  initializeGameUI(game)
 }

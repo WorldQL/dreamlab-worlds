@@ -5,7 +5,7 @@ import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
-import { Container, Graphics } from 'pixi.js'
+import { Container, Graphics, Texture } from 'pixi.js'
 
 export const createPickupItem = createSpawnableEntity(
   (
@@ -119,10 +119,11 @@ export const createPickupItem = createSpawnableEntity(
             // inventory.clear()
 
             // *** Creating an item
+            const texture = Texture.from(spriteSource)
             const newItem: Item = {
               id: 'goldbow123', // maybe we use cuid()
               displayName: itemDisplayName,
-              image: createSprite(spriteSource).texture,
+              texture,
               animationName, // animation type i.e "greatsword", "bow"
               itemOptions: {
                 anchorX: 0.5,
