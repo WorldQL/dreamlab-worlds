@@ -6,7 +6,7 @@ export const inventoryStyles: Record<string, CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     border: '2px solid #ccc',
-    width: '220px',
+    width: '465px',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: '5px',
   },

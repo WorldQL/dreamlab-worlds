@@ -45,9 +45,9 @@ const Inventory: React.FC<Props> = ({
               onDragStart={handleSlotDragStart(rowIndex, colIndex)}
               onDrop={handleSlotDragEnd(rowIndex, colIndex)}
               onDragOver={e => e.preventDefault()}
-              draggable={data[rowIndex][colIndex] !== undefined}
+              draggable={!!slot}
             >
-              <InventorySlot slot={slot} />
+              {slot && <InventorySlot slot={slot} />}
             </div>
           ))}
         </div>
