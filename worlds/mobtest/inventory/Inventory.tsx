@@ -67,6 +67,7 @@ const Inventory: React.FC<Props> = ({
             onDragOver={e => e.preventDefault()}
             draggable={!!slot}
           >
+            <div style={styles.weaponSlotNumber}>{colIndex + 1}</div>
             {slot && <InventorySlot slot={slot} />}
           </div>
         ))}
@@ -74,5 +75,4 @@ const Inventory: React.FC<Props> = ({
     </div>
   )
 }
-
 export default Inventory

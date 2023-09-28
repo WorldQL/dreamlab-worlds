@@ -54,6 +54,9 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <canvas ref={ref} width='50' height='50'></canvas>
+      {isHovered && slot?.displayName && (
+        <div style={styles.itemTooltip}>{slot.displayName}</div>
+      )}
     </div>
   )
 }

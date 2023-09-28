@@ -39,17 +39,13 @@ const App: React.FC<{ game: any; player: any }> = ({ game, player }) => {
     const handleDigitInput = () => {
       const weaponSlots = data[data.length - 1].slice(0, 4)
 
-      if (game.client?.inputs.getInput('@inventory/digit1') && weaponSlots[0]) {
-        player.inventory.setCurrentItem(weaponSlots[0])
-      }
-      if (game.client?.inputs.getInput('@inventory/digit2') && weaponSlots[1]) {
-        player.inventory.setCurrentItem(weaponSlots[1])
-      }
-      if (game.client?.inputs.getInput('@inventory/digit3') && weaponSlots[2]) {
-        player.inventory.setCurrentItem(weaponSlots[2])
-      }
-      if (game.client?.inputs.getInput('@inventory/digit4') && weaponSlots[3]) {
-        player.inventory.setCurrentItem(weaponSlots[3])
+      for (let i = 1; i <= 4; i++) {
+        if (
+          game.client?.inputs.getInput(`@inventory/digit${i}`) &&
+          weaponSlots[i - 1]
+        ) {
+          player.inventory.setCurrentItem(weaponSlots[i - 1])
+        }
       }
 
       requestAnimationFrame(handleDigitInput)
