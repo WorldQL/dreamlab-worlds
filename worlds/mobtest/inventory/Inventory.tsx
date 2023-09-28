@@ -35,7 +35,9 @@ const Inventory: React.FC<Props> = ({
 
   return (
     <div style={styles.inventory}>
-      {data.map((row, rowIndex) => (
+      <h2 style={styles.inventoryTitle}>Inventory</h2>
+
+      {data.slice(0, -1).map((row, rowIndex) => (
         <div key={rowIndex} style={styles.inventoryRow}>
           {row.map((slot, colIndex) => (
             <div
@@ -52,6 +54,23 @@ const Inventory: React.FC<Props> = ({
           ))}
         </div>
       ))}
+
+      <div style={styles.weaponSlots}>
+        <h2 style={styles.inventoryTitle}>Weapons</h2>
+        {data[data.length - 1].slice(0, 4).map((slot, colIndex) => (
+          <div
+            key={colIndex}
+            style={styles.inventorySlot}
+            onClick={handleSlotClick(data.length - 1, colIndex)}
+            onDragStart={handleSlotDragStart(data.length - 1, colIndex)}
+            onDrop={handleSlotDragEnd(data.length - 1, colIndex)}
+            onDragOver={e => e.preventDefault()}
+            draggable={!!slot}
+          >
+            {slot && <InventorySlot slot={slot} />}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

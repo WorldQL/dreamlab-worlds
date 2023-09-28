@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'https://esm.sh/react@18.2.0'
+import React, { useRef, useEffect, useState } from 'https://esm.sh/react@18.2.0'
 import { Application, Sprite } from 'pixi.js'
 import { InventorySlot as SlotType } from './types'
 import { inventoryStyles as styles } from './InventoryStyle.js'
@@ -10,6 +10,7 @@ interface Props {
 const InventorySlot: React.FC<Props> = ({ slot }) => {
   const ref = useRef<HTMLCanvasElement | null>(null)
   const appRef = useRef<Application | null>(null)
+  const [isHovered, setIsHovered] = useState(false)
 
   useEffect(() => {
     if (ref.current) {
@@ -44,7 +45,14 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
   }, [slot])
 
   return (
-    <div style={styles.inventorySlot}>
+    <div
+      style={{
+        ...styles.inventorySlot,
+        ...(isHovered ? styles.inventorySlotHover : {}),
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <canvas ref={ref} width='50' height='50'></canvas>
     </div>
   )
