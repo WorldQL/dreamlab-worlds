@@ -27,6 +27,15 @@ const Inventory: React.FC<Props> = ({
         return
       }
       onDragStart(row, col)
+
+      const dragImage = e.currentTarget.querySelector('.inventorySprite')
+      if (dragImage) {
+        e.dataTransfer.setDragImage(
+          dragImage,
+          dragImage.clientWidth / 2,
+          dragImage.clientHeight / 2,
+        )
+      }
     }
 
   const handleSlotDragEnd = (row: number, col: number) => () => {

@@ -11,6 +11,7 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
   const ref = useRef<HTMLCanvasElement | null>(null)
   const appRef = useRef<Application | null>(null)
   const [isHovered, setIsHovered] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
     if (ref.current) {
@@ -52,9 +53,18 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={() => setIsDragging(false)}
     >
-      <canvas ref={ref} width='50' height='50'></canvas>
-      {isHovered && slot?.displayName && (
+      <canvas
+        ref={ref}
+        width='50'
+        height='50'
+        className='inventorySprite'
+        draggable
+      ></canvas>
+
+      {isHovered && !isDragging && slot?.displayName && (
         <div style={styles.itemTooltip}>{slot.displayName}</div>
       )}
     </div>
