@@ -128,10 +128,6 @@ export const createPlatform = createSpawnableEntity(
 
         const alpha = debug.value ? 0.5 : 0
         gfxBounds.alpha = alpha
-
-        if (sprite) {
-          sprite.position = pos
-        }
       },
     }
   },

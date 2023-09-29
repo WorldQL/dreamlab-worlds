@@ -72,24 +72,42 @@ export const createBackground = createSpawnableEntity(
 
       onPhysicsStep() {},
 
-      onRenderFrame(_, { game }, { camera, container, graphics, sprite }) {
+      onRenderFrame(_, { game }, { camera, container, graphics }) {
         const debug = game.debug
+        console.log(camera.zoomScale)
 
-        const zoomAdjustedParallaxX = parallaxX * camera.zoomScale
-        const zoomAdjustedParallaxY = parallaxY * camera.zoomScale
+        const DEFAULT_SCALE = 1
+        if (!game.client) {
+          throw new Error('game.client is undefined')
+        }
+        const targetW = game.client?.render.container.clientWidth
+        const targetH = game.client?.render.container.clientHeight
+
+        const zoomScale = camera.zoomScale
+        const cameraOffset = camera.offset
+
+        const offsetXAtDefaultZoom =
+          targetW / DEFAULT_SCALE / 2 - cameraOffset.x
+        const offsetXAtCurrentZoom = targetW / zoomScale / 2 - cameraOffset.x
+        const offsetXDifference = offsetXAtCurrentZoom - offsetXAtDefaultZoom
+
+        const offsetYAtDefaultZoom =
+          targetH / DEFAULT_SCALE / 2 - cameraOffset.y
+        const offsetYAtCurrentZoom = targetH / zoomScale / 2 - cameraOffset.y
+        const offsetYDifference = offsetYAtCurrentZoom - offsetYAtDefaultZoom
 
         const parallaxPos = Vec.create(
-          position.x + camera.offset.x * zoomAdjustedParallaxX,
-          position.y + camera.offset.y * zoomAdjustedParallaxY,
+          position.x +
+            cameraOffset.x * parallaxX +
+            offsetXDifference * (1 - parallaxX),
+          position.y +
+            cameraOffset.y * parallaxY +
+            offsetYDifference * (1 - parallaxY),
         )
+        const scalingFactor = Math.max(2, 0.25)
+        container.scale.set(scalingFactor, scalingFactor)
 
         container.position = parallaxPos
-
-        if (sprite) {
-          sprite.scale.set(1 / camera.zoomScale, 1 / camera.zoomScale)
-
-          sprite.position = parallaxPos
-        }
 
         const alpha = debug.value ? 0.5 : 0
         graphics.alpha = alpha

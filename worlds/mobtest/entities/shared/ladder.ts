@@ -103,7 +103,7 @@ export const createLadder = createSpawnableEntity(
         }
       },
 
-      onRenderFrame(_, { game }, { camera, container, gfxBounds, sprite }) {
+      onRenderFrame(_, { game }, { camera, container, gfxBounds }) {
         const debug = game.debug
         const pos = Vec.add(position, camera.offset)
 
@@ -112,11 +112,6 @@ export const createLadder = createSpawnableEntity(
 
         const alpha = debug.value ? 0.5 : 0
         gfxBounds.alpha = alpha
-
-        if (sprite) {
-          sprite.position = pos
-          sprite.angle = body.angle
-        }
       },
     }
   },
