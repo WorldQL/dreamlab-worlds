@@ -1,4 +1,3 @@
-// WIP
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { createSprite } from '@dreamlab.gg/core/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
@@ -34,6 +33,8 @@ export const createPlatform = createSpawnableEntity(
         friction: 0,
       },
     )
+
+    let isPlatformActive = false
 
     return {
       get tags() {
@@ -103,15 +104,33 @@ export const createPlatform = createSpawnableEntity(
 
         if (!playerBody) return
 
-        const collisions = Matter.Query.collides(body, [playerBody])
-
         const inputs = game.client?.inputs
         const isCrouching = inputs?.getInput('@player/crouch') ?? false
 
-        body.collisionFilter.mask =
-          collisions.length > 0 && isCrouching ? 0x0000 : PLAYER_CATEGORY
+        if (isPlatformActive) {
+          if (isCrouching) {
+            isPlatformActive = false
+          }
+        } else if (
+          Matter.Query.collides(body, [playerBody]).length > 0 &&
+          !isCrouching
+        ) {
+          const playerHeight = 370 // need to add player.height to the player entity
+          const playerAbovePlatform =
+            playerBody.position.y + playerHeight / 2 <
+            (body.position.y + body.bounds.min.y) / 2
 
-        body.isSensor = Boolean(collisions.length > 0 && isCrouching)
+          const playerMovingDownward = playerBody.velocity.y > 0
+
+          if (playerAbovePlatform && playerMovingDownward) {
+            isPlatformActive = true
+          } else {
+            isPlatformActive = false
+          }
+        }
+
+        body.collisionFilter.mask = isPlatformActive ? PLAYER_CATEGORY : 0x0000
+        body.isSensor = !isPlatformActive
       },
 
       onRenderFrame(
@@ -126,8 +145,18 @@ export const createPlatform = createSpawnableEntity(
         container.position = pos
         container.rotation = body.angle
 
-        const alpha = debug.value ? 0.5 : 0
-        gfxBounds.alpha = alpha
+        const activeAlpha = 1
+        const inactiveAlpha = 0.5
+
+        const platformAlpha = isPlatformActive ? activeAlpha : inactiveAlpha
+        gfxBounds.alpha = platformAlpha
+
+        if (sprite) {
+          sprite.alpha = platformAlpha
+        }
+
+        const debugAlpha = debug.value ? 0.5 : 0
+        gfxBounds.alpha = debug.value ? debugAlpha : platformAlpha
       },
     }
   },
