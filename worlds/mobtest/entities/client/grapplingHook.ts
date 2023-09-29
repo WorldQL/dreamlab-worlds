@@ -51,6 +51,8 @@ export const createGrapplingHook = createSpawnableEntity(
       frictionAir: 0.2,
     })
 
+    let hasReachedTarget = false
+
     return {
       get tags() {
         return tags
@@ -150,6 +152,7 @@ export const createGrapplingHook = createSpawnableEntity(
             const force = Vec.mult(dir, forceMagnitude)
             Matter.Body.applyForce(body, body.position, force)
           } else {
+            hasReachedTarget = true
             Matter.Body.setVelocity(body, { x: 0, y: 0 })
             const playerToHookDirection = Vec.normalise(
               subtract(body.position, playerBody.position),
@@ -172,7 +175,15 @@ export const createGrapplingHook = createSpawnableEntity(
           const pos = Vec.add(body.position, camera.offset)
           gfxBounds.visible = true
           container.position = pos
-          container.rotation = body.angle
+
+          if (!hasReachedTarget && cursorPosition) {
+            const dx = cursorPosition.x - body.position.x
+            const dy = cursorPosition.y - body.position.y
+            const angle = Math.atan2(dy, dx)
+            container.rotation = angle
+          } else {
+            container.rotation = body.angle
+          }
 
           const alpha = debug.value ? 0.5 : 0
           gfxBounds.alpha = alpha
@@ -182,6 +193,7 @@ export const createGrapplingHook = createSpawnableEntity(
           }
         } else {
           gfxBounds.visible = false
+          hasReachedTarget = false
           if (sprite) {
             sprite.visible = false
           }
