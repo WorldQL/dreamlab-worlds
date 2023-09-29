@@ -10,7 +10,7 @@ export const createLadder = createSpawnableEntity(
     { tags, transform, zIndex },
     width: number,
     height: number,
-    spriteSource: string,
+    spriteSource?: string,
   ) => {
     const { position } = transform
 

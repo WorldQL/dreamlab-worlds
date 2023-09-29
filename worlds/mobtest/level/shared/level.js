@@ -33,14 +33,14 @@ export const level = [
       rotation: 90,
     },
   },
-//   {
-//     entity: '@dreamlab/BreakableSolid', // right spawn wall
-//     args: [400, 50],
-//     transform: {
-//       position: { x: 475, y: -25 },
-//       rotation: 90,
-//     },
-//   },
+  {
+    entity: '@dreamlab/BreakableSolid', // right spawn wall
+    args: [400, 50],
+    transform: {
+      position: { x: 475, y: -25 },
+      rotation: 90,
+    },
+  },
   {
     entity: '@dreamlab/BreakableSolid', // right spawn wall
     args: [400, 50],
