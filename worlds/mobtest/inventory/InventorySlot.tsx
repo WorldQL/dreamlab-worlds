@@ -26,7 +26,7 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
             width: 50,
             height: 50,
             view: canvas,
-            background: '#1c1c1c',
+            backgroundAlpha: 0,
           })
         }
 
@@ -50,6 +50,7 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
       style={{
         ...styles.inventorySlot,
         ...(isHovered ? styles.inventorySlotHover : {}),
+        border: slot ? '2px solid #8c7ae6' : '2px solid transparent',
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
