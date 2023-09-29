@@ -1,5 +1,3 @@
-// wip
-// - sprites are in wrong position, show be same position as the graphic
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { Camera } from '@dreamlab.gg/core/entities'
 import { createSprite } from '@dreamlab.gg/core/textures'
@@ -94,7 +92,7 @@ export const createGrapplingHook = createSpawnableEntity(
         if (sprite) {
           container.addChild(sprite)
         } else {
-          gfxBounds.beginFill(0xffffff)
+          gfxBounds.beginFill(0x404040)
           gfxBounds.drawCircle(0, 0, 10)
           gfxBounds.endFill()
           container.addChild(gfxBounds)
@@ -180,11 +178,7 @@ export const createGrapplingHook = createSpawnableEntity(
           gfxBounds.alpha = alpha
 
           if (sprite) {
-            gfxBounds.visible = false
-
-            sprite.visible = true
-            sprite.position = pos
-            sprite.rotation = body.angle
+            sprite.visible = body.render.visible
           }
         } else {
           gfxBounds.visible = false
