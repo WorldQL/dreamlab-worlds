@@ -74,12 +74,11 @@ export const createBackground = createSpawnableEntity(
 
       onRenderFrame(_, { game }, { camera, container, graphics }) {
         const debug = game.debug
-        console.log(camera.zoomScale)
-
-        const DEFAULT_SCALE = 1
         if (!game.client) {
           throw new Error('game.client is undefined')
         }
+
+        const DEFAULT_SCALE = 1
         const targetW = game.client?.render.container.clientWidth
         const targetH = game.client?.render.container.clientHeight
 
