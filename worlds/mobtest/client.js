@@ -1,4 +1,4 @@
-import { initializeGameUI } from './dist/inventory.js'
+import { initializeGameUI } from './dist/inventory/inventoryManager.js'
 import { sharedInit } from './shared.js'
 import { createBackground } from './dist/entities/client/background.js'
 import { createFreeform } from './dist/entities/client/freeform.js'
