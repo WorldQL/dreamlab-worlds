@@ -29,11 +29,12 @@ const onPointerMove = (ev: PointerEvent, camera: Camera): void => {
   cursorPosition = camera.localToWorld(screenPosition)
 }
 
-export const createGrapplingHook = createSpawnableEntity(
+export const createGrappleHook = createSpawnableEntity(
   (
     { tags, transform, zIndex },
     width: number,
     height: number,
+    mustConnectWithBody: boolean = false,
     spriteSource?: string,
   ) => {
     const { position } = transform
@@ -139,6 +140,17 @@ export const createGrapplingHook = createSpawnableEntity(
         const isCrouching = inputs?.getInput('@dreamlab/hook') ?? false
 
         if (isCrouching && cursorPosition) {
+          if (mustConnectWithBody) {
+            const bodiesAtCursor = Matter.Query.point(
+              Matter.Composite.allBodies(game.physics.engine.world),
+              cursorPosition,
+            )
+
+            if (bodiesAtCursor.length === 0) {
+              return
+            }
+          }
+
           if (body.render.visible === false) {
             Matter.Body.setPosition(body, playerBody.position)
             body.render.visible = true
