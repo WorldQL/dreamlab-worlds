@@ -13,42 +13,38 @@ import {
 } from './events/InventoryDragEvent.js'
 import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 
-export type InventoryData = PlayerInventoryItem[][]
+export type InventoryData = PlayerInventoryItem[]
 
 const InventoryApp: React.FC<{ game: any; player: Player }> = ({
   game,
   player,
 }) => {
-  const initialData = Array.from({ length: 4 }, () => Array(9).fill(undefined))
+  const totalSlots = 36
+  const initialData = Array(totalSlots).fill(undefined)
   const [data, setData] = useState<InventoryData>(initialData)
-  const [currentSlot, setCurrentSlot] = useState<{
-    row: number
-    col: number
-  }>({ row: 0, col: 0 })
-  const [sourceSlot, setSourceSlot] = useState<{
-    row: number
-    col: number
-  } | null>(null)
+  const [currentSlot, setCurrentSlot] = useState<number>(0)
+  const [sourceSlot, setSourceSlot] = useState<number | null>(null)
   const [isInventoryOpen, setIsInventoryOpen] = useState(false)
 
   // fill local inventory with player.inventory
   useEffect(() => {
     const playerItems = player.inventory.getItems()
-    const flatData = data.flat()
-    playerItems.forEach((item: PlayerInventoryItem, index: any) => {
-      flatData[index] = item
+    setData(prev => {
+      const newData = [...prev]
+      playerItems.forEach((item: PlayerInventoryItem, index: number) => {
+        newData[index] = item
+      })
+      return newData
     })
-    setData(chunkArray(flatData, 9))
   }, [player])
 
   // handles switching current item in hand
   useEffect(() => {
     const handleDigitInput = () => {
-      const hotbarSlots = data[0].slice(0, 9)
       Array.from({ length: 9 }, (_, i) => {
         if (game.client?.inputs.getInput(`@inventory/digit${i + 1}`)) {
-          setCurrentSlot({ row: 0, col: i })
-          player.inventory.setItemInHand(hotbarSlots[i])
+          setCurrentSlot(i)
+          player.inventory.setItemInHand(data[i])
         }
       })
       requestAnimationFrame(handleDigitInput)
@@ -74,8 +70,8 @@ const InventoryApp: React.FC<{ game: any; player: Player }> = ({
   }, [game])
 
   const handleSlotInteraction = useCallback(
-    (row: number, col: number, interaction: Function) => {
-      interaction(row, col)
+    (slotIndex: number, interaction: Function) => {
+      interaction(slotIndex)
     },
     [],
   )
@@ -83,38 +79,36 @@ const InventoryApp: React.FC<{ game: any; player: Player }> = ({
   return isInventoryOpen ? (
     <Inventory
       data={data}
-      onClick={(row, col) =>
-        handleSlotInteraction(row, col, handleInventoryClick)
+      onClick={slotIndex =>
+        handleSlotInteraction(slotIndex, handleInventoryClick)
       }
-      onDragStart={(row, col) => {
-        setSourceSlot({ row, col })
-        handleSlotInteraction(row, col, handleInventoryDragStart)
+      onDragStart={slotIndex => {
+        setSourceSlot(slotIndex)
+        handleSlotInteraction(slotIndex, handleInventoryDragStart)
       }}
-      onDragEnd={(row, col) => {
-        if (!sourceSlot) return
+      onDragEnd={slotIndex => {
+        if (sourceSlot === null) return
 
-        const { row: sourceRow, col: sourceCol } = sourceSlot
-
-        if (sourceRow === row && sourceCol === col) {
+        if (sourceSlot === slotIndex) {
           setSourceSlot(null)
           return
         }
 
         const newData = [...data]
-        ;[newData[sourceRow][sourceCol], newData[row][col]] = [
-          newData[row][col],
-          newData[sourceRow][sourceCol],
+        ;[newData[sourceSlot], newData[slotIndex]] = [
+          newData[slotIndex],
+          newData[sourceSlot],
         ]
 
-        if (currentSlot.row === sourceRow && currentSlot.col === sourceCol) {
-          player.inventory.setItemInHand(newData[sourceRow][sourceCol])
-        } else if (currentSlot.row === row && currentSlot.col === col) {
-          player.inventory.setItemInHand(newData[row][col])
+        if (currentSlot === sourceSlot) {
+          player.inventory.setItemInHand(newData[sourceSlot])
+        } else if (currentSlot === slotIndex) {
+          player.inventory.setItemInHand(newData[slotIndex])
         }
 
         setData(newData)
         setSourceSlot(null)
-        handleSlotInteraction(row, col, handleInventoryDragEnd)
+        handleSlotInteraction(slotIndex, handleInventoryDragEnd)
       }}
     />
   ) : null
@@ -143,21 +137,4 @@ export const initializeGameUI = (game: any) => {
       )
     }
   })
-}
-
-/**
- * This utility function is used to restructure the inventory data from a flat array
- * into a nested array, where each sub-array represents a row in the inventory grid.
- * The specified `size` parameter determines the number of columns in each row.
- *
- * @param array - The original flat array representing the inventory items.
- * @param size - The number of columns in the inventory grid, which is also the length of each sub-array.
- * @returns A nested array where each sub-array represents a row of items in the inventory grid.
- */
-const chunkArray = (array: any[], size: number) => {
-  const result = []
-  for (let i = 0; i < array.length; i += size) {
-    result.push(array.slice(i, i + size))
-  }
-  return result
 }

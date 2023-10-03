@@ -5,9 +5,9 @@ import { InventoryData } from './inventoryManager.js'
 
 interface Props {
   data: InventoryData
-  onClick: (row: number, col: number) => void
-  onDragStart: (row: number, col: number) => void
-  onDragEnd: (row: number, col: number) => void
+  onClick: (slotIndex: number) => void
+  onDragStart: (slotIndex: number) => void
+  onDragEnd: (slotIndex: number) => void
 }
 
 const Inventory: React.FC<Props> = ({
@@ -16,45 +16,28 @@ const Inventory: React.FC<Props> = ({
   onDragStart,
   onDragEnd,
 }) => {
-  const handleSlotClick = (row: number, col: number) => () => {
-    onClick(row, col)
-  }
-
-  const handleSlotDragStart =
-    (row: number, col: number) => (e: React.DragEvent) => {
-      if (!data[row][col]) {
-        e.preventDefault()
-        return
-      }
-      onDragStart(row, col)
-
-      const dragImage = e.currentTarget.querySelector('.inventorySprite')
-      if (dragImage) {
-        e.dataTransfer.setDragImage(
-          dragImage,
-          dragImage.clientWidth / 2,
-          dragImage.clientHeight / 2,
-        )
-      }
-    }
-
-  const handleSlotDragEnd = (row: number, col: number) => () => {
-    onDragEnd(row, col)
-  }
+  const numCols = 9
+  const chunkedData = chunkArray(data, numCols)
 
   return (
     <div style={styles.inventory}>
       <h2 style={styles.inventoryTitle}>Inventory</h2>
 
-      {data.slice(1).map((row, rowIndex) => (
+      {chunkedData.slice(1).map((row, rowIndex) => (
         <div key={rowIndex} style={styles.inventoryRow}>
-          {row.map((slot, colIndex) => (
+          {row.map((slot, slotIndex) => (
             <div
-              key={colIndex}
+              key={slotIndex}
               style={styles.inventorySlot}
-              onClick={handleSlotClick(rowIndex + 1, colIndex)}
-              onDragStart={handleSlotDragStart(rowIndex + 1, colIndex)}
-              onDrop={handleSlotDragEnd(rowIndex + 1, colIndex)}
+              onClick={() => onClick((rowIndex + 1) * numCols + slotIndex)}
+              onDragStart={e => {
+                if (!slot) {
+                  e.preventDefault()
+                  return
+                }
+                onDragStart((rowIndex + 1) * numCols + slotIndex)
+              }}
+              onDrop={() => onDragEnd((rowIndex + 1) * numCols + slotIndex)}
               onDragOver={e => e.preventDefault()}
               draggable={!!slot}
             >
@@ -65,13 +48,19 @@ const Inventory: React.FC<Props> = ({
       ))}
 
       <div style={styles.hotbarSlots}>
-        {data[0].map((slot, colIndex) => (
+        {chunkedData[0].map((slot, slotIndex) => (
           <div
-            key={colIndex}
+            key={slotIndex}
             style={styles.inventorySlot}
-            onClick={handleSlotClick(0, colIndex)}
-            onDragStart={handleSlotDragStart(0, colIndex)}
-            onDrop={handleSlotDragEnd(0, colIndex)}
+            onClick={() => onClick(slotIndex)}
+            onDragStart={e => {
+              if (!slot) {
+                e.preventDefault()
+                return
+              }
+              onDragStart(slotIndex)
+            }}
+            onDrop={() => onDragEnd(slotIndex)}
             onDragOver={e => e.preventDefault()}
             draggable={!!slot}
           >
@@ -82,4 +71,13 @@ const Inventory: React.FC<Props> = ({
     </div>
   )
 }
+
+const chunkArray = (array: any[], size: number) => {
+  const result = []
+  for (let i = 0; i < array.length; i += size) {
+    result.push(array.slice(i, i + size))
+  }
+  return result
+}
+
 export default Inventory
