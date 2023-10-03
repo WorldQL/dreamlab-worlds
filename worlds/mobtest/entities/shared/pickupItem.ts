@@ -1,11 +1,11 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
-import { Item } from '@dreamlab.gg/core/dist/managers'
+import { createNewItem, ItemOptions } from '@dreamlab.gg/core/dist/managers'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
-import { Container, Graphics, Texture } from 'pixi.js'
+import { Container, Graphics } from 'pixi.js'
 
 export const createPickupItem = createSpawnableEntity(
   (
@@ -112,30 +112,37 @@ export const createPickupItem = createSpawnableEntity(
           const player = game.entities.find(isPlayer)
           if (player) {
             const inventory = player.inventory
-            // *** Getting all inventory items
-            //const items = inventory.getItems()
 
-            // *** Removing all items
-            // inventory.clear()
+            // Operations for inventory items:
+            // Get all items:
+            // const items = inventory.getItems();
+            // Remove all items:
+            // inventory.clear();
 
-            // *** Creating an item
-            const texture = Texture.from(spriteSource)
-            const newItem: Item = {
-              id: 'goldbow123', // maybe we use cuid()
-              displayName: itemDisplayName,
-              texture,
-              animationName, // animation type i.e "greatsword", "bow"
-              itemOptions: {
-                anchorX: 0.5,
-                anchorY: 0.5,
-                hand: 'right',
-              },
+            // Create a new item with the following structure:
+            // - displayName: string
+            // - textureURL: string
+            // - animationName: string
+            // - itemOptions?: ItemOptions
+            const itemOptions: ItemOptions = {
+              anchorX: 0.5,
+              anchorY: 0.5,
+              hand: 'right',
             }
 
-            // *** Adding the item to inventory
+            const newItem = createNewItem(
+              itemDisplayName,
+              spriteSource,
+              animationName,
+              itemOptions,
+            )
+
+            // Add the created item to inventory
             inventory.addItem(newItem)
-            // *** Setting the current held item
+
+            // Set the new item as the current held item
             inventory.setCurrentItem(newItem)
+
             pickedUp = true
             Matter.World.remove(game.physics.engine.world, body)
           }
