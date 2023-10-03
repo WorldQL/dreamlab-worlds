@@ -43,20 +43,6 @@ export const inventoryStyles: Record<string, CSSProperties> = {
     borderTop: '2px solid #8c7ae6',
     paddingTop: '10px',
   },
-  weaponSlotNumber: {
-    position: 'absolute',
-    top: '50%',
-    left: '-30px',
-    transform: 'translateY(-50%)',
-    fontWeight: 'bold',
-    fontSize: '18px',
-    color: '#8c7ae6',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: '50%',
-    padding: '5px',
-    zIndex: 1,
-  },
-
   itemTooltip: {
     position: 'absolute',
     zIndex: 10,

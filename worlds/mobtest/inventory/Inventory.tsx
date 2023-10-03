@@ -65,8 +65,7 @@ const Inventory: React.FC<Props> = ({
       ))}
 
       <div style={styles.weaponSlots}>
-        <h2 style={styles.inventoryTitle}>Weapons</h2>
-        {data[data.length - 1].slice(0, 4).map((slot, colIndex) => (
+        {data[data.length - 1].map((slot, colIndex) => (
           <div
             key={colIndex}
             style={styles.inventorySlot}
@@ -76,7 +75,6 @@ const Inventory: React.FC<Props> = ({
             onDragOver={e => e.preventDefault()}
             draggable={!!slot}
           >
-            <div style={styles.weaponSlotNumber}>{colIndex + 1}</div>
             {slot && <InventorySlot slot={slot} />}
           </div>
         ))}

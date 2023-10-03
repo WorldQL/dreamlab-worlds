@@ -40,8 +40,8 @@ const InventoryApp: React.FC<{ game: any; player: any }> = ({
   // handles switching current item in hand
   useEffect(() => {
     const handleDigitInput = () => {
-      const weaponSlots = data[data.length - 1].slice(0, 4)
-      Array.from({ length: 4 }, (_, i) => {
+      const weaponSlots = data[data.length - 1].slice(0, 9)
+      Array.from({ length: 9 }, (_, i) => {
         if (
           game.client?.inputs.getInput(`@inventory/digit${i + 1}`) &&
           weaponSlots[i]
@@ -111,11 +111,15 @@ const InventoryApp: React.FC<{ game: any; player: any }> = ({
 export const initializeGameUI = (game: any) => {
   const registerInput = (input: string, key: string) =>
     game.client?.inputs.registerInput(input, key)
-  ;['open', 'digit1', 'digit2', 'digit3', 'digit4'].forEach((input, i) =>
-    registerInput(
-      `@inventory/${input}`,
-      ['KeyQ', 'Digit1', 'Digit2', 'Digit3', 'Digit4'][i],
-    ),
+
+  const digits = Array.from({ length: 9 }, (_, i) => 'digit' + (i + 1))
+  const keys = [
+    'KeyQ',
+    ...Array.from({ length: 9 }, (_, i) => 'Digit' + (i + 1)),
+  ]
+
+  ;['open', ...digits].forEach((input, i) =>
+    registerInput(`@inventory/${input}`, keys[i]),
   )
 
   game.events.common.addListener('onInstantiate', (entity: unknown) => {

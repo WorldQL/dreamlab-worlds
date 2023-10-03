@@ -140,9 +140,6 @@ export const createPickupItem = createSpawnableEntity(
             // Add the created item to inventory
             inventory.addItem(newItem)
 
-            // Set the new item as the current held item
-            inventory.setCurrentItem(newItem)
-
             pickedUp = true
             Matter.World.remove(game.physics.engine.world, body)
           }
