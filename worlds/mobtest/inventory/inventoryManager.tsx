@@ -1,4 +1,4 @@
-import { isPlayer } from '@dreamlab.gg/core/dist/entities'
+import { Player, isPlayer } from '@dreamlab.gg/core/dist/entities'
 import React, {
   useCallback,
   useEffect,
@@ -15,7 +15,7 @@ import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 
 export type InventoryData = PlayerInventoryItem[][]
 
-const InventoryApp: React.FC<{ game: any; player: any }> = ({
+const InventoryApp: React.FC<{ game: any; player: Player }> = ({
   game,
   player,
 }) => {
@@ -100,6 +100,11 @@ const InventoryApp: React.FC<{ game: any; player: any }> = ({
           newData[row][col],
           newData[sourceRow][sourceCol],
         ]
+
+        if (player.inventory.currentItem() === newData[sourceRow][sourceCol]) {
+          player.inventory.setCurrentItem(newData[row][col])
+        }
+
         setData(newData)
         setSourceSlot(null)
         handleSlotInteraction(row, col, handleInventoryDragEnd)
