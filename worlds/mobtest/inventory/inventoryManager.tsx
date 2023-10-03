@@ -21,6 +21,10 @@ const InventoryApp: React.FC<{ game: any; player: Player }> = ({
 }) => {
   const initialData = Array.from({ length: 4 }, () => Array(9).fill(undefined))
   const [data, setData] = useState<InventoryData>(initialData)
+  const [currentSlot, setCurrentSlot] = useState<{
+    row: number
+    col: number
+  }>({ row: 0, col: 0 })
   const [sourceSlot, setSourceSlot] = useState<{
     row: number
     col: number
@@ -42,11 +46,9 @@ const InventoryApp: React.FC<{ game: any; player: Player }> = ({
     const handleDigitInput = () => {
       const hotbarSlots = data[0].slice(0, 9)
       Array.from({ length: 9 }, (_, i) => {
-        if (
-          game.client?.inputs.getInput(`@inventory/digit${i + 1}`) &&
-          hotbarSlots[i]
-        ) {
-          player.inventory.setCurrentItem(hotbarSlots[i])
+        if (game.client?.inputs.getInput(`@inventory/digit${i + 1}`)) {
+          setCurrentSlot({ row: 0, col: i })
+          player.inventory.setItemInHand(hotbarSlots[i])
         }
       })
       requestAnimationFrame(handleDigitInput)
@@ -90,19 +92,24 @@ const InventoryApp: React.FC<{ game: any; player: Player }> = ({
       }}
       onDragEnd={(row, col) => {
         if (!sourceSlot) return
+
         const { row: sourceRow, col: sourceCol } = sourceSlot
+
         if (sourceRow === row && sourceCol === col) {
           setSourceSlot(null)
           return
         }
+
         const newData = [...data]
         ;[newData[sourceRow][sourceCol], newData[row][col]] = [
           newData[row][col],
           newData[sourceRow][sourceCol],
         ]
 
-        if (player.inventory.currentItem() === newData[sourceRow][sourceCol]) {
-          player.inventory.setCurrentItem(newData[row][col])
+        if (currentSlot.row === sourceRow && currentSlot.col === sourceCol) {
+          player.inventory.setItemInHand(newData[sourceRow][sourceCol])
+        } else if (currentSlot.row === row && currentSlot.col === col) {
+          player.inventory.setItemInHand(newData[row][col])
         }
 
         setData(newData)
