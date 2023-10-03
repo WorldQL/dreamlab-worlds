@@ -1,10 +1,6 @@
+import { Item } from '@dreamlab.gg/core/dist/managers'
 import { Texture } from 'pixi.js'
 
-export interface Item {
-  id: string
-  displayName: string
-  texture: Texture
-}
 
 export type InventorySlot = Item | undefined
 
