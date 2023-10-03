@@ -1,10 +1,9 @@
-import React from 'https://esm.sh/react@18.2.0'
-import { InventoryData } from './types'
-import InventorySlot from './InventorySlot.js'
+import React, { useState } from 'https://esm.sh/react@18.2.0'
 import { inventoryStyles as styles } from './InventoryStyle.js'
+import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 
 interface Props {
-  data: InventoryData
+  data: PlayerInventoryItem[][]
   onClick: (row: number, col: number) => void
   onDragStart: (row: number, col: number) => void
   onDragEnd: (row: number, col: number) => void
@@ -42,6 +41,39 @@ const Inventory: React.FC<Props> = ({
     onDragEnd(row, col)
   }
 
+  const renderSlotContent = (slot: PlayerInventoryItem) => {
+    const [isHovered, setIsHovered] = useState(false)
+    const [isDragging, setIsDragging] = useState(false)
+
+    return (
+      <div
+        style={{
+          ...styles.inventorySlot,
+          ...(isHovered ? styles.inventorySlotHover : {}),
+          border: slot ? '2px solid #8c7ae6' : '2px solid transparent',
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={() => setIsDragging(false)}
+      >
+        {slot && slot.textureURL && (
+          <img
+            src={slot.textureURL}
+            width='50'
+            height='50'
+            className='inventorySprite'
+            draggable
+            alt={slot.displayName}
+          />
+        )}
+        {isHovered && !isDragging && slot?.displayName && (
+          <div style={styles.itemTooltip}>{slot.displayName}</div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div style={styles.inventory}>
       <h2 style={styles.inventoryTitle}>Inventory</h2>
@@ -58,7 +90,7 @@ const Inventory: React.FC<Props> = ({
               onDragOver={e => e.preventDefault()}
               draggable={!!slot}
             >
-              {slot && <InventorySlot slot={slot} />}
+              {slot && renderSlotContent(slot)}
             </div>
           ))}
         </div>
@@ -77,7 +109,7 @@ const Inventory: React.FC<Props> = ({
             draggable={!!slot}
           >
             <div style={styles.weaponSlotNumber}>{colIndex + 1}</div>
-            {slot && <InventorySlot slot={slot} />}
+            {slot && renderSlotContent(slot)}
           </div>
         ))}
       </div>

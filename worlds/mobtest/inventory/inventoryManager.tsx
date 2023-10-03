@@ -11,14 +11,14 @@ import {
   handleInventoryDragStart,
   handleInventoryDragEnd,
 } from './events/InventoryDragEvent.js'
-import { InventoryData, InventorySlot } from './types.js'
+import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 
 const InventoryApp: React.FC<{ game: any; player: any }> = ({
   game,
   player,
 }) => {
   const initialData = Array.from({ length: 4 }, () => Array(9).fill(undefined))
-  const [data, setData] = useState<InventoryData>(initialData)
+  const [data, setData] = useState<PlayerInventoryItem[][]>(initialData)
   const [sourceSlot, setSourceSlot] = useState<{
     row: number
     col: number
@@ -29,7 +29,7 @@ const InventoryApp: React.FC<{ game: any; player: any }> = ({
   useEffect(() => {
     const playerItems = player.inventory.getItems()
     const flatData = data.flat()
-    playerItems.forEach((item: InventorySlot, index: any) => {
+    playerItems.forEach((item: PlayerInventoryItem, index: any) => {
       flatData[index] = item
     })
     setData(chunkArray(flatData, 9))
