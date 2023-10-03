@@ -23,7 +23,7 @@ export const createPickupItem = createSpawnableEntity(
       position.y,
       width,
       height,
-      { isStatic: true, render: { visible: true } },
+      { isStatic: true, render: { visible: false }, isSensor: true },
     )
 
     let pickedUp = false
