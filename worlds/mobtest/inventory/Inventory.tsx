@@ -64,7 +64,7 @@ const Inventory: React.FC<Props> = ({
         </div>
       ))}
 
-      <div style={styles.weaponSlots}>
+      <div style={styles.hotbarSlots}>
         {data[0].map((slot, colIndex) => (
           <div
             key={colIndex}

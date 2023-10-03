@@ -148,7 +148,7 @@ export const createBreakableSolid = createSpawnableEntity(
         const hasAttacker = (entities: any[]) => {
           return entities.some(
             (ev: { label: string }) =>
-              ev.label === 'player' || ev.label === 'weapon',
+              ev.label === 'player' || ev.label === 'item',
           )
         }
 

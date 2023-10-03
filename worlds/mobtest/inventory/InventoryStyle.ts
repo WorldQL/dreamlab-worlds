@@ -36,7 +36,7 @@ export const inventoryStyles: Record<string, CSSProperties> = {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     transform: 'scale(1.05)',
   },
-  weaponSlots: {
+  hotbarSlots: {
     display: 'flex',
     justifyContent: 'space-between',
     marginTop: '10px',
