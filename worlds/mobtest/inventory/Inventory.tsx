@@ -1,10 +1,10 @@
 import React from 'https://esm.sh/react@18.2.0'
 import InventorySlot from './InventorySlot.js'
 import { inventoryStyles as styles } from './InventoryStyle.js'
-import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
+import { InventoryData } from './inventoryManager.js'
 
 interface Props {
-  data: PlayerInventoryItem[][]
+  data: InventoryData
   onClick: (row: number, col: number) => void
   onDragStart: (row: number, col: number) => void
   onDragEnd: (row: number, col: number) => void

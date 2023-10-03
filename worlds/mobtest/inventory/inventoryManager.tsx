@@ -13,12 +13,14 @@ import {
 } from './events/InventoryDragEvent.js'
 import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 
+export type InventoryData = PlayerInventoryItem[][]
+
 const InventoryApp: React.FC<{ game: any; player: any }> = ({
   game,
   player,
 }) => {
   const initialData = Array.from({ length: 4 }, () => Array(9).fill(undefined))
-  const [data, setData] = useState<PlayerInventoryItem[][]>(initialData)
+  const [data, setData] = useState<InventoryData>(initialData)
   const [sourceSlot, setSourceSlot] = useState<{
     row: number
     col: number
