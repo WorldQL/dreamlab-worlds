@@ -1,7 +1,5 @@
-import { Item } from '@dreamlab.gg/core/dist/managers'
-import { Texture } from 'pixi.js'
+import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 
-
-export type InventorySlot = Item | undefined
+export type InventorySlot = PlayerInventoryItem | undefined
 
 export type InventoryData = InventorySlot[][]
