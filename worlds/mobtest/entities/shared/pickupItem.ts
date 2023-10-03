@@ -1,6 +1,6 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
-import { createNewItem, ItemOptions } from '@dreamlab.gg/core/dist/managers'
+import { ItemOptions } from '@dreamlab.gg/core/dist/managers'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
@@ -130,7 +130,7 @@ export const createPickupItem = createSpawnableEntity(
               hand: 'right',
             }
 
-            const newItem = createNewItem(
+            const newItem = inventory.createNewItem(
               itemDisplayName,
               spriteSource,
               animationName,
