@@ -122,7 +122,7 @@ export const createPickupItem = createSpawnableEntity(
             // Create a new item with the following structure:
             // - displayName: string
             // - textureURL: string
-            // - animationName: string
+            // - animationName: string (See KnownAnimation from '@dreamlab.gg/core/dist/entities')
             // - itemOptions?: ItemOptions
             const itemOptions: ItemOptions = {
               anchorX: 0.5,
