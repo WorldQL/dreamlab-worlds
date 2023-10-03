@@ -10,13 +10,15 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
   const [isHovered, setIsHovered] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
 
+  const combinedStyles = {
+    ...styles.inventorySlot,
+    ...(isHovered ? styles.inventorySlotHover : {}),
+    border: slot ? '2px solid #8c7ae6' : '2px solid transparent',
+  }
+
   return (
     <div
-      style={{
-        ...styles.inventorySlot,
-        ...(isHovered ? styles.inventorySlotHover : {}),
-        border: slot ? '2px solid #8c7ae6' : '2px solid transparent',
-      }}
+      style={combinedStyles}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onDragStart={() => setIsDragging(true)}

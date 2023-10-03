@@ -1,3 +1,3 @@
-export const handleInventoryClick = (row: number, col: number) => {
-  console.log(`Slot at [${row},${col}] was clicked`)
-}
+import { InventoryEvent } from './inventoryEvent'
+
+export interface InventoryClickEvent extends InventoryEvent {}

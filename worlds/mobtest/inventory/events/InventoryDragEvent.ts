@@ -1,7 +1,12 @@
-export const handleInventoryDragStart = (slot: number) => {
-  console.log(`Started dragging from slot [${slot}]`)
+import { InventoryEvent } from './inventoryEvent'
+
+export interface InventoryDragStartEvent extends InventoryEvent {
+  setSourceSlot: (cursorSlot: number | null) => void
+  setData: (data: any[]) => void
 }
 
-export const handleInventoryDragEnd = (slot: number) => {
-  console.log(`Ended dragging at slot [${slot}]`)
+export interface InventoryDragEndEvent extends InventoryEvent {
+  sourceSlot: number
+  targetSlot: number
+  setData: (data: any[]) => void
 }

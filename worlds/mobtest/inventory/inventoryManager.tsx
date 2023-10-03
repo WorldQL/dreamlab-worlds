@@ -1,30 +1,37 @@
 import { Player, isPlayer } from '@dreamlab.gg/core/dist/entities'
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-} from 'https://esm.sh/react@18.2.0'
+import React, { useEffect, useState } from 'https://esm.sh/react@18.2.0'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import Inventory from './Inventory.js'
-import { handleInventoryClick } from './events/InventoryClickEvent.js'
+import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
+import { handleInventoryClick } from './listeners/InventoryClick.js'
 import {
   handleInventoryDragStart,
   handleInventoryDragEnd,
-} from './events/InventoryDragEvent.js'
-import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
+} from './listeners/InventoryDrag.js'
+import { InventoryClickEvent } from './events/inventoryClickEvent.js'
+import {
+  InventoryDragStartEvent,
+  InventoryDragEndEvent,
+} from './events/inventoryDragEvent.js'
 
 export type InventoryData = PlayerInventoryItem[]
+const TOTAL_SLOTS = 36
 
 const InventoryApp: React.FC<{ game: any; player: Player }> = ({
   game,
   player,
 }) => {
-  const totalSlots = 36
-  const initialData = Array(totalSlots).fill(undefined)
+  const initialData = Array(TOTAL_SLOTS).fill(undefined)
   const [data, setData] = useState<InventoryData>(initialData)
-  const [currentSlot, setCurrentSlot] = useState<number>(0)
+  const [activeSlot, setActiveSlot] = useState<number>(0)
   const [sourceSlot, setSourceSlot] = useState<number | null>(null)
   const [isInventoryOpen, setIsInventoryOpen] = useState(false)
+
+  const commonEventProps = {
+    data,
+    player,
+    activeSlot,
+  }
 
   // fill local inventory with player.inventory
   useEffect(() => {
@@ -43,7 +50,7 @@ const InventoryApp: React.FC<{ game: any; player: Player }> = ({
     const handleDigitInput = () => {
       Array.from({ length: 9 }, (_, i) => {
         if (game.client?.inputs.getInput(`@inventory/digit${i + 1}`)) {
-          setCurrentSlot(i)
+          setActiveSlot(i)
           player.inventory.setItemInHand(data[i])
         }
       })
@@ -69,47 +76,48 @@ const InventoryApp: React.FC<{ game: any; player: Player }> = ({
     checkInputAndOpenInventory()
   }, [game])
 
-  const handleSlotInteraction = useCallback(
-    (slotIndex: number, interaction: Function) => {
-      interaction(slotIndex)
-    },
-    [],
-  )
+  const handleClick = (slotIndex: number) => {
+    const event: InventoryClickEvent = {
+      ...commonEventProps,
+      cursorSlot: slotIndex,
+    }
+    handleInventoryClick(event)
+  }
+
+  const handleDragStartEvent = (slotIndex: number) => {
+    const event: InventoryDragStartEvent = {
+      ...commonEventProps,
+      cursorSlot: slotIndex,
+      setSourceSlot,
+      setData,
+    }
+    handleInventoryDragStart(event)
+  }
+
+  const handleDragEndEvent = (slotIndex: number) => {
+    if (sourceSlot === null) return
+    if (sourceSlot === slotIndex) {
+      setSourceSlot(null)
+      return
+    }
+
+    const event: InventoryDragEndEvent = {
+      ...commonEventProps,
+      cursorSlot: slotIndex,
+      sourceSlot,
+      targetSlot: slotIndex,
+      setData,
+    }
+    handleInventoryDragEnd(event)
+    setSourceSlot(null)
+  }
 
   return isInventoryOpen ? (
     <Inventory
       data={data}
-      onClick={slotIndex =>
-        handleSlotInteraction(slotIndex, handleInventoryClick)
-      }
-      onDragStart={slotIndex => {
-        setSourceSlot(slotIndex)
-        handleSlotInteraction(slotIndex, handleInventoryDragStart)
-      }}
-      onDragEnd={slotIndex => {
-        if (sourceSlot === null) return
-
-        if (sourceSlot === slotIndex) {
-          setSourceSlot(null)
-          return
-        }
-
-        const newData = [...data]
-        ;[newData[sourceSlot], newData[slotIndex]] = [
-          newData[slotIndex],
-          newData[sourceSlot],
-        ]
-
-        if (currentSlot === sourceSlot) {
-          player.inventory.setItemInHand(newData[sourceSlot])
-        } else if (currentSlot === slotIndex) {
-          player.inventory.setItemInHand(newData[slotIndex])
-        }
-
-        setData(newData)
-        setSourceSlot(null)
-        handleSlotInteraction(slotIndex, handleInventoryDragEnd)
-      }}
+      onClick={handleClick}
+      onDragStart={handleDragStartEvent}
+      onDragEnd={handleDragEndEvent}
     />
   ) : null
 }
