@@ -46,15 +46,15 @@ const Inventory: React.FC<Props> = ({
     <div style={styles.inventory}>
       <h2 style={styles.inventoryTitle}>Inventory</h2>
 
-      {data.slice(0, -1).map((row, rowIndex) => (
+      {data.slice(1).map((row, rowIndex) => (
         <div key={rowIndex} style={styles.inventoryRow}>
           {row.map((slot, colIndex) => (
             <div
               key={colIndex}
               style={styles.inventorySlot}
-              onClick={handleSlotClick(rowIndex, colIndex)}
-              onDragStart={handleSlotDragStart(rowIndex, colIndex)}
-              onDrop={handleSlotDragEnd(rowIndex, colIndex)}
+              onClick={handleSlotClick(rowIndex + 1, colIndex)}
+              onDragStart={handleSlotDragStart(rowIndex + 1, colIndex)}
+              onDrop={handleSlotDragEnd(rowIndex + 1, colIndex)}
               onDragOver={e => e.preventDefault()}
               draggable={!!slot}
             >
@@ -65,13 +65,13 @@ const Inventory: React.FC<Props> = ({
       ))}
 
       <div style={styles.weaponSlots}>
-        {data[data.length - 1].map((slot, colIndex) => (
+        {data[0].map((slot, colIndex) => (
           <div
             key={colIndex}
             style={styles.inventorySlot}
-            onClick={handleSlotClick(data.length - 1, colIndex)}
-            onDragStart={handleSlotDragStart(data.length - 1, colIndex)}
-            onDrop={handleSlotDragEnd(data.length - 1, colIndex)}
+            onClick={handleSlotClick(0, colIndex)}
+            onDragStart={handleSlotDragStart(0, colIndex)}
+            onDrop={handleSlotDragEnd(0, colIndex)}
             onDragOver={e => e.preventDefault()}
             draggable={!!slot}
           >

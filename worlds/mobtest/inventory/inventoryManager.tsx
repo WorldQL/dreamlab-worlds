@@ -40,7 +40,7 @@ const InventoryApp: React.FC<{ game: any; player: any }> = ({
   // handles switching current item in hand
   useEffect(() => {
     const handleDigitInput = () => {
-      const weaponSlots = data[data.length - 1].slice(0, 9)
+      const weaponSlots = data[0].slice(0, 9)
       Array.from({ length: 9 }, (_, i) => {
         if (
           game.client?.inputs.getInput(`@inventory/digit${i + 1}`) &&
