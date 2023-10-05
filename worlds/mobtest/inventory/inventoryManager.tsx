@@ -1,5 +1,9 @@
 import { Player, isPlayer } from '@dreamlab.gg/core/dist/entities'
-import React, { useEffect, useState } from 'https://esm.sh/react@18.2.0'
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+} from 'https://esm.sh/react@18.2.0'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import Inventory from './Inventory.js'
 import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
@@ -45,36 +49,87 @@ const InventoryApp: React.FC<{ game: any; player: Player }> = ({
     })
   }, [player])
 
-  // handles switching current item in hand
-  useEffect(() => {
-    const handleDigitInput = () => {
-      Array.from({ length: 9 }, (_, i) => {
-        if (game.client?.inputs.getInput(`@inventory/digit${i + 1}`)) {
-          setActiveSlot(i)
-          player.inventory.setItemInHand(data[i])
-        }
-      })
-      requestAnimationFrame(handleDigitInput)
-    }
-    handleDigitInput()
-  }, [game, player, data])
+  const onInventoryOpen = useCallback(
+    (pressed: boolean) => {
+      if (!pressed) return
+      setIsInventoryOpen(prev => !prev)
+    },
+    [setIsInventoryOpen],
+  )
 
-  // handles opening the inventory
+  const onInventoryDigit = useCallback(
+    (digit: number, pressed: boolean) => {
+      if (!pressed) return
+
+      const idx = digit - 1
+      setActiveSlot(idx)
+      player.inventory.setItemInHand(data[idx])
+    },
+    [player, data, setActiveSlot],
+  )
+
+  // #region The following code is ugly but is required for memoisation for event listeners to work properly in react
+  // prettier-ignore
+  const onDigit0 = useCallback((v: boolean) => onInventoryDigit(0, v), [onInventoryDigit])
+  // prettier-ignore
+  const onDigit1 = useCallback((v: boolean) => onInventoryDigit(1, v), [onInventoryDigit])
+  // prettier-ignore
+  const onDigit2 = useCallback((v: boolean) => onInventoryDigit(2, v), [onInventoryDigit])
+  // prettier-ignore
+  const onDigit3 = useCallback((v: boolean) => onInventoryDigit(3, v), [onInventoryDigit])
+  // prettier-ignore
+  const onDigit4 = useCallback((v: boolean) => onInventoryDigit(4, v), [onInventoryDigit])
+  // prettier-ignore
+  const onDigit5 = useCallback((v: boolean) => onInventoryDigit(5, v), [onInventoryDigit])
+  // prettier-ignore
+  const onDigit6 = useCallback((v: boolean) => onInventoryDigit(6, v), [onInventoryDigit])
+  // prettier-ignore
+  const onDigit7 = useCallback((v: boolean) => onInventoryDigit(7, v), [onInventoryDigit])
+  // prettier-ignore
+  const onDigit8 = useCallback((v: boolean) => onInventoryDigit(8, v), [onInventoryDigit])
+  // prettier-ignore
+  const onDigit9 = useCallback((v: boolean) => onInventoryDigit(9, v), [onInventoryDigit])
+
   useEffect(() => {
-    let lastToggleTime = 0
-    const toggleDelay = 200
-    const checkInputAndOpenInventory = () => {
-      const shouldOpenInventory =
-        game.client?.inputs?.getInput('@inventory/open') ?? false
-      const currentTime = Date.now()
-      if (shouldOpenInventory && currentTime - lastToggleTime > toggleDelay) {
-        setIsInventoryOpen(prev => !prev)
-        lastToggleTime = currentTime
-      }
-      requestAnimationFrame(checkInputAndOpenInventory)
+    game.client.inputs.addListener('@inventory/open', onInventoryOpen)
+    game.client.inputs.addListener('@inventory/digit0', onDigit0)
+    game.client.inputs.addListener('@inventory/digit1', onDigit1)
+    game.client.inputs.addListener('@inventory/digit2', onDigit2)
+    game.client.inputs.addListener('@inventory/digit3', onDigit3)
+    game.client.inputs.addListener('@inventory/digit4', onDigit4)
+    game.client.inputs.addListener('@inventory/digit5', onDigit5)
+    game.client.inputs.addListener('@inventory/digit6', onDigit6)
+    game.client.inputs.addListener('@inventory/digit7', onDigit7)
+    game.client.inputs.addListener('@inventory/digit8', onDigit8)
+    game.client.inputs.addListener('@inventory/digit9', onDigit9)
+
+    return () => {
+      game.client.inputs.removeListener('@inventory/open', onInventoryOpen)
+      game.client.inputs.removeListener('@inventory/digit0', onDigit0)
+      game.client.inputs.removeListener('@inventory/digit1', onDigit1)
+      game.client.inputs.removeListener('@inventory/digit2', onDigit2)
+      game.client.inputs.removeListener('@inventory/digit3', onDigit3)
+      game.client.inputs.removeListener('@inventory/digit4', onDigit4)
+      game.client.inputs.removeListener('@inventory/digit5', onDigit5)
+      game.client.inputs.removeListener('@inventory/digit6', onDigit6)
+      game.client.inputs.removeListener('@inventory/digit7', onDigit7)
+      game.client.inputs.removeListener('@inventory/digit8', onDigit8)
+      game.client.inputs.removeListener('@inventory/digit9', onDigit9)
     }
-    checkInputAndOpenInventory()
-  }, [game])
+  }, [
+    onInventoryOpen,
+    onDigit0,
+    onDigit1,
+    onDigit2,
+    onDigit3,
+    onDigit4,
+    onDigit5,
+    onDigit6,
+    onDigit7,
+    onDigit8,
+    onDigit9,
+  ])
+  // #endregion
 
   const handleClick = (slotIndex: number) => {
     const event: InventoryClickEvent = {
