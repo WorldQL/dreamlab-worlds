@@ -1,6 +1,6 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { isNetPlayer, isPlayer } from '@dreamlab.gg/core/entities'
-import { cloneTransform, distance, Vec } from '@dreamlab.gg/core/math'
+import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/network'
 import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
@@ -60,8 +60,8 @@ export const createHittableMob = createSpawnableEntity(
             .find(netplayer => netplayer.peerID === peerID)
 
           if (!player) throw new Error('missing netplayer')
-          const dist = distance(player.position, body.position)
-          if (dist > hitRadius) return
+          const xDiff = Math.abs(player.position.x - body.position.x);
+          if (xDiff > hitRadius) return;
 
           direction = body.position.x > player.position.x ? 1 : -1
           const force = 0.5 * direction
@@ -223,8 +223,9 @@ export const createHittableMob = createSpawnableEntity(
         if (hit && hitTimer === 0) {
           const player = game.entities.find(isPlayer)
           if (!player) return
-          const dist = distance(player.position, bodyPosition)
-          if (dist > hitRadius) return
+          const xDiff = Math.abs(player.position.x - body.position.x);
+          if (xDiff > hitRadius) return;
+
 
           hitTimer += hitCooldown
           netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
