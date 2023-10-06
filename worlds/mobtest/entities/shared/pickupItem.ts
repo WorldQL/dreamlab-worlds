@@ -1,5 +1,5 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { isPlayer } from '@dreamlab.gg/core/dist/entities'
+import { Player } from '@dreamlab.gg/core/dist/entities'
 import { ItemOptions } from '@dreamlab.gg/core/dist/managers'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
@@ -31,6 +31,36 @@ export const createPickupItem = createSpawnableEntity(
     const floatHeight = 5
     const rotationSpeed = 0.01
 
+    const onPlayerCollision = (
+      pair: readonly [player: Player, otherBody: Matter.Body],
+    ) => {
+      const [player, bodyCollided] = pair
+      if (body && bodyCollided === body) {
+        const inventory = player.inventory
+
+        // Create a new item with the following structure:
+        // - displayName: string
+        // - textureURL: string
+        // - animationName: string (See KnownAnimation from '@dreamlab.gg/core/dist/entities')
+        // - itemOptions?: ItemOptions
+        const itemOptions: ItemOptions = {
+          anchorX: 0.5,
+          anchorY: 0.5,
+          hand: 'right',
+        }
+
+        const newItem = inventory.createNewItem(
+          itemDisplayName,
+          spriteSource,
+          animationName,
+          itemOptions,
+        )
+
+        inventory.addItem(newItem)
+        pickedUp = true
+      }
+    }
+
     return {
       get tags() {
         return tags
@@ -46,6 +76,10 @@ export const createPickupItem = createSpawnableEntity(
 
       init({ game }) {
         game.physics.register(this, body)
+        game.events.common.addListener(
+          'onPlayerCollisionStart',
+          onPlayerCollision,
+        )
 
         return { game, body }
       },
@@ -82,6 +116,10 @@ export const createPickupItem = createSpawnableEntity(
 
       teardown({ game }) {
         game.physics.unregister(this, body)
+        game.events.common.removeListener(
+          'onPlayerCollisionStart',
+          onPlayerCollision,
+        )
       },
 
       teardownRenderContext({ container }) {
@@ -89,61 +127,12 @@ export const createPickupItem = createSpawnableEntity(
       },
 
       onPhysicsStep(_, { game }) {
-        if (pickedUp) return
+        if (pickedUp) {
+          Matter.World.remove(game.physics.engine.world, body)
+          return
+        }
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
-
-        const entitiesInArea = Matter.Query.region(
-          game.physics.engine.world.bodies,
-          Matter.Bounds.create([
-            {
-              x: body.position.x - width / 2,
-              y: body.position.y - height / 2,
-            },
-            {
-              x: body.position.x + width / 2,
-              y: body.position.y + height / 2,
-            },
-          ]),
-        )
-
-        const playerCollided = entitiesInArea.find(ev => ev.label === 'player')
-        if (playerCollided) {
-          const player = game.entities.find(isPlayer)
-          if (player) {
-            const inventory = player.inventory
-
-            // Operations for inventory items:
-            // Get all items:
-            // const items = inventory.getItems();
-            // Remove all items:
-            // inventory.clear();
-
-            // Create a new item with the following structure:
-            // - displayName: string
-            // - textureURL: string
-            // - animationName: string (See KnownAnimation from '@dreamlab.gg/core/dist/entities')
-            // - itemOptions?: ItemOptions
-            const itemOptions: ItemOptions = {
-              anchorX: 0.5,
-              anchorY: 0.5,
-              hand: 'right',
-            }
-
-            const newItem = inventory.createNewItem(
-              itemDisplayName,
-              spriteSource,
-              animationName,
-              itemOptions,
-            )
-
-            // Add the created item to inventory
-            inventory.addItem(newItem)
-
-            pickedUp = true
-            Matter.World.remove(game.physics.engine.world, body)
-          }
-        }
       },
 
       onRenderFrame(_, { game }, { camera, container, gfxBounds, sprite }) {
