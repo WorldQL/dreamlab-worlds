@@ -25,22 +25,25 @@ const TOTAL_SLOTS = 36
 
 const GameContext = createContext<any | null>(null)
 
-const useGameInputEventListener = (event: any, handler: any) => {
+const useGameEventListener = (
+  source: 'inputs' | 'common',
+  event: any,
+  handler: any,
+) => {
   const game = useContext(GameContext)
 
   useEffect(() => {
-    game.client.inputs.addListener(event, handler)
-    return () => game.client.inputs.removeListener(event, handler)
-  }, [event, handler, game])
-}
-
-const useGameCommonEventListener = (event: any, handler: any) => {
-  const game = useContext(GameContext)
-
-  useEffect(() => {
-    game.events.common.addListener(event, handler)
-    return () => game.events.common.removeListener(event, handler)
-  }, [event, handler, game])
+    switch (source) {
+      case 'inputs':
+        game.client.inputs.addListener(event, handler)
+        return () => game.client.inputs.removeListener(event, handler)
+      case 'common':
+        game.events.common.addListener(event, handler)
+        return () => game.events.common.removeListener(event, handler)
+      default:
+        throw new Error(`Unsupported event source: ${source}`)
+    }
+  }, [source, event, handler, game])
 }
 
 const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
@@ -114,14 +117,14 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
   )
 
   // listen to the events
-  useGameInputEventListener('@inventory/open', onInventoryOpen)
+  useGameEventListener('inputs', '@inventory/open', onInventoryOpen)
   for (let i = 0; i <= 9; i++) {
-    useGameInputEventListener(`@inventory/digit${i}`, (v: boolean) =>
+    useGameEventListener('inputs', `@inventory/digit${i}`, (v: boolean) =>
       onInventoryDigits(i, v),
     )
   }
-  useGameCommonEventListener('onInventoryAddItem', onItemAdd)
-  useGameCommonEventListener('onInventoryRemoveItem', onItemRemove)
+  useGameEventListener('common', 'onInventoryAddItem', onItemAdd)
+  useGameEventListener('common', 'onInventoryRemoveItem', onItemRemove)
 
   const handleClick = (slotIndex: number) => {
     const event: InventoryClickEvent = {
