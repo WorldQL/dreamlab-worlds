@@ -1,4 +1,5 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
+import { isPlayer, Player } from '@dreamlab.gg/core/dist/entities'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
@@ -22,6 +23,18 @@ export const createLadder = createSpawnableEntity(
       { isStatic: true },
     )
 
+    let isClimbing = false
+
+    const onPlayerCollision = (
+      pair: readonly [player: Player, otherBody: Matter.Body],
+      eventType: 'start' | 'end',
+    ) => {
+      const [, bodyCollided] = pair
+      if (body && bodyCollided === body) {
+        isClimbing = eventType === 'start'
+      }
+    }
+
     return {
       get tags() {
         return tags
@@ -37,6 +50,12 @@ export const createLadder = createSpawnableEntity(
 
       init({ game }) {
         game.physics.register(this, body)
+        game.events.common.addListener('onPlayerCollisionStart', pair =>
+          onPlayerCollision(pair, 'start'),
+        )
+        game.events.common.addListener('onPlayerCollisionEnd', pair =>
+          onPlayerCollision(pair, 'end'),
+        )
 
         return { game, body }
       },
@@ -73,6 +92,12 @@ export const createLadder = createSpawnableEntity(
 
       teardown({ game }) {
         game.physics.unregister(this, body)
+        game.events.common.removeListener('onPlayerCollisionStart', pair =>
+          onPlayerCollision(pair, 'start'),
+        )
+        game.events.common.removeListener('onPlayerCollisionEnd', pair =>
+          onPlayerCollision(pair, 'end'),
+        )
       },
 
       teardownRenderContext({ container }) {
@@ -82,24 +107,14 @@ export const createLadder = createSpawnableEntity(
       onPhysicsStep(_, { game }) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
-
-        const entitiesInArea = Matter.Query.region(
-          game.physics.engine.world.bodies,
-          Matter.Bounds.create([
-            {
-              x: body.position.x - width / 2,
-              y: body.position.y - height / 2,
-            },
-            {
-              x: body.position.x + width / 2,
-              y: body.position.y + height / 2,
-            },
-          ]),
-        )
-
-        const player = entitiesInArea.find(ev => ev.label === 'player')
-        if (player) {
-          Matter.Body.applyForce(player, player.position, { x: 0, y: -0.2 })
+        if (isClimbing) {
+          const player = game.entities.find(isPlayer)
+          if (player) {
+            Matter.Body.applyForce(player.body, player.position, {
+              x: 0,
+              y: -0.2,
+            })
+          }
         }
       },
 
