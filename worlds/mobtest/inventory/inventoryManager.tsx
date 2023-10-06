@@ -20,17 +20,26 @@ import {
   handleInventoryDragEnd,
 } from './listeners/InventoryDrag.js'
 
-export type InventoryData = PlayerInventoryItem[]
+export type InventoryData = (PlayerInventoryItem | undefined)[]
 const TOTAL_SLOTS = 36
 
 const GameContext = createContext<any | null>(null)
 
-const useGameEventListener = (event: any, handler: any) => {
+const useGameInputEventListener = (event: any, handler: any) => {
   const game = useContext(GameContext)
 
   useEffect(() => {
     game.client.inputs.addListener(event, handler)
     return () => game.client.inputs.removeListener(event, handler)
+  }, [event, handler, game])
+}
+
+const useGameCommonEventListener = (event: any, handler: any) => {
+  const game = useContext(GameContext)
+
+  useEffect(() => {
+    game.events.common.addListener(event, handler)
+    return () => game.events.common.removeListener(event, handler)
   }, [event, handler, game])
 }
 
@@ -76,13 +85,43 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
     [player, data, setActiveSlot],
   )
 
-  // listen to the inputs
-  useGameEventListener('@inventory/open', onInventoryOpen)
+  const onItemAdd = useCallback(
+    (item: PlayerInventoryItem) => {
+      setData(prev => {
+        const newData = [...prev]
+        const slotIndex = newData.findIndex(slot => slot === undefined)
+        if (slotIndex !== -1) {
+          newData[slotIndex] = item
+        }
+        return newData
+      })
+    },
+    [setData],
+  )
+
+  const onItemRemove = useCallback(
+    (item: PlayerInventoryItem) => {
+      setData(prev => {
+        const newData = [...prev]
+        const slotIndex = newData.findIndex(slot => slot && slot.id === item.id)
+        if (slotIndex !== -1) {
+          newData[slotIndex] = undefined
+        }
+        return newData
+      })
+    },
+    [setData],
+  )
+
+  // listen to the events
+  useGameInputEventListener('@inventory/open', onInventoryOpen)
   for (let i = 0; i <= 9; i++) {
-    useGameEventListener(`@inventory/digit${i}`, (v: boolean) =>
+    useGameInputEventListener(`@inventory/digit${i}`, (v: boolean) =>
       onInventoryDigits(i, v),
     )
   }
+  useGameCommonEventListener('onInventoryAddItem', onItemAdd)
+  useGameCommonEventListener('onInventoryRemoveItem', onItemRemove)
 
   const handleClick = (slotIndex: number) => {
     const event: InventoryClickEvent = {
