@@ -95,11 +95,14 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
         const slotIndex = newData.findIndex(slot => slot === undefined)
         if (slotIndex !== -1) {
           newData[slotIndex] = item
+          if (slotIndex === activeSlot) {
+            player.inventory.setItemInHand(item)
+          }
         }
         return newData
       })
     },
-    [setData],
+    [setData, activeSlot, player.inventory],
   )
 
   const onItemRemove = useCallback(
@@ -109,11 +112,14 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
         const slotIndex = newData.findIndex(slot => slot && slot.id === item.id)
         if (slotIndex !== -1) {
           newData[slotIndex] = undefined
+          if (slotIndex === activeSlot) {
+            player.inventory.setItemInHand(undefined)
+          }
         }
         return newData
       })
     },
-    [setData],
+    [setData, activeSlot, player.inventory],
   )
 
   // listen to the events
