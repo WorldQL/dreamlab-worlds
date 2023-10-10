@@ -1,4 +1,4 @@
-import { createHittableMob } from './entities/shared/basic.js'
+import { createHittableMob } from './dist/entities/shared/mobs/passive.js'
 import { createLadder } from './dist/entities/shared/ladder.js'
 import { createBreakableSolid } from './dist/entities/shared/breakableSolid.js'
 import { createPickupItem } from './dist/entities/shared/pickupItem.js'

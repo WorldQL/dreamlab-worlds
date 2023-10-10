@@ -1,5 +1,6 @@
-import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { isNetPlayer, isPlayer } from '@dreamlab.gg/core/entities'
+import { createSpawnableEntity, SpawnableEntity } from '@dreamlab.gg/core'
+import { A } from '@dreamlab.gg/core/dist/managers-e50e9729'
+import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/network'
 import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
@@ -17,7 +18,7 @@ export const createHittableMob = createSpawnableEntity(
 
     const hitRadius = width / 2 + 120
     const hitCooldown = 1 // Second(s)
-    let hitTimer = 0
+    let hitCooldownCounter = 0
 
     const healthIndicatorWidth = width + 50
     const healthIndicatorHeight = 20
@@ -26,6 +27,32 @@ export const createHittableMob = createSpawnableEntity(
     let health = maxHealth
 
     let direction = 1
+
+    let netClient: A | undefined
+
+    const onPlayerAttack: (
+      playerBody: Matter.Body,
+      animation: string,
+    ) => void = (playerBody, _) => {
+      if (hitCooldownCounter <= 0) {
+        const xDiff = playerBody.position.x - body.position.x
+
+        if (Math.abs(xDiff) <= hitRadius) {
+          netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+          hitCooldownCounter = hitCooldown * 60
+        }
+      }
+    }
+
+    const onCollisionStart = (
+      pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
+    ) => {
+      const [a, b] = pair
+      if (a.uid === uid || b.uid === uid) {
+        console.log('hello?')
+        direction = -direction
+      }
+    }
 
     return {
       get tags() {
@@ -36,18 +63,24 @@ export const createHittableMob = createSpawnableEntity(
         return cloneTransform(transform)
       },
 
-      isInBounds() {
+      isInBounds(position) {
         return Matter.Query.point([body], position).length > 0
       },
 
       init({ game }) {
         game.physics.register(this, body)
+        game.events.common.addListener('onPlayerAttack', onPlayerAttack)
+        game.events.common.addListener('onCollisionStart', onCollisionStart)
 
         const netServer = onlyNetServer(game)
-        const netClient = onlyNetClient(game)
+        netClient = onlyNetClient(game)
 
         /** @type {import('@dreamlab.gg/core/network').MessageListenerServer} */
-        const onHitServer = ({ peerID }, _, data) => {
+        const onHitServer = (
+          { peerID }: any,
+          _: any,
+          data: { uid: string },
+        ) => {
           const network = netServer
           if (!network) throw new Error('missing network')
 
@@ -60,8 +93,6 @@ export const createHittableMob = createSpawnableEntity(
             .find(netplayer => netplayer.peerID === peerID)
 
           if (!player) throw new Error('missing netplayer')
-          const xDiff = Math.abs(player.position.x - body.position.x);
-          if (xDiff > hitRadius) return;
 
           direction = body.position.x > player.position.x ? 1 : -1
           const force = 0.5 * direction
@@ -88,7 +119,7 @@ export const createHittableMob = createSpawnableEntity(
         }
 
         /** @type {import('@dreamlab.gg/core/network').MessageListenerClient} */
-        const onHitClient = (_, data) => {
+        const onHitClient = (_: any, data: { uid: string; health: number }) => {
           const network = netClient
           if (!network) throw new Error('missing network')
 
@@ -165,6 +196,7 @@ export const createHittableMob = createSpawnableEntity(
 
       teardown({ game, onHitServer, onHitClient, netServer, netClient }) {
         game.physics.unregister(this, body)
+        game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
 
         netServer?.removeCustomMessageListener(HIT_CHANNEL, onHitServer)
         netClient?.removeCustomMessageListener(HIT_CHANNEL, onHitClient)
@@ -175,69 +207,22 @@ export const createHittableMob = createSpawnableEntity(
         ctrHealth.destroy({ children: true })
       },
 
-      onPhysicsStep({ delta }, { game, netClient }) {
-        const { position: bodyPosition } = body
-        const halfWidth = width / 2
-
+      onPhysicsStep(_) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
+        if (hitCooldownCounter > 0) {
+          hitCooldownCounter -= 1
+        }
+
         const speed = 2
-        const collisionCheckDistance = speed + 10
-        const sideCheckHeight = height - 10
-
-        const baseX =
-          direction === 1
-            ? bodyPosition.x + halfWidth
-            : bodyPosition.x - halfWidth
-
-        const potentialCollisionArea = {
-          min: {
-            x: baseX - (direction === 1 ? 0 : collisionCheckDistance),
-            y: bodyPosition.y - sideCheckHeight / 2,
-          },
-          max: {
-            x: baseX + (direction === 1 ? collisionCheckDistance : 0),
-            y: bodyPosition.y + sideCheckHeight / 2,
-          },
-        }
-
-        const bodiesInArea = Matter.Query.region(
-          game.physics.engine.world.bodies,
-          potentialCollisionArea,
-        )
-        const collidingBody = bodiesInArea.find(b => b !== body)
-
-        if (collidingBody) {
-          if (collidingBody.label === 'player') {
-            Matter.Body.setPosition(collidingBody, { x: 0, y: -100 })
-          } else {
-            direction = -direction
-          }
-        } else {
-          Matter.Body.translate(body, { x: speed * direction, y: 0 })
-        }
-
-        const inputs = game.client?.inputs
-        const hit = inputs?.getInput('@player/attack') ?? false
-        if (hit && hitTimer === 0) {
-          const player = game.entities.find(isPlayer)
-          if (!player) return
-          const xDiff = Math.abs(player.position.x - body.position.x);
-          if (xDiff > hitRadius) return;
-
-
-          hitTimer += hitCooldown
-          netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
-        } else {
-          hitTimer = Math.max(hitTimer - delta, 0)
-        }
+        Matter.Body.translate(body, { x: speed * direction, y: 0 })
       },
 
       onRenderFrame(
         { smooth },
         { game },
-        { camera, container, gfxBounds, gfxHittest, gfxHealthAmount },
+        { camera, container, gfxHittest, gfxBounds, gfxHealthAmount },
       ) {
         const debug = game.debug
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
@@ -248,7 +233,7 @@ export const createHittableMob = createSpawnableEntity(
 
         const alpha = debug.value ? 0.5 : 0
         gfxBounds.alpha = alpha
-        gfxHittest.alpha = hitTimer === 0 ? alpha / 3 : 0
+        gfxHittest.alpha = hitCooldownCounter === 0 ? alpha / 3 : 0
 
         drawBox(
           gfxHealthAmount,
