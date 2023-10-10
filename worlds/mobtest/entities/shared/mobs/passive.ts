@@ -49,7 +49,7 @@ export const createHittableMob = createSpawnableEntity(
     ) => {
       const [a, b] = pair
       if (a.uid === uid || b.uid === uid) {
-        console.log('hello?')
+        console.log('hit')
         direction = -direction
       }
     }
@@ -197,6 +197,7 @@ export const createHittableMob = createSpawnableEntity(
       teardown({ game, onHitServer, onHitClient, netServer, netClient }) {
         game.physics.unregister(this, body)
         game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
+        game.events.common.removeListener('onCollisionStart', onCollisionStart)
 
         netServer?.removeCustomMessageListener(HIT_CHANNEL, onHitServer)
         netClient?.removeCustomMessageListener(HIT_CHANNEL, onHitClient)
