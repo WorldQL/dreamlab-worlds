@@ -185,7 +185,7 @@ export const initializeGameUI = (game: any) => {
 
   const digits = Array.from({ length: 9 }, (_, i) => 'digit' + (i + 1))
   const keys = [
-    'KeyQ',
+    'KeyE',
     ...Array.from({ length: 9 }, (_, i) => 'Digit' + (i + 1)),
   ]
 
