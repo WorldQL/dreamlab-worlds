@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "import/order": [
+      "error",
+      {
+        "newlines-between": "ignore"
+      }
+    ]
+  }
+}

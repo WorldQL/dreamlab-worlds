@@ -1,5 +1,5 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { Vec, toDegrees, toRadians } from '@dreamlab.gg/core/math'
+import { toDegrees, toRadians, Vec } from '@dreamlab.gg/core/math'
 import { drawCircle } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Graphics } from 'pixi.js'
