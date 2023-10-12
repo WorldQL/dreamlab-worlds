@@ -23,7 +23,7 @@ interface ProjectileEntity {
     gfxBounds: Graphics
     sprite?: Sprite
   }
-  teardown(data: { game: any }): void
+  teardown(data: any): void
   teardownRenderContext(data: { container: Container }): void
   onPhysicsStep(data: { delta: number }, context: { game: any }): void
   onRenderFrame(
@@ -52,28 +52,12 @@ export const createProjectile = createSpawnableEntity(
       restitution: 0,
     })
 
-    const lifespan = 30000 // 30secs
-    let lifeTimer = 0
-    const speed = 50
+    // const lifespan = 30000 // 30secs
+    // let lifeTimer = 0
+    const speed = 2
     const velocity = { x: direction * speed, y: 0 }
-
-    const onPlayerAttack: (
-      pair: readonly [playerBody: Matter.Body, animation: string],
-      game: any,
-    ) => void = ([playerBody, animation], game) => {
-      console.log('test222?')
-      if (animation === 'bow') {
-        console.log('test?')
-        // const playerDirection = playerBody.velocity.x >= 0 ? 1 : -1
-        // game.spawn({
-        //   entity: '@dreamlab/Projectile',
-        //   args: [50, playerDirection],
-        //   transform: {
-        //     position: [body.position.x, body.position.y],
-        //   },
-        // })
-      }
-    }
+    let lastProjectileSpawnTime = 0
+    const projectileSpawnCooldown = 2000
 
     return {
       tags,
@@ -89,14 +73,33 @@ export const createProjectile = createSpawnableEntity(
       },
 
       init({ game }) {
+        const onPlayerAttack = (
+          _playerBody: Matter.Body,
+          animation: string,
+        ) => {
+          if (animation === 'bow') {
+            const currentTime = Date.now()
+            if (
+              currentTime - lastProjectileSpawnTime >=
+              projectileSpawnCooldown
+            ) {
+              lastProjectileSpawnTime = currentTime
+              const playerDirection = _playerBody.velocity.x >= 0 ? 1 : -1
+              game.spawn({
+                entity: '@dreamlab/Projectile',
+                args: [50, playerDirection],
+                transform: {
+                  position: [body.position.x, body.position.y],
+                },
+              })
+            }
+          }
+        }
+
         game.physics.register(this, body)
-        game.events.common.addListener(
-          'onPlayerAttack',
-          (pair: readonly [playerBody: Matter.Body, animation: string]) =>
-            onPlayerAttack(pair, game),
-        )
+        game.events.common.addListener('onPlayerAttack', onPlayerAttack)
         Matter.Body.setVelocity(body, velocity)
-        return { game, body }
+        return { game, body, onPlayerAttack }
       },
 
       initRenderContext(_, { camera, stage }) {
@@ -133,49 +136,18 @@ export const createProjectile = createSpawnableEntity(
         }
       },
 
-      teardown({ game }) {
+      teardown({ game, onPlayerAttack }) {
         game.physics.unregister(this, body)
-        game.events.common.removeListener(
-          'onPlayerAttack',
-          (pair: readonly [playerBody: Matter.Body, animation: string]) =>
-            onPlayerAttack(pair, game),
-        )
+        game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
       },
 
       teardownRenderContext({ container }) {
         container.destroy({ children: true })
       },
 
-      onPhysicsStep({ delta }, { game }) {
+      onPhysicsStep(_) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
-
-        lifeTimer += delta
-        if (lifeTimer >= lifespan) {
-          game.destroy(this)
-        }
-
-        const collisions = Matter.Query.collides(
-          body,
-          game.physics.engine.world.bodies,
-        )
-        if (collisions && collisions.length > 0) {
-          for (let collision of collisions) {
-            if (
-              collision.bodyA.label === 'basic_mob' ||
-              collision.bodyB.label === 'basic_mob'
-            ) {
-              continue
-            }
-            if (
-              collision.bodyA.label !== 'projectile' ||
-              collision.bodyB.label !== 'projectile'
-            ) {
-              game.destroy(this)
-              break
-            }
-          }
-        }
       },
 
       onRenderFrame(_, { game }, { camera, container, gfxBounds }) {
