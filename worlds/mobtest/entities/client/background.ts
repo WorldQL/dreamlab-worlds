@@ -24,6 +24,10 @@ export const createBackground = createSpawnableEntity(
         return tags
       },
 
+      get body() {
+        return undefined
+      },
+
       get transform() {
         return cloneTransform(transform)
       },

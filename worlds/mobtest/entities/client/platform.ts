@@ -41,6 +41,10 @@ export const createPlatform = createSpawnableEntity(
         return tags
       },
 
+      get body() {
+        return [body]
+      },
+
       get transform() {
         return cloneTransform(transform)
       },
