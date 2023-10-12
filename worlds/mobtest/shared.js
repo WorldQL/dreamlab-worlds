@@ -15,5 +15,6 @@ export const sharedInit = async game => {
   game.register('@dreamlab/Platform', createPlatform)
   game.register('@dreamlab/Projectile', createProjectile)
 
+
   await game.spawnMany(...level)
 }

@@ -1,18 +1,12 @@
 import { sharedInit } from './shared.js'
 
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
 /** @type {import('@dreamlab.gg/core/sdk').InitServer} */
 export const init = async game => {
   await sharedInit(game)
-
-  game.spawn({
-    entity: '@dreamlab/PassiveMob',
+  await game.spawn({
+    entity: '@dreamlab/ServerTime',
     args: [],
-    transform: { position: [-1_250, 300] },
+    transform: { position: [0, 0] },
     tags: ['net/replicated'],
   })
-
 }
