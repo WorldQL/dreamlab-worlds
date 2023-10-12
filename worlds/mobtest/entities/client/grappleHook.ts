@@ -63,10 +63,6 @@ export const createGrappleHook = createSpawnableEntity(
         return cloneTransform(transform)
       },
 
-      get body() {
-        return [body]
-      },
-
       get zIndex() {
         return zIndex
       },

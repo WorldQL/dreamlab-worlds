@@ -59,10 +59,6 @@ export const createBreakableSolid = createSpawnableEntity(
         return tags
       },
 
-      get body() {
-        return [bodyLeft, bodyRight]
-      },
-
       get transform() {
         return cloneTransform(transform)
       },

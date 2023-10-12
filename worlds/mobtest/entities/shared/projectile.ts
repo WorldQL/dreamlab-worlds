@@ -7,7 +7,6 @@ import { Container, Graphics, Sprite } from 'pixi.js'
 
 interface ProjectileEntity {
   tags: string[]
-  body: Matter.Body[] | undefined
   transform: {
     position: Matter.Vector
     rotation: number
@@ -61,10 +60,6 @@ export const createProjectile = createSpawnableEntity(
 
     return {
       tags,
-
-      get body() {
-        return [body]
-      },
 
       transform: cloneTransform(transform),
 
