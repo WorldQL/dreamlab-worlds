@@ -68,33 +68,9 @@ export const createProjectile = createSpawnableEntity(
       },
 
       init({ game }) {
-        const onPlayerAttack = (
-          _playerBody: Matter.Body,
-          animation: string,
-        ) => {
-          if (animation === 'bow') {
-            const currentTime = Date.now()
-            if (
-              currentTime - lastProjectileSpawnTime >=
-              projectileSpawnCooldown
-            ) {
-              lastProjectileSpawnTime = currentTime
-              const playerDirection = _playerBody.velocity.x >= 0 ? 1 : -1
-              game.spawn({
-                entity: '@dreamlab/Projectile',
-                args: [50, playerDirection],
-                transform: {
-                  position: [body.position.x, body.position.y],
-                },
-              })
-            }
-          }
-        }
-
         game.physics.register(this, body)
-        game.events.common.addListener('onPlayerAttack', onPlayerAttack)
         Matter.Body.setVelocity(body, velocity)
-        return { game, body, onPlayerAttack }
+        return { game, body }
       },
 
       initRenderContext(_, { camera, stage }) {
@@ -131,9 +107,8 @@ export const createProjectile = createSpawnableEntity(
         }
       },
 
-      teardown({ game, onPlayerAttack }) {
+      teardown({ game }) {
         game.physics.unregister(this, body)
-        game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
       },
 
       teardownRenderContext({ container }) {

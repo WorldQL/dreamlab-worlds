@@ -18,14 +18,6 @@ export const level = [
     },
   },
   {
-    entity: '@dreamlab/Projectile',
-    args: [50, 1],
-    transform: {
-      position: { x: 1_000, y: 400 },
-      rotation: 0,
-    },
-  },
-  {
     entity: '@dreamlab/Solid', // left spawn wall
     args: [250, 50],
     transform: {
