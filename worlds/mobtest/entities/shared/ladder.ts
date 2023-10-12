@@ -44,6 +44,10 @@ export const createLadder = createSpawnableEntity(
         return cloneTransform(transform)
       },
 
+      get body() {
+        return [body]
+      },
+
       isInBounds(position) {
         return Matter.Query.point([body], position).length > 0
       },

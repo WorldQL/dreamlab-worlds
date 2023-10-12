@@ -1,5 +1,5 @@
 import { createSpawnableEntity, SpawnableEntity } from '@dreamlab.gg/core'
-import { A } from '@dreamlab.gg/core/dist/managers-e50e9729'
+import { A } from '@dreamlab.gg/core/dist/managers-f7ae7cbc'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/network'
@@ -7,7 +7,7 @@ import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
-export const createHittableMob = createSpawnableEntity(
+export const createPassiveMob = createSpawnableEntity(
   ({ uid, tags, transform, zIndex }) => {
     const HIT_CHANNEL = '@dreamlab/Hittable/hit'
     const { position } = transform
@@ -49,7 +49,6 @@ export const createHittableMob = createSpawnableEntity(
     ) => {
       const [a, b] = pair
       if (a.uid === uid || b.uid === uid) {
-        console.log('hit')
         direction = -direction
       }
     }
@@ -61,6 +60,10 @@ export const createHittableMob = createSpawnableEntity(
 
       get transform() {
         return cloneTransform(transform)
+      },
+
+      get body() {
+        return [body]
       },
 
       isInBounds(position) {
@@ -107,7 +110,7 @@ export const createHittableMob = createSpawnableEntity(
 
             setTimeout(() => {
               game.spawn({
-                entity: '@dreamlab/Hittable',
+                entity: '@dreamlab/PassiveMob',
                 args: [],
                 transform: { position: [respawnPosition.x, respawnPosition.y] },
                 tags: ['net/replicated'],
