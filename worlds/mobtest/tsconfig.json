@@ -17,8 +17,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "outDir": "dist"
+    "outDir": "dist",
+    "allowJs": true
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.js", "**/*.ts", "**/*.tsx"],
   "exclude": ["dist"]
 }
