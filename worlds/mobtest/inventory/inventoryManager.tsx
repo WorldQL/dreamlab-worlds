@@ -9,16 +9,16 @@ import React, {
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import Inventory from './Inventory.js'
 import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
-import { InventoryClickEvent } from './events/inventoryClickEvent.js'
-import {
-  InventoryDragStartEvent,
-  InventoryDragEndEvent,
-} from './events/inventoryDragEvent.js'
 import { handleInventoryClick } from './listeners/InventoryClick.js'
 import {
   handleInventoryDragStart,
   handleInventoryDragEnd,
 } from './listeners/InventoryDrag.js'
+import { InventoryClickEvent } from './events/InventoryClickEvent.js'
+import {
+  InventoryDragStartEvent,
+  InventoryDragEndEvent,
+} from './events/InventoryDragEvent.js'
 
 export type InventoryData = (PlayerInventoryItem | undefined)[]
 const TOTAL_SLOTS = 36

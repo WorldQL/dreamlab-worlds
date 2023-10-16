@@ -73,7 +73,7 @@ export const createGrappleHook = createSpawnableEntity(
 
       init({ game }) {
         game.physics.register(this, body)
-        game.client?.inputs.registerInput('@dreamlab/hook', 'ShiftLeft')
+        game.client?.inputs.registerInput('@dreamlab/hook', 'KeyQ')
 
         return { game, body }
       },

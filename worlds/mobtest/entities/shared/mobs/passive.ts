@@ -1,5 +1,4 @@
 import { createSpawnableEntity, SpawnableEntity } from '@dreamlab.gg/core'
-import { A } from '@dreamlab.gg/core/dist/managers-f7ae7cbc'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/network'
@@ -28,12 +27,11 @@ export const createPassiveMob = createSpawnableEntity(
 
     let direction = 1
 
-    let netClient: A | undefined
-
     const onPlayerAttack: (
       playerBody: Matter.Body,
       animation: string,
-    ) => void = (playerBody, _) => {
+      netClient?: any,
+    ) => void = (playerBody, _, netClient) => {
       if (hitCooldownCounter <= 0) {
         const xDiff = playerBody.position.x - body.position.x
 
@@ -68,11 +66,15 @@ export const createPassiveMob = createSpawnableEntity(
 
       init({ game }) {
         game.physics.register(this, body)
-        game.events.common.addListener('onPlayerAttack', onPlayerAttack)
+        game.events.common.addListener(
+          'onPlayerAttack',
+          (playerBody, animation) =>
+            onPlayerAttack(playerBody, animation, netClient),
+        )
         game.events.common.addListener('onCollisionStart', onCollisionStart)
 
         const netServer = onlyNetServer(game)
-        netClient = onlyNetClient(game)
+        const netClient = onlyNetClient(game)
 
         /** @type {import('@dreamlab.gg/core/network').MessageListenerServer} */
         const onHitServer = (
