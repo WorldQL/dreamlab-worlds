@@ -9,11 +9,11 @@
     "fmt": "npm run format"
   },
   "devDependencies": {
-    "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7",
+    "@types/react": "^18.2.28",
+    "@types/react-dom": "^18.2.13",
     "@dreamlab.gg/core": "^0.0.41",
-    "@luludev/eslint-config": "^0.4.2",
-    "eslint": "^8.48.0",
-    "prettier": "^3.0.2"
+    "@luludev/eslint-config": "^0.5.0",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3"
   }
 }
