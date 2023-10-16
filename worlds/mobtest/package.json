@@ -1,16 +1,13 @@
 {
   "name": "mobtest",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc -w",
+    "dev": "npm run build -- --watch",
     "lint": "prettier --check . && eslint . --ext js",
     "format": "prettier --write . && eslint . --ext js --fix",
     "fmt": "npm run format"
   },
-  "author": "",
   "devDependencies": {
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",

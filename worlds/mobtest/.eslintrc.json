@@ -1,14 +1,18 @@
 {
-  "ignorePatterns": ["dist/"],
   "root": true,
   "extends": [
     "@luludev/eslint-config/common",
     "@luludev/eslint-config/browser",
+    "@luludev/eslint-config/typescript",
     "@luludev/eslint-config/prettier"
   ],
+  "parserOptions": {
+    "project": "./tsconfig.eslint.json"
+  },
   "rules": {
     "import/no-extraneous-dependencies": 0,
     "jsdoc/valid-types": 0,
     "unicorn/no-array-callback-reference": 0
-  }
+  },
+  "ignorePatterns": ["**/dist/*"]
 }
