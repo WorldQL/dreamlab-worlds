@@ -26,7 +26,6 @@ import {
 export type InventoryData = (PlayerInventoryItem | undefined)[]
 const TOTAL_SLOTS = 36
 
-// TODO: fix this
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const GameContext = createContext<any | null>(null)
 
