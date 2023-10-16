@@ -11,6 +11,7 @@
     "project": "./tsconfig.eslint.json"
   },
   "rules": {
+    "react/prop-types": "off",
     "import/no-extraneous-dependencies": 0,
     "jsdoc/valid-types": 0,
     "unicorn/no-array-callback-reference": 0
