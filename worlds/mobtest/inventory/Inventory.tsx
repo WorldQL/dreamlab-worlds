@@ -1,15 +1,23 @@
-import React from 'https://esm.sh/react@18.2.0'
-import InventorySlot from './InventorySlot.js'
-import { inventoryStyles as styles } from './InventoryStyle.js'
-import { InventoryData } from './inventoryManager.js'
-import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
+import React from "https://esm.sh/react@18.2.0";
+import InventorySlot from "./InventorySlot.js";
+import { inventoryStyles as styles } from "./InventoryStyle.js";
+import { InventoryData } from "./InventoryManager.js";
+import { PlayerInventoryItem } from "@dreamlab.gg/core/dist/managers";
 
 interface Props {
-  data: InventoryData
-  onClick: (slotIndex: number) => void
-  onDragStart: (slotIndex: number) => void
-  onDragEnd: (slotIndex: number) => void
+  data: InventoryData;
+  onClick: (slotIndex: number) => void;
+  onDragStart: (slotIndex: number) => void;
+  onDragEnd: (slotIndex: number) => void;
 }
+
+const chunkArray = (array: any[], size: number) => {
+  const result = [];
+  for (let index = 0; index < array.length; index += size) {
+    result.push(array.slice(index, index + size));
+  }
+  return result;
+};
 
 const Inventory: React.FC<Props> = ({
   data,
@@ -17,35 +25,35 @@ const Inventory: React.FC<Props> = ({
   onDragStart,
   onDragEnd,
 }) => {
-  const numCols = 9
-  const chunkedData = chunkArray(data, numCols)
+  const numCols = 9;
+  const chunkedData = chunkArray(data, numCols);
 
   const createSlot = (
     slot: PlayerInventoryItem,
     slotIndex: number,
     offset: number = 0,
   ) => {
-    const index = offset + slotIndex
+    const index = offset + slotIndex;
     return (
       <div
         key={slotIndex}
         style={styles.inventorySlot}
         onClick={() => onClick(index)}
-        onDragStart={e => {
+        onDragStart={(ev) => {
           if (!slot) {
-            e.preventDefault()
-            return
+            ev.preventDefault();
+            return;
           }
-          onDragStart(index)
+          onDragStart(index);
         }}
         onDrop={() => onDragEnd(index)}
-        onDragOver={e => e.preventDefault()}
+        onDragOver={(ev) => ev.preventDefault()}
         draggable={!!slot}
       >
         {slot && <InventorySlot slot={slot} />}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div style={styles.inventory}>
@@ -61,15 +69,7 @@ const Inventory: React.FC<Props> = ({
         {chunkedData[0].map((slot, slotIndex) => createSlot(slot, slotIndex))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-const chunkArray = (array: any[], size: number) => {
-  const result = []
-  for (let i = 0; i < array.length; i += size) {
-    result.push(array.slice(i, i + size))
-  }
-  return result
-}
-
-export default Inventory
+export default Inventory;

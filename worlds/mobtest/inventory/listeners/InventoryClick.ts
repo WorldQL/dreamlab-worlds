@@ -1,5 +1,5 @@
-import { InventoryClickEvent } from '../events/InventoryClickEvent'
+import { InventoryClickEvent } from "../events/InventoryClickEvent";
 
 export const handleInventoryClick = (event: InventoryClickEvent) => {
-  console.log(`Slot at [${event.cursorSlot}] was clicked`)
-}
+  console.log(`Slot at [${event.cursorSlot}] was clicked`);
+};

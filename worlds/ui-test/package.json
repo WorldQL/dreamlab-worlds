@@ -4,11 +4,19 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc -w",
+    "lint": "prettier --check . && eslint . --ext js",
+    "format": "prettier --write . && eslint . --ext js --fix",
+    "fmt": "npm run format"
   },
   "author": "",
   "dependencies": {
     "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7"
+    "@types/react-dom": "^18.2.7",
+    "@dreamlab.gg/core": "^0.0.41",
+    "@luludev/eslint-config": "^0.4.2",
+    "eslint": "^8.48.0",
+    "prettier": "^3.0.2"
   }
 }

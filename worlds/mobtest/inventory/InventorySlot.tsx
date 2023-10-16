@@ -1,20 +1,20 @@
-import React, { useState } from 'https://esm.sh/react@18.2.0'
-import { inventoryStyles as styles } from './InventoryStyle.js'
-import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
+import React, { useState } from "https://esm.sh/react@18.2.0";
+import { inventoryStyles as styles } from "./InventoryStyle.js";
+import { PlayerInventoryItem } from "@dreamlab.gg/core/dist/managers";
 
 interface Props {
-  slot: PlayerInventoryItem
+  slot: PlayerInventoryItem;
 }
 
 const InventorySlot: React.FC<Props> = ({ slot }) => {
-  const [isHovered, setIsHovered] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const combinedStyles = {
     ...styles.inventorySlot,
     ...(isHovered ? styles.inventorySlotHover : {}),
-    border: slot ? '2px solid #8c7ae6' : '2px solid transparent',
-  }
+    border: slot ? "2px solid #8c7ae6" : "2px solid transparent",
+  };
 
   return (
     <div
@@ -27,9 +27,9 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
       {slot && slot.textureURL && (
         <img
           src={slot.textureURL}
-          width='50'
-          height='50'
-          className='inventorySprite'
+          width="50"
+          height="50"
+          className="inventorySprite"
           draggable
           alt={slot.displayName}
         />
@@ -39,7 +39,7 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
         <div style={styles.itemTooltip}>{slot.displayName}</div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default InventorySlot
+export default InventorySlot;

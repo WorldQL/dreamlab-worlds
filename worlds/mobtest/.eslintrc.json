@@ -1,4 +1,5 @@
 {
+  "ignorePatterns": ["dist/"],
   "root": true,
   "extends": [
     "@luludev/eslint-config/common",

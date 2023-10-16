@@ -1,8 +1,8 @@
-import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { createSprite } from '@dreamlab.gg/core/textures'
-import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
-import { drawBox } from '@dreamlab.gg/core/utils'
-import { Container, Graphics } from 'pixi.js'
+import { createSpawnableEntity } from "@dreamlab.gg/core";
+import { createSprite } from "@dreamlab.gg/core/textures";
+import { cloneTransform, Vec } from "@dreamlab.gg/core/math";
+import { drawBox } from "@dreamlab.gg/core/utils";
+import { Container, Graphics } from "pixi.js";
 
 export const createFreeform = createSpawnableEntity(
   (
@@ -11,73 +11,73 @@ export const createFreeform = createSpawnableEntity(
     height: number,
     spriteSource: string,
   ) => {
-    const { position, rotation } = transform
+    const { position, rotation } = transform;
 
     return {
       get position() {
-        return Vec.create(position.x, position.y)
+        return Vec.create(position.x, position.y);
       },
 
       get tags() {
-        return tags
+        return tags;
       },
 
       get transform() {
-        return cloneTransform(transform)
+        return cloneTransform(transform);
       },
 
       isInBounds() {
-        return false
+        return false;
       },
 
       init({ game }) {
-        return { game }
+        return { game };
       },
 
       initRenderContext(_, { camera, stage }) {
-        const container = new Container()
-        container.sortableChildren = true
-        container.zIndex = zIndex
-        const graphics = new Graphics()
-        graphics.zIndex = zIndex
+        const container = new Container();
+        container.sortableChildren = true;
+        container.zIndex = zIndex;
+        const graphics = new Graphics();
+        graphics.zIndex = zIndex;
         const sprite = createSprite(spriteSource, {
           width,
           height,
           zIndex,
-        })
+        });
 
         if (sprite) {
-          container.addChild(sprite)
+          container.addChild(sprite);
         } else {
-          drawBox(graphics, { width, height }, { stroke: '#00f' })
-          container.addChild(graphics)
+          drawBox(graphics, { width, height }, { stroke: "#00f" });
+          container.addChild(graphics);
         }
 
-        stage.addChild(container)
+        stage.addChild(container);
         return {
           camera,
           container,
           graphics,
           sprite,
-        }
+        };
       },
 
       teardown() {},
 
       teardownRenderContext({ container }) {
-        container.destroy({ children: true })
+        container.destroy({ children: true });
       },
 
       onPhysicsStep() {},
 
       onRenderFrame(_, { game }, { camera, container }) {
-        const debug = game.debug
-        const pos = Vec.add(position, camera.offset)
+        const debug = game.debug;
+        const pos = Vec.add(position, camera.offset);
 
-        container.position = pos
-        container.angle = rotation
-        container.alpha = debug.value ? 0.5 : 0
+        container.position = pos;
+        container.angle = rotation;
+        container.alpha = debug.value ? 0.5 : 0;
       },
-    }
+    };
   },
-)
+);

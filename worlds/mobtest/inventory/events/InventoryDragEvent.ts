@@ -1,12 +1,12 @@
-import { InventoryEvent } from './inventoryEvent'
+import { InventoryEvent } from "./InventoryEvent";
 
 export interface InventoryDragStartEvent extends InventoryEvent {
-  setSourceSlot: (cursorSlot: number | null) => void
-  setData: (data: any[]) => void
+  setSourceSlot: (cursorSlot: number | null) => void;
+  setData: (data: any[]) => void;
 }
 
 export interface InventoryDragEndEvent extends InventoryEvent {
-  sourceSlot: number
-  targetSlot: number
-  setData: (data: any[]) => void
+  sourceSlot: number;
+  targetSlot: number;
+  setData: (data: any[]) => void;
 }
