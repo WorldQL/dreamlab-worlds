@@ -4,8 +4,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "npm run build -- --watch",
-    "lint": "prettier --check . && eslint . --ext ts",
-    "format": "prettier --write . && eslint . --ext ts --fix",
+    "lint": "prettier --check . && eslint . --ext ts,tsx",
+    "format": "prettier --write . && eslint . --ext ts,tsx --fix",
     "fmt": "npm run format"
   },
   "devDependencies": {
