@@ -32,7 +32,8 @@ export const createBreakableSolid = createSpawnableEntity(
     const createBody = (px: number, py: number, wd: number, ht: number) =>
       Matter.Bodies.rectangle(px, py, wd, ht, bodyOptions)
 
-    let bodyLeft: Matter.Body, bodyRight: Matter.Body
+    let bodyLeft: Matter.Body
+    let bodyRight: Matter.Body
 
     if (splitVertically) {
       bodyLeft = createBody(position.x, position.y, halfWidth, height)
@@ -81,7 +82,8 @@ export const createBreakableSolid = createSpawnableEntity(
         container.sortableChildren = true
         container.zIndex = zIndex
 
-        let gfxBoundsLeft, gfxBoundsRight
+        let gfxBoundsLeft
+        let gfxBoundsRight
 
         if (spriteSource) {
           gfxBoundsLeft = createSprite(spriteSource, {
@@ -169,7 +171,7 @@ export const createBreakableSolid = createSpawnableEntity(
           !isBroken
         ) {
           isBroken = true
-          ;[bodyLeft, bodyRight].forEach(body => {
+          for (const body of [bodyLeft, bodyRight]) {
             Matter.Body.setStatic(body, false)
             const forceDirection = body === bodyLeft ? -0.05 : 0.05
             Matter.Body.applyForce(
@@ -180,7 +182,7 @@ export const createBreakableSolid = createSpawnableEntity(
               },
               { x: forceDirection, y: 0 },
             )
-          })
+          }
         }
       },
 

@@ -1,6 +1,6 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { Player } from '@dreamlab.gg/core/dist/entities'
-import { ItemOptions } from '@dreamlab.gg/core/dist/managers'
+import type { Player } from '@dreamlab.gg/core/dist/entities'
+import type { ItemOptions } from '@dreamlab.gg/core/dist/managers'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
@@ -104,6 +104,7 @@ export const createPickupItem = createSpawnableEntity(
           drawBox(gfxBounds, { width, height }, { stroke: '#00f' })
           container.addChild(gfxBounds)
         }
+
         stage.addChild(container)
 
         return {
@@ -131,6 +132,7 @@ export const createPickupItem = createSpawnableEntity(
           Matter.World.remove(game.physics.engine.world, body)
           return
         }
+
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
       },

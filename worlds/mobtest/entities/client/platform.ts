@@ -1,6 +1,6 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { createSprite } from '@dreamlab.gg/core/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import { createSprite } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
@@ -122,11 +122,9 @@ export const createPlatform = createSpawnableEntity(
 
           const playerMovingDownward = playerBody.velocity.y > 0
 
-          if (playerAbovePlatform && playerMovingDownward) {
-            isPlatformActive = true
-          } else {
-            isPlatformActive = false
-          }
+          isPlatformActive = Boolean(
+            playerAbovePlatform && playerMovingDownward,
+          )
         }
 
         body.collisionFilter.mask = isPlatformActive ? PLAYER_CATEGORY : 0x0000

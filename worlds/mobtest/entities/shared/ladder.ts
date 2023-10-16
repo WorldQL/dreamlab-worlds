@@ -1,5 +1,6 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { isPlayer, Player } from '@dreamlab.gg/core/dist/entities'
+import type { Player } from '@dreamlab.gg/core/dist/entities'
+import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
@@ -27,7 +28,7 @@ export const createLadder = createSpawnableEntity(
 
     const onPlayerCollision = (
       pair: readonly [player: Player, otherBody: Matter.Body],
-      eventType: 'start' | 'end',
+      eventType: 'end' | 'start',
     ) => {
       const [, bodyCollided] = pair
       if (body && bodyCollided === body) {
@@ -80,6 +81,7 @@ export const createLadder = createSpawnableEntity(
           drawBox(gfxBounds, { width, height }, { stroke: '#00f' })
           container.addChild(gfxBounds)
         }
+
         stage.addChild(container)
 
         return {

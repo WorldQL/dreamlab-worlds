@@ -1,4 +1,4 @@
-import {
+import type {
   InventoryDragEndEvent,
   InventoryDragStartEvent,
 } from '../events/InventoryDragEvent'

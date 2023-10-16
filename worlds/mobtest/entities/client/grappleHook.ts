@@ -1,7 +1,7 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { Camera } from '@dreamlab.gg/core/entities'
-import { createSprite } from '@dreamlab.gg/core/textures'
+import type { Camera } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import { createSprite } from '@dreamlab.gg/core/textures'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
@@ -15,7 +15,7 @@ const subtract = (v1: Vector, v2: Vector): Vector => {
 }
 
 const distance = (v1: Vector, v2: Vector): number => {
-  return Math.sqrt((v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2)
+  return Math.hypot(v1.x - v2.x, v1.y - v2.y)
 }
 
 let cursorPosition: Vector | undefined
@@ -34,7 +34,7 @@ export const createGrappleHook = createSpawnableEntity(
     { tags, transform, zIndex },
     width: number,
     height: number,
-    mustConnectWithBody: boolean = false,
+    mustConnectWithBody = false,
     spriteSource?: string,
   ) => {
     const { position } = transform

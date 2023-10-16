@@ -1,14 +1,14 @@
+import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import React from 'https://esm.sh/react@18.2.0'
+import type { InventoryData } from './InventoryManager.js'
 import InventorySlot from './InventorySlot.js'
 import { inventoryStyles as styles } from './InventoryStyle.js'
-import { InventoryData } from './InventoryManager.js'
-import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 
 interface Props {
   data: InventoryData
-  onClick: (slotIndex: number) => void
-  onDragStart: (slotIndex: number) => void
-  onDragEnd: (slotIndex: number) => void
+  onClick(slotIndex: number): void
+  onDragStart(slotIndex: number): void
+  onDragEnd(slotIndex: number): void
 }
 
 const chunkArray = (array: any[], size: number) => {
@@ -16,6 +16,7 @@ const chunkArray = (array: any[], size: number) => {
   for (let index = 0; index < array.length; index += size) {
     result.push(array.slice(index, index + size))
   }
+
   return result
 }
 
@@ -31,7 +32,7 @@ const Inventory: React.FC<Props> = ({
   const createSlot = (
     slot: PlayerInventoryItem,
     slotIndex: number,
-    offset: number = 0,
+    offset = 0,
   ) => {
     const index = offset + slotIndex
     return (
@@ -44,11 +45,12 @@ const Inventory: React.FC<Props> = ({
             ev.preventDefault()
             return
           }
+
           onDragStart(index)
         }}
         onDrop={() => onDragEnd(index)}
         onDragOver={ev => ev.preventDefault()}
-        draggable={!!slot}
+        draggable={Boolean(slot)}
       >
         {slot && <InventorySlot slot={slot} />}
       </div>

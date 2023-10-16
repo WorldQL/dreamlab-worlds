@@ -1,24 +1,25 @@
-import { Player, isPlayer } from '@dreamlab.gg/core/dist/entities'
+import type { Player } from '@dreamlab.gg/core/dist/entities'
+import { isPlayer } from '@dreamlab.gg/core/dist/entities'
+import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
+import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import React, {
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useState,
-  useContext,
-  createContext,
 } from 'https://esm.sh/react@18.2.0'
-import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import Inventory from './Inventory.js'
-import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
+import type { InventoryClickEvent } from './events/InventoryClickEvent.js'
+import type {
+  InventoryDragEndEvent,
+  InventoryDragStartEvent,
+} from './events/InventoryDragEvent.js'
 import { handleInventoryClick } from './listeners/InventoryClick.js'
 import {
-  handleInventoryDragStart,
   handleInventoryDragEnd,
+  handleInventoryDragStart,
 } from './listeners/InventoryDrag.js'
-import { InventoryClickEvent } from './events/InventoryClickEvent.js'
-import {
-  InventoryDragStartEvent,
-  InventoryDragEndEvent,
-} from './events/InventoryDragEvent.js'
 
 export type InventoryData = (PlayerInventoryItem | undefined)[]
 const TOTAL_SLOTS = 36
@@ -26,7 +27,7 @@ const TOTAL_SLOTS = 36
 const GameContext = createContext<any | null>(null)
 
 const useGameEventListener = (
-  source: 'inputs' | 'common',
+  source: 'common' | 'inputs',
   event: any,
   handler: any,
 ) => {
@@ -47,7 +48,7 @@ const useGameEventListener = (
 }
 
 const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
-  const initialData = Array(TOTAL_SLOTS).fill(undefined)
+  const initialData = Array.from({ length: TOTAL_SLOTS }).fill(undefined)
   const [data, setData] = useState<InventoryData>(initialData)
   const [activeSlot, setActiveSlot] = useState<number>(0)
   const [isInventoryOpen, setIsInventoryOpen] = useState(false)
@@ -92,13 +93,14 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
     (item: PlayerInventoryItem) => {
       setData(prev => {
         const newData = [...prev]
-        const slotIndex = newData.findIndex(slot => slot === undefined)
+        const slotIndex = newData.indexOf(undefined)
         if (slotIndex !== -1) {
           newData[slotIndex] = item
           if (slotIndex === activeSlot) {
             player.inventory.setItemInHand(item)
           }
         }
+
         return newData
       })
     },
@@ -116,6 +118,7 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
             player.inventory.setItemInHand(undefined)
           }
         }
+
         return newData
       })
     },
@@ -129,6 +132,7 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
       onInventoryDigits(index, va),
     )
   }
+
   useGameEventListener('common', 'onInventoryAddItem', onItemAdd)
   useGameEventListener('common', 'onInventoryRemoveItem', onItemRemove)
 
@@ -189,9 +193,8 @@ export const initializeGameUI = (game: any) => {
     ...Array.from({ length: 9 }, (_, index) => 'Digit' + (index + 1)),
   ]
 
-  ;['open', ...digits].forEach((input, index) =>
-    registerInput(`@inventory/${input}`, keys[index]),
-  )
+  for (const [index, input] of ['open', ...digits].entries())
+    registerInput(`@inventory/${input}`, keys[index])
 
   game.events.common.addListener('onInstantiate', (entity: unknown) => {
     if (isPlayer(entity)) {

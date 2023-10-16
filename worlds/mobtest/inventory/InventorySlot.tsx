@@ -1,6 +1,6 @@
+import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import React, { useState } from 'https://esm.sh/react@18.2.0'
 import { inventoryStyles as styles } from './InventoryStyle.js'
-import { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 
 interface Props {
   slot: PlayerInventoryItem

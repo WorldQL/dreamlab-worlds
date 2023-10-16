@@ -1,4 +1,5 @@
-import { createSpawnableEntity, SpawnableEntity } from '@dreamlab.gg/core'
+import type { SpawnableEntity } from '@dreamlab.gg/core'
+import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/network'
@@ -66,15 +67,16 @@ export const createPassiveMob = createSpawnableEntity(
 
       init({ game }) {
         game.physics.register(this, body)
+
+        const netServer = onlyNetServer(game)
+        const netClient = onlyNetClient(game)
+
         game.events.common.addListener(
           'onPlayerAttack',
           (playerBody, animation) =>
             onPlayerAttack(playerBody, animation, netClient),
         )
         game.events.common.addListener('onCollisionStart', onCollisionStart)
-
-        const netServer = onlyNetServer(game)
-        const netClient = onlyNetClient(game)
 
         /** @type {import('@dreamlab.gg/core/network').MessageListenerServer} */
         const onHitServer = (

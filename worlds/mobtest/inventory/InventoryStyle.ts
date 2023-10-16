@@ -1,4 +1,4 @@
-import { CSSProperties } from 'https://esm.sh/react@18.2.0'
+import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
 
 export const inventoryStyles: Record<string, CSSProperties> = {
   inventory: {

@@ -3,7 +3,8 @@ import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
-import { Container, Graphics, Sprite } from 'pixi.js'
+import type { Sprite } from 'pixi.js'
+import { Container, Graphics } from 'pixi.js'
 
 interface ProjectileEntity {
   tags: string[]
@@ -93,6 +94,7 @@ export const createProjectile = createSpawnableEntity(
           )
           container.addChild(gfxBounds)
         }
+
         stage.addChild(container)
 
         return {
