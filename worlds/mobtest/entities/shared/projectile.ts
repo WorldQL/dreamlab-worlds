@@ -3,35 +3,7 @@ import { createSprite } from '@dreamlab.gg/core/dist/textures'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
-import type { Sprite } from 'pixi.js'
 import { Container, Graphics } from 'pixi.js'
-
-interface ProjectileEntity {
-  tags: string[]
-  transform: {
-    position: Matter.Vector
-    rotation: number
-  }
-  isInBounds(position: Matter.Vector): boolean
-  init(data: { game: any }): { game: any; body: Matter.Body }
-  initRenderContext(
-    _: unknown,
-    data: { camera: any; stage: any },
-  ): {
-    camera: any
-    container: Container
-    gfxBounds: Graphics
-    sprite?: Sprite
-  }
-  teardown(data: any): void
-  teardownRenderContext(data: { container: Container }): void
-  onPhysicsStep(data: { delta: number }, context: { game: any }): void
-  onRenderFrame(
-    _: unknown,
-    context: { game: any },
-    renderContext: { camera: any; container: Container; gfxBounds: Graphics },
-  ): void
-}
 
 export const createProjectile = createSpawnableEntity(
   (
@@ -39,7 +11,7 @@ export const createProjectile = createSpawnableEntity(
     radius: number,
     direction: number,
     spriteSource?: string,
-  ): ProjectileEntity => {
+  ) => {
     const { position } = transform
 
     const body = Matter.Bodies.circle(position.x, position.y, radius, {

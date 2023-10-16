@@ -2,6 +2,7 @@ import type { SpawnableEntity } from '@dreamlab.gg/core'
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import type { NetClient } from '@dreamlab.gg/core/network'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/network'
 import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
@@ -31,7 +32,7 @@ export const createPassiveMob = createSpawnableEntity(
     const onPlayerAttack: (
       playerBody: Matter.Body,
       animation: string,
-      netClient?: any,
+      netClient?: NetClient,
     ) => void = (playerBody, _, netClient) => {
       if (hitCooldownCounter <= 0) {
         const xDiff = playerBody.position.x - body.position.x
@@ -78,10 +79,9 @@ export const createPassiveMob = createSpawnableEntity(
         )
         game.events.common.addListener('onCollisionStart', onCollisionStart)
 
-        /** @type {import('@dreamlab.gg/core/network').MessageListenerServer} */
-        const onHitServer = (
-          { peerID }: any,
-          _: any,
+        const onHitServer = async (
+          { peerID }: { peerID: string },
+          _: unknown,
           data: { uid: string },
         ) => {
           const network = netServer
@@ -106,10 +106,10 @@ export const createPassiveMob = createSpawnableEntity(
             const respawnPosition = { ...body.position }
 
             // @ts-expect-error `this` is a partial entity
-            game.destroy(this)
+            await game.destroy(this)
 
-            setTimeout(() => {
-              game.spawn({
+            setTimeout(async () => {
+              await game.spawn({
                 entity: '@dreamlab/PassiveMob',
                 args: [],
                 transform: { position: [respawnPosition.x, respawnPosition.y] },
@@ -121,8 +121,10 @@ export const createPassiveMob = createSpawnableEntity(
           }
         }
 
-        /** @type {import('@dreamlab.gg/core/network').MessageListenerClient} */
-        const onHitClient = (_: any, data: { uid: string; health: number }) => {
+        const onHitClient = (
+          _: unknown,
+          data: { uid: string; health: number },
+        ) => {
           const network = netClient
           if (!network) throw new Error('missing network')
 

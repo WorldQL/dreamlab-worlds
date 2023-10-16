@@ -1,7 +1,7 @@
 import { createBackground } from './dist/entities/client/background.js'
 import { createFreeform } from './dist/entities/client/freeform.js'
 import { createGrappleHook } from './dist/entities/client/grappleHook.js'
-import { initializeGameUI } from './dist/inventory/InventoryManager.js'
+import { initializeGameUI } from './dist/inventory/inventoryManager.js'
 // import { images } from './level/client/graphics.js'
 import { map1 } from './level/client/map1.js'
 import { sharedInit } from './shared.js'

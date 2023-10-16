@@ -24,7 +24,7 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
       onDragStart={() => setIsDragging(true)}
       onDragEnd={() => setIsDragging(false)}
     >
-      {slot && slot.textureURL && (
+      {slot?.textureURL && (
         <img
           src={slot.textureURL}
           width='50'

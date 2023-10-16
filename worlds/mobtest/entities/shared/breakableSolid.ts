@@ -55,6 +55,12 @@ export const createBreakableSolid = createSpawnableEntity(
 
     let isBroken = false
 
+    const hasAttacker = (entities: Matter.Body[]) => {
+      return entities.some(
+        (ev: { label: string }) => ev.label === 'player' || ev.label === 'item',
+      )
+    }
+
     return {
       get tags() {
         return tags
@@ -136,21 +142,14 @@ export const createBreakableSolid = createSpawnableEntity(
         const getEntitiesInAreaOfBody = (
           body: Matter.Body,
           halfW: number,
-          h: number,
+          ht: number,
         ) => {
           return Matter.Query.region(
             game.physics.engine.world.bodies,
             Matter.Bounds.create([
-              { x: body.position.x - halfW / 4, y: body.position.y - h / 2 },
-              { x: body.position.x + halfW / 4, y: body.position.y + h / 2 },
+              { x: body.position.x - halfW / 4, y: body.position.y - ht / 2 },
+              { x: body.position.x + halfW / 4, y: body.position.y + ht / 2 },
             ]),
-          )
-        }
-
-        const hasAttacker = (entities: any[]) => {
-          return entities.some(
-            (ev: { label: string }) =>
-              ev.label === 'player' || ev.label === 'item',
           )
         }
 

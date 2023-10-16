@@ -1,8 +1,8 @@
 import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import React from 'https://esm.sh/react@18.2.0'
-import type { InventoryData } from './InventoryManager.js'
 import InventorySlot from './InventorySlot.js'
 import { inventoryStyles as styles } from './InventoryStyle.js'
+import type { InventoryData } from './inventoryManager.js'
 
 interface Props {
   data: InventoryData
@@ -11,7 +11,7 @@ interface Props {
   onDragEnd(slotIndex: number): void
 }
 
-const chunkArray = (array: any[], size: number) => {
+const chunkArray = (array: InventoryData, size: number) => {
   const result = []
   for (let index = 0; index < array.length; index += size) {
     result.push(array.slice(index, index + size))
@@ -30,7 +30,7 @@ const Inventory: React.FC<Props> = ({
   const chunkedData = chunkArray(data, numCols)
 
   const createSlot = (
-    slot: PlayerInventoryItem,
+    slot: PlayerInventoryItem | undefined,
     slotIndex: number,
     offset = 0,
   ) => {
@@ -61,6 +61,7 @@ const Inventory: React.FC<Props> = ({
     <div style={styles.inventory}>
       <h2 style={styles.inventoryTitle}>Inventory</h2>
       {chunkedData.slice(1).map((row, rowIndex) => (
+        // eslint-disable-next-line react/no-array-index-key
         <div key={rowIndex} style={styles.inventoryRow}>
           {row.map((slot, slotIndex) =>
             createSlot(slot, slotIndex, (rowIndex + 1) * numCols),

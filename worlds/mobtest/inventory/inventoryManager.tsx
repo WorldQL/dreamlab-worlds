@@ -1,5 +1,7 @@
+import type { Game } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
+import type { KeyCode } from '@dreamlab.gg/core/dist/input'
 import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import React, {
@@ -24,12 +26,14 @@ import {
 export type InventoryData = (PlayerInventoryItem | undefined)[]
 const TOTAL_SLOTS = 36
 
+// TODO: fix this
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const GameContext = createContext<any | null>(null)
 
 const useGameEventListener = (
   source: 'common' | 'inputs',
-  event: any,
-  handler: any,
+  event: unknown,
+  handler: unknown,
 ) => {
   const game = useContext(GameContext)
 
@@ -48,8 +52,9 @@ const useGameEventListener = (
 }
 
 const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
-  const initialData = Array.from({ length: TOTAL_SLOTS }).fill(undefined)
-  const [data, setData] = useState<InventoryData>(initialData)
+  const [data, setData] = useState<InventoryData>(
+    Array.from({ length: TOTAL_SLOTS }).fill(undefined) as InventoryData,
+  )
   const [activeSlot, setActiveSlot] = useState<number>(0)
   const [isInventoryOpen, setIsInventoryOpen] = useState(false)
   const [sourceSlot, setSourceSlot] = useState<number | null>(null)
@@ -64,9 +69,11 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
     const playerItems = player.inventory.getItems()
     setData(prev => {
       const newData = [...prev]
-      playerItems.forEach((item: PlayerInventoryItem, index: number) => {
+
+      for (const [index, item] of playerItems.entries()) {
         newData[index] = item
-      })
+      }
+
       return newData
     })
   }, [player])
@@ -128,6 +135,7 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
   // listen to the events
   useGameEventListener('inputs', '@inventory/open', onInventoryOpen)
   for (let index = 0; index <= 9; index++) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useGameEventListener('inputs', `@inventory/digit${index}`, (va: boolean) =>
       onInventoryDigits(index, va),
     )
@@ -182,15 +190,18 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
   ) : null
 }
 
-export const initializeGameUI = (game: any) => {
+export const initializeGameUI = (game: Game<false>) => {
   // here we register the inputs
-  const registerInput = (input: string, key: string) =>
+  const registerInput = (input: string, key: KeyCode) =>
     game.client?.inputs.registerInput(input, key)
 
   const digits = Array.from({ length: 9 }, (_, index) => 'digit' + (index + 1))
-  const keys = [
+  const keys: KeyCode[] = [
     'KeyE',
-    ...Array.from({ length: 9 }, (_, index) => 'Digit' + (index + 1)),
+    ...Array.from(
+      { length: 9 },
+      (_, index) => ('Digit' + (index + 1)) as KeyCode,
+    ),
   ]
 
   for (const [index, input] of ['open', ...digits].entries())
