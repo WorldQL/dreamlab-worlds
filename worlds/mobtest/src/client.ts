@@ -12,7 +12,7 @@ export const init: InitClient = async game => {
   game.register('@dreamlab/Hook', createGrappleHook)
 
   await sharedInit(game)
-  await game.spawn(...map1)
+  await game.spawnMany(...map1)
   // await game.spawn(...images)
 
   initializeGameUI(game)
