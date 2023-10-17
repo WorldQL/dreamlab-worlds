@@ -12,7 +12,13 @@ export const level: LooseSpawnableDefinition[] = [
   },
   {
     entity: '@dreamlab/PickupItem',
-    args: [200, 200, '/worlds/mobtest/assets/img/bow.png', 'Gold Bow', 'bow'],
+    args: {
+      width: 200,
+      height: 200,
+      spriteSource: '/worlds/mobtest/assets/img/bow.png',
+      itemDisplayName: 'Gold Bow',
+      animationName: 'bow',
+    },
     transform: {
       position: { x: 1_000, y: 400 },
       rotation: 0,
