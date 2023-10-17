@@ -1,22 +1,13 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
+import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { Camera } from '@dreamlab.gg/core/entities'
-import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
-import { createSprite } from '@dreamlab.gg/core/textures'
+import { cloneTransform, distance, Vec } from '@dreamlab.gg/core/math'
+import type { Vector } from '@dreamlab.gg/core/math'
+import { z } from '@dreamlab.gg/core/sdk'
+import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
-
-interface Vector {
-  x: number
-  y: number
-}
-
-const subtract = (v1: Vector, v2: Vector): Vector => {
-  return { x: v1.x - v2.x, y: v1.y - v2.y }
-}
-
-const distance = (v1: Vector, v2: Vector): number => {
-  return Math.hypot(v1.x - v2.x, v1.y - v2.y)
-}
+import type { Sprite } from 'pixi.js'
 
 let cursorPosition: Vector | undefined
 
@@ -29,13 +20,35 @@ const onPointerMove = (ev: PointerEvent, camera: Camera): void => {
   cursorPosition = camera.localToWorld(screenPosition)
 }
 
-export const createGrappleHook = createSpawnableEntity(
+const ArgsSchema = z.object({
+  width: z.number().positive().min(1),
+  height: z.number().positive().min(1),
+  mustConnectWithBody: z.boolean().default(false),
+  spriteSource: SpriteSourceSchema,
+})
+
+interface Data {
+  game: Game<boolean>
+  body: Matter.Body
+}
+
+interface Render {
+  camera: Camera
+  container: Container
+  gfxBounds: Graphics
+  sprite: Sprite | undefined
+}
+
+export const createGrappleHook = createSpawnableEntity<
+  typeof ArgsSchema,
+  SpawnableEntity<Data, Render>,
+  Data,
+  Render
+>(
+  ArgsSchema,
   (
     { tags, transform, zIndex },
-    width: number,
-    height: number,
-    mustConnectWithBody = false,
-    spriteSource?: string,
+    { width, height, mustConnectWithBody, spriteSource },
   ) => {
     const { position } = transform
 
@@ -159,7 +172,7 @@ export const createGrappleHook = createSpawnableEntity(
           const reachedTarget = distance(body.position, cursorPosition) <= 1
 
           if (!reachedTarget) {
-            const dir = Vec.normalise(subtract(cursorPosition, body.position))
+            const dir = Vec.normalise(Vec.sub(cursorPosition, body.position))
             const forceMagnitude = 0.005
             const force = Vec.mult(dir, forceMagnitude)
             Matter.Body.applyForce(body, body.position, force)
@@ -167,7 +180,7 @@ export const createGrappleHook = createSpawnableEntity(
             hasReachedTarget = true
             Matter.Body.setVelocity(body, { x: 0, y: 0 })
             const playerToHookDirection = Vec.normalise(
-              subtract(body.position, playerBody.position),
+              Vec.sub(body.position, playerBody.position),
             )
             const pullForceMagnitude = 1.5
             const pullForce = Vec.mult(
