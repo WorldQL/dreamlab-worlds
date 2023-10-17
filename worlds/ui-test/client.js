@@ -1,3 +1,3 @@
-// shim to import from built TypeScript. see source at ./client.tsx
-
-export { init } from './dist/client.js'
+// automatically export from typescript build
+// do not edit
+export * from './dist/client.js'

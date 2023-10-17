@@ -1,0 +1,15 @@
+{
+  "root": true,
+  "extends": [
+    "@luludev/eslint-config/common",
+    "@luludev/eslint-config/browser",
+    "@luludev/eslint-config/typescript",
+    "@luludev/eslint-config/react",
+    "@luludev/eslint-config/prettier"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.eslint.json"
+  },
+  "rules": {},
+  "ignorePatterns": ["**/dist/*"]
+}
