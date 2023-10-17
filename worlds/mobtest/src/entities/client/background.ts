@@ -1,17 +1,42 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
+import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
+import type { Camera } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import { Container, Graphics } from 'pixi.js'
+import type { Sprite } from 'pixi.js'
 
-export const createBackground = createSpawnableEntity(
+const ArgsSchema = z.object({
+  width: z.number().positive().min(1),
+  height: z.number().positive().min(1),
+  textureURL: z.string(),
+  parallaxX: z.number(),
+  parallaxY: z.number(),
+})
+
+interface Data {
+  game: Game<boolean>
+}
+
+interface Render {
+  camera: Camera
+  container: Container
+  graphics: Graphics
+  sprite: Sprite
+}
+
+export const createBackground = createSpawnableEntity<
+  typeof ArgsSchema,
+  SpawnableEntity<Data, Render>,
+  Data,
+  Render
+>(
+  ArgsSchema,
   (
     { tags, transform, zIndex },
-    width: number,
-    height: number,
-    textureURL: string,
-    parallaxX: number,
-    parallaxY: number,
+    { width, height, textureURL, parallaxX, parallaxY },
   ) => {
     const { position } = transform
 
@@ -64,7 +89,9 @@ export const createBackground = createSpawnableEntity(
         }
       },
 
-      teardown() {},
+      teardown(_) {
+        // No-op
+      },
 
       teardownRenderContext({ container }) {
         container.destroy({ children: true })
