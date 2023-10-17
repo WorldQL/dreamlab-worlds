@@ -1,17 +1,40 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { createSprite } from '@dreamlab.gg/core/dist/textures'
+import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
+import type { Camera } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import { z } from '@dreamlab.gg/core/sdk'
+import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
+import type { Sprite } from 'pixi.js'
 
-export const createProjectile = createSpawnableEntity(
-  (
-    { tags, transform, zIndex },
-    radius: number,
-    direction: number,
-    spriteSource?: string,
-  ) => {
+const ArgsSchema = z.object({
+  radius: z.number().positive().min(1),
+  direction: z.number(),
+  spriteSource: SpriteSourceSchema,
+})
+
+interface Data {
+  game: Game<boolean>
+  body: Matter.Body
+}
+
+interface Render {
+  camera: Camera
+  container: Container
+  gfxBounds: Graphics
+  sprite: Sprite | undefined
+}
+
+export const createProjectile = createSpawnableEntity<
+  typeof ArgsSchema,
+  SpawnableEntity<Data, Render>,
+  Data,
+  Render
+>(
+  ArgsSchema,
+  ({ tags, transform, zIndex }, { radius, direction, spriteSource }) => {
     const { position } = transform
 
     const body = Matter.Bodies.circle(position.x, position.y, radius, {
