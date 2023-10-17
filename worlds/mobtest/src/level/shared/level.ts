@@ -36,7 +36,7 @@ export const level: LooseSpawnableDefinition[] = [
   },
   // {
   //   entity: '@dreamlab/BreakableSolid', // right spawn wall
-  //   args: [400, 50],
+  //   args: { width: 400, height: 50 },
   //   transform: {
   //     position: { x: 475, y: -25 },
   //     rotation: 90,
@@ -44,7 +44,7 @@ export const level: LooseSpawnableDefinition[] = [
   // },
   // {
   //   entity: '@dreamlab/BreakableSolid', // right spawn wall
-  //   args: [400, 50],
+  //   args: { width: 400, height: 50 },
   //   transform: {
   //     position: { x: -475, y: -25 },
   //     rotation: 90,
@@ -140,7 +140,7 @@ export const level: LooseSpawnableDefinition[] = [
   },
   {
     entity: '@dreamlab/BreakableSolid', // well wooden planks
-    args: [265, 50],
+    args: { width: 265, height: 50 },
     transform: {
       position: { x: -1_690, y: 450 },
       rotation: 0,

@@ -1,17 +1,41 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { createSprite } from '@dreamlab.gg/core/dist/textures'
+import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
+import type { Camera } from '@dreamlab.gg/core/entities'
 import { cloneTransform, toRadians, Vec } from '@dreamlab.gg/core/math'
+import { z } from '@dreamlab.gg/core/sdk'
+import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
+import type { Sprite } from 'pixi.js'
 
-export const createBreakableSolid = createSpawnableEntity(
-  (
-    { tags, transform, zIndex },
-    width: number,
-    height: number,
-    spriteSource?: string,
-  ) => {
+const ArgsSchema = z.object({
+  width: z.number().positive().min(1),
+  height: z.number().positive().min(1),
+  spriteSource: SpriteSourceSchema,
+})
+
+interface Data {
+  game: Game<boolean>
+  bodyLeft: Matter.Body
+  bodyRight: Matter.Body
+}
+
+interface Render {
+  camera: Camera
+  container: Container
+  gfxBoundsLeft: Graphics | Sprite
+  gfxBoundsRight: Graphics | Sprite
+}
+
+export const createBreakableSolid = createSpawnableEntity<
+  typeof ArgsSchema,
+  SpawnableEntity<Data, Render>,
+  Data,
+  Render
+>(
+  ArgsSchema,
+  ({ tags, transform, zIndex }, { width, height, spriteSource }) => {
     const { position, rotation } = transform
 
     const halfWidth = width / 2
