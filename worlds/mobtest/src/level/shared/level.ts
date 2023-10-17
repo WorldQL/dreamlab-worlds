@@ -90,7 +90,7 @@ export const level: LooseSpawnableDefinition[] = [
   },
   {
     entity: '@dreamlab/Ladder', // right spawn ladder
-    args: [100, 1_000],
+    args: { width: 100, height: 1_000 },
     transform: {
       position: [1_450, 25],
       rotation: 0,

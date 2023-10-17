@@ -1,19 +1,41 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import type { Player } from '@dreamlab.gg/core/dist/entities'
-import { isPlayer } from '@dreamlab.gg/core/dist/entities'
-import { createSprite } from '@dreamlab.gg/core/dist/textures'
+import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
+import { isPlayer } from '@dreamlab.gg/core/entities'
+import type { Camera, Player } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import { z } from '@dreamlab.gg/core/sdk'
+import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
+import type { Sprite } from 'pixi.js'
 import { Container, Graphics } from 'pixi.js'
 
-export const createLadder = createSpawnableEntity(
-  (
-    { tags, transform, zIndex },
-    width: number,
-    height: number,
-    spriteSource?: string,
-  ) => {
+const ArgsSchema = z.object({
+  width: z.number().positive().min(1),
+  height: z.number().positive().min(1),
+  spriteSource: SpriteSourceSchema,
+})
+
+interface Data {
+  game: Game<boolean>
+  body: Matter.Body
+}
+
+interface Render {
+  camera: Camera
+  container: Container
+  gfxBounds: Graphics
+  sprite: Sprite | undefined
+}
+
+export const createLadder = createSpawnableEntity<
+  typeof ArgsSchema,
+  SpawnableEntity<Data, Render>,
+  Data,
+  Render
+>(
+  ArgsSchema,
+  ({ tags, transform, zIndex }, { width, height, spriteSource }) => {
     const { position } = transform
 
     const body = Matter.Bodies.rectangle(
