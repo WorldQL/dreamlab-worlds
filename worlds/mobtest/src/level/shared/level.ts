@@ -1,5 +1,6 @@
-/** @type {import('@dreamlab.gg/core').LooseSpawnableDefinition[]} */
-export const level = [
+import type { LooseSpawnableDefinition } from '@dreamlab.gg/core'
+
+export const level: LooseSpawnableDefinition[] = [
   {
     entity: '@dreamlab/Solid', // spawn floor
     args: [1_000, 250],
