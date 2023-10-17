@@ -2,28 +2,28 @@
 export const level = [
   {
     entity: '@dreamlab/Solid',
-    args: [1_290, 50],
+    args: { width: 1_290, height: 50 },
     transform: {
       position: [0, 295],
     },
   },
   {
     entity: '@dreamlab/Solid',
-    args: [50, 400],
+    args: { width: 50, height: 400 },
     transform: {
       position: [620, 70],
     },
   },
   {
     entity: '@dreamlab/Solid',
-    args: [50, 400],
+    args: { width: 50, height: 400 },
     transform: {
       position: [-620, 70],
     },
   },
   {
     entity: '@dreamlab/Solid',
-    args: [100, 100],
+    args: { width: 100, height: 100 },
     transform: {
       position: [-400, 120],
       rotation: 45,
@@ -31,7 +31,7 @@ export const level = [
   },
   {
     entity: '@dreamlab/Nonsolid',
-    args: [100, 100],
+    args: { width: 100, height: 100 },
     transform: {
       position: [400, 120],
       rotation: -45,

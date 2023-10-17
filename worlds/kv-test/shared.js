@@ -2,10 +2,11 @@ import { createEntity } from '@dreamlab.gg/core'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/network'
 import { createDebugText } from '@dreamlab.gg/core/utils'
 
+/** @type {import('@dreamlab.gg/core').LooseSpawnableDefinition[]} */
 export const level = [
   {
     entity: '@dreamlab/Solid',
-    args: [5_000, 50],
+    args: { width: 5_000, height: 50 },
     transform: {
       position: { x: 0, y: 295 },
       rotation: 0,

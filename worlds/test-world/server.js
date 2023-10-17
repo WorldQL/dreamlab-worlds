@@ -7,7 +7,7 @@ export const init = async game => {
   // since this is replicated it will get auto-spawned on clients as they join
   await game.spawn({
     entity: '@dreamlab/BouncyBall',
-    args: [50], // radius
+    args: { radius: 50 },
     transform: { position: [-375, -300] },
     tags: ['net/replicated'],
   })
