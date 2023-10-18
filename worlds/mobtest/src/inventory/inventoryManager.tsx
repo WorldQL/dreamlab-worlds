@@ -197,14 +197,15 @@ export const initializeGameUI = (game: Game<false>) => {
   const digits = Array.from({ length: 9 }, (_, index) => 'digit' + (index + 1))
   const keys: KeyCode[] = [
     'KeyE',
-    ...Array.from(
-      { length: 9 },
-      (_, index) => ('Digit' + (index + 1)) as KeyCode,
-    ),
+    ...Array.from({ length: 9 }, (_, index) => `Digit${index + 1}` as KeyCode),
   ]
 
-  for (const [index, input] of ['open', ...digits].entries())
-    registerInput(`@inventory/${input}`, keys[index])
+  for (const [index, input] of ['open', ...digits].entries()) {
+    const key = keys[index]
+    if (key) {
+      registerInput(`@inventory/${input}`, key)
+    }
+  }
 
   game.events.common.addListener('onInstantiate', (entity: unknown) => {
     if (isPlayer(entity)) {
