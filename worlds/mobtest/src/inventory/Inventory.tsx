@@ -69,7 +69,7 @@ const Inventory: React.FC<Props> = ({
         </div>
       ))}
       <div style={styles.hotbarSlots}>
-        {chunkedData[0].map((slot, slotIndex) => createSlot(slot, slotIndex))}
+        {chunkedData[0]?.map((slot, slotIndex) => createSlot(slot, slotIndex))}
       </div>
     </div>
   )
