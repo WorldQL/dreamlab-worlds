@@ -18,20 +18,20 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
 
   return (
     <div
-      style={combinedStyles}
+      onDragEnd={() => setIsDragging(false)}
+      onDragStart={() => setIsDragging(true)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onDragStart={() => setIsDragging(true)}
-      onDragEnd={() => setIsDragging(false)}
+      style={combinedStyles}
     >
       {slot?.textureURL && (
         <img
-          src={slot.textureURL}
-          width='50'
-          height='50'
+          alt={slot.displayName}
           className='inventorySprite'
           draggable
-          alt={slot.displayName}
+          height='50'
+          src={slot.textureURL}
+          width='50'
         />
       )}
 

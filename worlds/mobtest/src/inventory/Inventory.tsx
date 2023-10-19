@@ -37,9 +37,10 @@ const Inventory: React.FC<Props> = ({
     const index = offset + slotIndex
     return (
       <div
+        draggable={Boolean(slot)}
         key={slotIndex}
-        style={styles.inventorySlot}
         onClick={() => onClick(index)}
+        onDragOver={ev => ev.preventDefault()}
         onDragStart={ev => {
           if (!slot) {
             ev.preventDefault()
@@ -49,8 +50,7 @@ const Inventory: React.FC<Props> = ({
           onDragStart(index)
         }}
         onDrop={() => onDragEnd(index)}
-        onDragOver={ev => ev.preventDefault()}
-        draggable={Boolean(slot)}
+        style={styles.inventorySlot}
       >
         {slot && <InventorySlot slot={slot} />}
       </div>

@@ -183,8 +183,8 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
     <Inventory
       data={data}
       onClick={handleClick}
-      onDragStart={handleDragStartEvent}
       onDragEnd={handleDragEndEvent}
+      onDragStart={handleDragStartEvent}
     />
   ) : null
 }
