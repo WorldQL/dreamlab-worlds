@@ -14,6 +14,7 @@ import type {
   MessageListenerServer,
   NetClient,
   NetServer,
+  SyncedValue,
 } from '@dreamlab.gg/core/network'
 import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
@@ -28,7 +29,7 @@ interface Data {
   onHitClient: MessageListenerClient
   netServer: NetServer | undefined
   netClient: NetClient | undefined
-  direction: ReturnType<typeof syncedValue>
+  direction: SyncedValue<number>
   onPlayerAttack(
     playerBody: Matter.Body,
     animation: string,
@@ -277,7 +278,7 @@ export const createPassiveMob = createSpawnableEntity<
 
       const speed = 2
       Matter.Body.translate(body, {
-        x: speed * (direction.value as number),
+        x: speed * direction.value,
         y: 0,
       })
     },

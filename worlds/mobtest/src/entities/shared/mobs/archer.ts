@@ -161,7 +161,6 @@ export const createArcherMob = createSpawnableEntity<
         const force = 0.5 * mobData.direction.value
         Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
-        console.log(mobData.health.value)
         mobData.health.value -= 1
         if (mobData.health.value <= 0) {
           const respawnPosition = { ...body.position }
