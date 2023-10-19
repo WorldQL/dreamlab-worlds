@@ -4,7 +4,11 @@ import { z } from '@dreamlab.gg/core/dist/sdk'
 import type { Camera } from '@dreamlab.gg/core/entities'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
-import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/network'
+import {
+  onlyNetClient,
+  onlyNetServer,
+  syncedValue,
+} from '@dreamlab.gg/core/network'
 import type {
   MessageListenerClient,
   MessageListenerServer,
@@ -24,6 +28,15 @@ interface Data {
   onHitClient: MessageListenerClient
   netServer: NetServer | undefined
   netClient: NetClient | undefined
+  direction: ReturnType<typeof syncedValue>
+  onPlayerAttack(
+    playerBody: Matter.Body,
+    animation: string,
+    direction: number,
+  ): void
+  onCollisionStart(
+    pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
+  ): void
 }
 
 interface Render {
@@ -58,33 +71,6 @@ export const createPassiveMob = createSpawnableEntity<
   const maxHealth = 10
   let health = maxHealth
 
-  let direction = 1
-
-  const onPlayerAttack: (
-    playerBody: Matter.Body,
-    animation: string,
-    direction: number,
-    netClient?: NetClient,
-  ) => void = (playerBody, _animation, _direction, netClient) => {
-    if (hitCooldownCounter <= 0) {
-      const xDiff = playerBody.position.x - body.position.x
-
-      if (Math.abs(xDiff) <= hitRadius) {
-        netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
-        hitCooldownCounter = hitCooldown * 60
-      }
-    }
-  }
-
-  const onCollisionStart = (
-    pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
-  ) => {
-    const [a, b] = pair
-    if (a.uid === uid || b.uid === uid) {
-      direction = -direction
-    }
-  }
-
   return {
     get tags() {
       return tags
@@ -103,12 +89,33 @@ export const createPassiveMob = createSpawnableEntity<
 
       const netServer = onlyNetServer(game)
       const netClient = onlyNetClient(game)
+      const direction = syncedValue(game, uid, 'direction', 1)
 
-      game.events.common.addListener(
-        'onPlayerAttack',
-        (playerBody, animation, direction) =>
-          onPlayerAttack(playerBody, animation, direction, netClient),
-      )
+      const onPlayerAttack: (
+        playerBody: Matter.Body,
+        animation: string,
+        direction: number,
+      ) => void = (playerBody, _animation, _direction) => {
+        if (hitCooldownCounter <= 0) {
+          const xDiff = playerBody.position.x - body.position.x
+
+          if (Math.abs(xDiff) <= hitRadius) {
+            netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+            hitCooldownCounter = hitCooldown * 60
+          }
+        }
+      }
+
+      const onCollisionStart = (
+        pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
+      ) => {
+        const [a, b] = pair
+        if ((a.uid === uid || b.uid === uid) && game.server) {
+          direction.value = -direction.value
+        }
+      }
+
+      game.events.common.addListener('onPlayerAttack', onPlayerAttack)
       game.events.common.addListener('onCollisionStart', onCollisionStart)
 
       const onHitServer: MessageListenerServer = async (
@@ -129,8 +136,8 @@ export const createPassiveMob = createSpawnableEntity<
 
         if (!player) throw new Error('missing netplayer')
 
-        direction = body.position.x > player.position.x ? 1 : -1
-        const force = 0.5 * direction
+        direction.value = body.position.x > player.position.x ? 1 : -1
+        const force = 0.5 * direction.value
         Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
         health -= 1
@@ -170,7 +177,17 @@ export const createPassiveMob = createSpawnableEntity<
       netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
       netClient?.addCustomMessageListener(HIT_CHANNEL, onHitClient)
 
-      return { game, body, onHitServer, onHitClient, netServer, netClient }
+      return {
+        game,
+        body,
+        onHitServer,
+        onHitClient,
+        netServer,
+        netClient,
+        direction,
+        onPlayerAttack,
+        onCollisionStart,
+      }
     },
 
     initRenderContext(_, { camera, stage }) {
@@ -228,7 +245,15 @@ export const createPassiveMob = createSpawnableEntity<
       }
     },
 
-    teardown({ game, onHitServer, onHitClient, netServer, netClient }) {
+    teardown({
+      game,
+      onHitServer,
+      onHitClient,
+      netServer,
+      netClient,
+      onPlayerAttack,
+      onCollisionStart,
+    }) {
       game.physics.unregister(this, body)
       game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
       game.events.common.removeListener('onCollisionStart', onCollisionStart)
@@ -242,7 +267,7 @@ export const createPassiveMob = createSpawnableEntity<
       ctrHealth.destroy({ children: true })
     },
 
-    onPhysicsStep(_) {
+    onPhysicsStep(_, { direction }) {
       Matter.Body.setAngle(body, 0)
       Matter.Body.setAngularVelocity(body, 0)
 
@@ -251,7 +276,10 @@ export const createPassiveMob = createSpawnableEntity<
       }
 
       const speed = 2
-      Matter.Body.translate(body, { x: speed * direction, y: 0 })
+      Matter.Body.translate(body, {
+        x: speed * (direction.value as number),
+        y: 0,
+      })
     },
 
     onRenderFrame(
