@@ -6,6 +6,7 @@ import { createPassiveMob } from './entities/shared/mobs/passive.js'
 import { createPickupItem } from './entities/shared/pickupItem.js'
 import { createProjectile } from './entities/shared/projectile.js'
 import { level } from './level/shared/level.js'
+import { initBow } from './managers/bow.js'
 
 export const sharedInit: InitShared = async game => {
   game.register('@dreamlab/PassiveMob', createPassiveMob)
@@ -16,4 +17,6 @@ export const sharedInit: InitShared = async game => {
   game.register('@dreamlab/Projectile', createProjectile)
 
   await game.spawnMany(...level)
+
+  initBow(game)
 }
