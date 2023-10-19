@@ -19,6 +19,9 @@ const ArgsSchema = z.object({
 interface Data {
   game: Game<boolean>
   body: Matter.Body
+  onCollisionStart(
+    pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
+  ): Promise<void>
 }
 
 interface Render {
@@ -79,7 +82,7 @@ export const createProjectile = createSpawnableEntity<
 
         game.events.common.addListener('onCollisionStart', onCollisionStart)
 
-        return { game, body }
+        return { game, body, onCollisionStart }
       },
 
       initRenderContext(_, { camera, stage }) {
@@ -113,8 +116,9 @@ export const createProjectile = createSpawnableEntity<
         }
       },
 
-      teardown({ game }) {
+      teardown({ game, onCollisionStart }) {
         game.physics.unregister(this, body)
+        game.events.common.removeListener('onCollisionStart', onCollisionStart)
       },
 
       teardownRenderContext({ container }) {
