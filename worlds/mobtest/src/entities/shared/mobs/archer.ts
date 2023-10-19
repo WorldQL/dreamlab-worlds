@@ -25,7 +25,6 @@ const ArgsSchema = z.object({})
 interface MobData {
   health: SyncedValue<number>
   direction: SyncedValue<number>
-  hitCooldownCounter: SyncedValue<number>
   projectileCooldownCounter: SyncedValue<number>
 }
 
@@ -70,9 +69,11 @@ export const createArcherMob = createSpawnableEntity<
   const body = Matter.Bodies.rectangle(position.x, position.y, width, height)
 
   const maxHealth = 5
+  let mobHealth = maxHealth
   const projectileCooldown = 2 * 60 // 2 seconds
   const hitRadius = width / 2 + 120
   const hitCooldown = 1 // Second(s)
+  let hitCooldownCounter = 0
 
   const healthIndicatorWidth = width + 50
   const healthIndicatorHeight = 20
@@ -98,7 +99,6 @@ export const createArcherMob = createSpawnableEntity<
 
       const direction = syncedValue(game, uid, 'direction', 1)
       const health = syncedValue(game, uid, 'health', maxHealth)
-      const hitCooldownCounter = syncedValue(game, uid, 'hitCooldownCounter', 0)
       const projectileCooldownCounter = syncedValue(
         game,
         uid,
@@ -109,20 +109,20 @@ export const createArcherMob = createSpawnableEntity<
       const mobData = {
         health,
         direction,
-        hitCooldownCounter,
         projectileCooldownCounter,
       }
 
       const onPlayerAttack: (
         playerBody: Matter.Body,
-        animation: string,
-        direction: number,
+        _animation: string,
+        _direction: number,
       ) => void = (playerBody, _animation, _direction) => {
-        if (mobData.hitCooldownCounter.value <= 0) {
+        if (hitCooldownCounter <= 0) {
           const xDiff = playerBody.position.x - body.position.x
 
           if (Math.abs(xDiff) <= hitRadius) {
             netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+            hitCooldownCounter = hitCooldown * 60
           }
         }
       }
@@ -157,11 +157,11 @@ export const createArcherMob = createSpawnableEntity<
 
         if (!player) throw new Error('missing netplayer')
 
-        mobData.hitCooldownCounter.value = hitCooldown * 60
         mobData.direction.value = body.position.x > player.position.x ? 1 : -1
         const force = 0.5 * mobData.direction.value
         Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
+        console.log(mobData.health.value)
         mobData.health.value -= 1
         if (mobData.health.value <= 0) {
           const respawnPosition = { ...body.position }
@@ -180,7 +180,7 @@ export const createArcherMob = createSpawnableEntity<
         } else {
           network.broadcastCustomMessage(HIT_CHANNEL, {
             uid,
-            health: mobData.health,
+            health: mobData.health.value,
           })
         }
       }
@@ -196,7 +196,7 @@ export const createArcherMob = createSpawnableEntity<
         if (!('health' in data)) return
         if (typeof data.health !== 'number') return
 
-        mobData.health.value = data.health
+        mobHealth = data.health
       }
 
       netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
@@ -302,11 +302,11 @@ export const createArcherMob = createSpawnableEntity<
         y: 0,
       })
 
-      if (game.server) {
-        if (mobData.hitCooldownCounter.value > 0) {
-          mobData.hitCooldownCounter.value -= 1
-        }
+      if (hitCooldownCounter > 0) {
+        hitCooldownCounter -= 1
+      }
 
+      if (game.server) {
         if (mobData.projectileCooldownCounter.value === 0) {
           const xOffset = mobData.direction.value === 1 ? 150 : -150
           const yOffset = 75
@@ -335,7 +335,7 @@ export const createArcherMob = createSpawnableEntity<
 
     onRenderFrame(
       { smooth },
-      { game, mobData },
+      { game },
       { camera, container, gfxHittest, gfxBounds, gfxHealthAmount },
     ) {
       const debug = game.debug
@@ -347,12 +347,12 @@ export const createArcherMob = createSpawnableEntity<
 
       const alpha = debug.value ? 0.5 : 0
       gfxBounds.alpha = alpha
-      gfxHittest.alpha = mobData.hitCooldownCounter.value === 0 ? alpha / 3 : 0
+      gfxHittest.alpha = hitCooldownCounter === 0 ? alpha / 3 : 0
 
       drawBox(
         gfxHealthAmount,
         {
-          width: (mobData.health.value / maxHealth) * healthIndicatorWidth,
+          width: (mobHealth / maxHealth) * healthIndicatorWidth,
           height: 20,
         },
         { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
