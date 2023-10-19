@@ -5,7 +5,7 @@ export const init: InitServer = async game => {
   await sharedInit(game)
 
   await game.spawn({
-    entity: '@dreamlab/PassiveMob',
+    entity: '@dreamlab/ArcherMob',
     args: {},
     transform: { position: [-1_250, 300] },
     tags: ['net/replicated'],

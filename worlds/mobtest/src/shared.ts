@@ -2,6 +2,7 @@ import type { InitShared } from '@dreamlab.gg/core/sdk'
 import { createPlatform } from './entities/client/platform.js'
 import { createBreakableSolid } from './entities/shared/breakableSolid.js'
 import { createLadder } from './entities/shared/ladder.js'
+import { createArcherMob } from './entities/shared/mobs/archer.js'
 import { createPassiveMob } from './entities/shared/mobs/passive.js'
 import { createPickupItem } from './entities/shared/pickupItem.js'
 import { createProjectile } from './entities/shared/projectile.js'
@@ -10,6 +11,8 @@ import { initBow } from './managers/bow.js'
 
 export const sharedInit: InitShared = async game => {
   game.register('@dreamlab/PassiveMob', createPassiveMob)
+  game.register('@dreamlab/ArcherMob', createArcherMob)
+
   game.register('@dreamlab/Ladder', createLadder)
   game.register('@dreamlab/BreakableSolid', createBreakableSolid)
   game.register('@dreamlab/PickupItem', createPickupItem)
