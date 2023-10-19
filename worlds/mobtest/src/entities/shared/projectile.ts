@@ -35,7 +35,10 @@ export const createProjectile = createSpawnableEntity<
   Render
 >(
   ArgsSchema,
-  ({ tags, transform, zIndex }, { width, height, direction, spriteSource }) => {
+  (
+    { uid, tags, transform, zIndex },
+    { width, height, direction, spriteSource },
+  ) => {
     const { position } = transform
 
     const body = Matter.Bodies.rectangle(
@@ -64,6 +67,18 @@ export const createProjectile = createSpawnableEntity<
 
       init({ game }) {
         game.physics.register(this, body)
+
+        const onCollisionStart = async (
+          pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
+        ) => {
+          const [a, b] = pair
+          if (a.uid === uid || b.uid === uid)
+            // @ts-expect-error `this` is a partial entity
+            await game.destroy(this)
+        }
+
+        game.events.common.addListener('onCollisionStart', onCollisionStart)
+
         return { game, body }
       },
 
