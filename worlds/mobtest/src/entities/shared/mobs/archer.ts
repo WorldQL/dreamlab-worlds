@@ -69,7 +69,7 @@ export const createArcherMob = createSpawnableEntity<
   const height = width * 2
   const body = Matter.Bodies.rectangle(position.x, position.y, width, height)
 
-  const maxHealth = 10
+  const maxHealth = 5
   const projectileCooldown = 2 * 60 // 2 seconds
   const hitRadius = width / 2 + 120
   const hitCooldown = 1 // Second(s)
@@ -123,7 +123,6 @@ export const createArcherMob = createSpawnableEntity<
 
           if (Math.abs(xDiff) <= hitRadius) {
             netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
-            mobData.hitCooldownCounter.value = hitCooldown * 60
           }
         }
       }
@@ -158,6 +157,7 @@ export const createArcherMob = createSpawnableEntity<
 
         if (!player) throw new Error('missing netplayer')
 
+        mobData.hitCooldownCounter.value = hitCooldown * 60
         mobData.direction.value = body.position.x > player.position.x ? 1 : -1
         const force = 0.5 * mobData.direction.value
         Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
@@ -171,7 +171,7 @@ export const createArcherMob = createSpawnableEntity<
 
           setTimeout(async () => {
             await game.spawn({
-              entity: '@dreamlab/PassiveMob',
+              entity: '@dreamlab/ArcherMob',
               args: {},
               transform: { position: [respawnPosition.x, respawnPosition.y] },
               tags: ['net/replicated'],
