@@ -63,8 +63,9 @@ export const createPassiveMob = createSpawnableEntity<
   const onPlayerAttack: (
     playerBody: Matter.Body,
     animation: string,
+    direction: number,
     netClient?: NetClient,
-  ) => void = (playerBody, _, netClient) => {
+  ) => void = (playerBody, _animation, _direction, netClient) => {
     if (hitCooldownCounter <= 0) {
       const xDiff = playerBody.position.x - body.position.x
 
@@ -105,8 +106,8 @@ export const createPassiveMob = createSpawnableEntity<
 
       game.events.common.addListener(
         'onPlayerAttack',
-        (playerBody, animation) =>
-          onPlayerAttack(playerBody, animation, netClient),
+        (playerBody, animation, direction) =>
+          onPlayerAttack(playerBody, animation, direction, netClient),
       )
       game.events.common.addListener('onCollisionStart', onCollisionStart)
 

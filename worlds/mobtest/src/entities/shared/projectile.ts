@@ -10,7 +10,8 @@ import { Container, Graphics } from 'pixi.js'
 import type { Sprite } from 'pixi.js'
 
 const ArgsSchema = z.object({
-  radius: z.number().positive().min(1),
+  width: z.number().positive().min(1),
+  height: z.number().positive().min(1),
   direction: z.number(),
   spriteSource: SpriteSourceSchema,
 })
@@ -34,21 +35,23 @@ export const createProjectile = createSpawnableEntity<
   Render
 >(
   ArgsSchema,
-  ({ tags, transform, zIndex }, { radius, direction, spriteSource }) => {
+  ({ tags, transform, zIndex }, { width, height, direction, spriteSource }) => {
     const { position } = transform
 
-    const body = Matter.Bodies.circle(position.x, position.y, radius, {
-      isStatic: false,
-      label: 'projectile',
-      render: { visible: false },
-      density: 0.001,
-      frictionAir: 0,
-      friction: 1,
-      restitution: 0,
-    })
-
-    const speed = 2
-    const velocity = { x: direction * speed, y: 0 }
+    const body = Matter.Bodies.rectangle(
+      position.x,
+      position.y,
+      width,
+      height,
+      {
+        label: 'Projectile',
+        render: { visible: false },
+        density: 0.001,
+        frictionAir: 0,
+        friction: 1,
+        restitution: 0,
+      },
+    )
 
     return {
       tags,
@@ -61,7 +64,6 @@ export const createProjectile = createSpawnableEntity<
 
       init({ game }) {
         game.physics.register(this, body)
-        Matter.Body.setVelocity(body, velocity)
         return { game, body }
       },
 
@@ -73,8 +75,8 @@ export const createProjectile = createSpawnableEntity<
         const gfxBounds = new Graphics()
         const sprite = spriteSource
           ? createSprite(spriteSource, {
-              width: radius / 2,
-              height: radius / 2,
+              width,
+              height,
               zIndex,
             })
           : undefined
@@ -82,11 +84,7 @@ export const createProjectile = createSpawnableEntity<
         if (sprite) {
           container.addChild(sprite)
         } else {
-          drawBox(
-            gfxBounds,
-            { width: radius / 2, height: radius / 2 },
-            { stroke: '#00f' },
-          )
+          drawBox(gfxBounds, { width, height }, { stroke: '#00f' })
           container.addChild(gfxBounds)
         }
 
@@ -111,11 +109,15 @@ export const createProjectile = createSpawnableEntity<
       onPhysicsStep(_) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
+
+        const speed = 50
+        const velocity = { x: speed * direction, y: 0 }
+        Matter.Body.setVelocity(body, velocity)
       },
 
       onRenderFrame(_, { game }, { camera, container, gfxBounds }) {
         const debug = game.debug
-        const pos = Vec.add(position, camera.offset)
+        const pos = Vec.add(body.position, camera.offset)
 
         container.position = pos
         container.rotation = body.angle
