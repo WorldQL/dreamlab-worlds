@@ -1,7 +1,8 @@
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import { createSpawnableEntity } from '@dreamlab.gg/core'
+import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import { z } from '@dreamlab.gg/core/dist/sdk'
-import type { Camera } from '@dreamlab.gg/core/entities'
+import type { Camera, Player } from '@dreamlab.gg/core/entities'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import {
@@ -35,11 +36,7 @@ interface Data {
   onHitClient: MessageListenerClient
   netServer: NetServer | undefined
   netClient: NetClient | undefined
-  onPlayerAttack(
-    playerBody: Matter.Body,
-    animation: string,
-    direction: number,
-  ): void
+  onPlayerAttack(player: Player, item: PlayerInventoryItem): void
   onCollisionStart(
     pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
   ): void
@@ -113,12 +110,11 @@ export const createArcherMob = createSpawnableEntity<
       }
 
       const onPlayerAttack: (
-        playerBody: Matter.Body,
-        _animation: string,
-        _direction: number,
-      ) => void = (playerBody, _animation, _direction) => {
+        player: Player,
+        item: PlayerInventoryItem,
+      ) => void = (player, _item) => {
         if (hitCooldownCounter <= 0) {
-          const xDiff = playerBody.position.x - body.position.x
+          const xDiff = player.body.position.x - body.position.x
 
           if (Math.abs(xDiff) <= hitRadius) {
             netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
