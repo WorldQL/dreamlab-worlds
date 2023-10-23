@@ -77,13 +77,6 @@ export const createProjectile = createSpawnableEntity<
           const [a, b] = pair
           if (a.uid === uid || b.uid === uid)
             await game.destroy(this as SpawnableEntity)
-
-          await game.spawn({
-            entity: '@dreamlab/Particle',
-            args: { radius: 50, direction, speed: 10 },
-            transform: { position: [body.position.x, body.position.y] },
-            tags: ['net/replicated'],
-          })
         }
 
         game.events.common.addListener('onCollisionStart', onCollisionStart)
