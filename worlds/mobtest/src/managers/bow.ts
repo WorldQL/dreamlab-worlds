@@ -11,14 +11,14 @@ export const initBow = (game: Game<false>) => {
       if (player.currentAnimation !== 'bow') return
 
       const currentTime = Date.now()
-
-      if (!lastSpawnedTime || currentTime - lastSpawnedTime > 1_000) {
+      // need this code because the event gets emitted multiple times on a single animation frame :(
+      if (!lastSpawnedTime || currentTime - lastSpawnedTime > 250) {
         lastSpawnedTime = currentTime
       } else {
         return
       }
 
-      const xOffset = player.facingDirection === 1 ? 150 : -150
+      const xOffset = player.facingDirection === 1 ? 165 : -165
       const yOffset = 75
 
       await game.spawn({
