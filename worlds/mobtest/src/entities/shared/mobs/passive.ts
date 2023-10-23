@@ -141,8 +141,7 @@ export const createPassiveMob = createSpawnableEntity<
         if (health <= 0) {
           const respawnPosition = { ...body.position }
 
-          // @ts-expect-error `this` is a partial entity
-          await game.destroy(this)
+          await game.destroy(this as SpawnableEntity)
 
           setTimeout(async () => {
             await game.spawn({
