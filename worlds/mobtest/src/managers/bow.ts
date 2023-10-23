@@ -31,6 +31,7 @@ export const initBow = (game: Game<false>) => {
           },
           rotation: 0,
         },
+        tags: ['net/replicated'],
       })
     },
   )
