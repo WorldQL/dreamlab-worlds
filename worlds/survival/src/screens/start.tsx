@@ -3,33 +3,22 @@ import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
-import React, { useEffect, useState } from 'https://esm.sh/react@18.2.0'
+import React, { useState } from 'https://esm.sh/react@18.2.0'
+import { GameScreen } from './active'
 import { styles } from './styles'
 
-interface ScreenProps {
+export interface ScreenProps {
   game: Game<false>
   player: Player
 }
 
-const StartScreen: React.FC<ScreenProps> = ({ game }) => {
+const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
   const [hovered, setHovered] = useState(false)
   const [active, setActive] = useState(false)
-  const [visible, setVisible] = useState(true)
-
-  useEffect(() => {
-    const killListener = () => {
-      console.log(`Killed a zombie!`)
-    }
-
-    game.events.custom.addListener('onPlayerKill', killListener)
-
-    return () => {
-      game.events.custom.removeListener('onPlayerKill', killListener)
-    }
-  }, [game])
+  const [gameStarted, setGameStarted] = useState(false)
 
   const handlePlayClick = async () => {
-    setVisible(false)
+    setGameStarted(true)
   }
 
   const getButtonStyles = (): CSSProperties => {
@@ -47,7 +36,9 @@ const StartScreen: React.FC<ScreenProps> = ({ game }) => {
     return style
   }
 
-  if (!visible) return null
+  if (gameStarted) {
+    return <GameScreen game={game} player={player} />
+  }
 
   return (
     <div style={styles.container}>

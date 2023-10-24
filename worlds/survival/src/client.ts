@@ -8,6 +8,8 @@ import { initializeStartScreen } from './screens/start.js'
 import { sharedInit } from './shared.js'
 
 export const init: InitClient = async game => {
+  initializeStartScreen(game)
+
   // entities
   game.register('@dreamlab/Background', createBackground)
   game.register('@dreamlab/Hook', createGrappleHook)
@@ -17,5 +19,4 @@ export const init: InitClient = async game => {
   // await game.spawn(...images)
 
   initializeGameUI(game)
-  initializeStartScreen(game)
 }

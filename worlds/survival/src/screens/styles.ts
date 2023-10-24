@@ -1,6 +1,22 @@
 import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
 
 export const styles: { [key: string]: CSSProperties } = {
+  gameScreenContainer: {
+    position: 'absolute',
+    top: '10%',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    pointerEvents: 'none',
+    background: 'transparent',
+  },
+
+  gameScreenTitle: {
+    fontSize: '32px',
+    color: 'white',
+    textShadow: '2px 2px 4px black',
+  },
   bloodStain: {
     position: 'absolute',
     top: 0,
