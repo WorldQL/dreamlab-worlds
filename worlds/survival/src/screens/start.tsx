@@ -1,6 +1,7 @@
 import type { Game } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
+import { onlyNetClient } from '@dreamlab.gg/core/dist/network'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
 import React, { useState } from 'https://esm.sh/react@18.2.0'
@@ -17,8 +18,12 @@ const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
   const [active, setActive] = useState(false)
   const [gameStarted, setGameStarted] = useState(false)
 
+  const PLAY_CHANNEL = 'game/start'
+  const netClient = onlyNetClient(game)
+
   const handlePlayClick = async () => {
     setGameStarted(true)
+    netClient?.sendCustomMessage(PLAY_CHANNEL, {})
   }
 
   const getButtonStyles = (): CSSProperties => {
