@@ -142,6 +142,7 @@ export const createZombieMob = createSpawnableEntity<
           const respawnPosition = { ...body.position }
 
           await game.destroy(this as SpawnableEntity)
+          game.events.custom.emit('onPlayerKill', player)
 
           setTimeout(async () => {
             await game.spawn({
