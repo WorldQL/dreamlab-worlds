@@ -2,6 +2,7 @@ import type { Entity } from '@dreamlab.gg/core'
 import type { MessageListenerServer } from '@dreamlab.gg/core/dist/network'
 import { onlyNetServer } from '@dreamlab.gg/core/dist/network'
 import type { InitServer } from '@dreamlab.gg/core/sdk'
+import Matter from 'matter-js'
 import { isZombie } from './entities/shared/mobs/zombie.js'
 import { sharedInit } from './shared.js'
 
@@ -55,12 +56,33 @@ export const init: InitServer = async game => {
   }
 
   const spawnZombies = async () => {
+    const player = Matter.Composite.allBodies(game.physics.engine.world).find(
+      b => b.label === 'player',
+    )
+
+    if (!player) {
+      console.warn(
+        "No player found! Zombies can't be spawned relative to the player.",
+      )
+      return
+    }
+
+    const playerPosition = player.position
+    const leftSpawnPosition: [number, number] = [
+      playerPosition.x - 800,
+      playerPosition.y,
+    ]
+    const rightSpawnPosition: [number, number] = [
+      playerPosition.x + 800,
+      playerPosition.y,
+    ]
+
     await game.spawn({
       entity: '@dreamlab/ZombieMob',
       args: zombieTypes[
         Math.floor(Math.random() * zombieTypes.length)
       ] as Record<string, unknown>,
-      transform: { position: [-1_250, 300] },
+      transform: { position: leftSpawnPosition },
       tags: ['net/replicated'],
     })
 
@@ -69,7 +91,7 @@ export const init: InitServer = async game => {
       args: zombieTypes[
         Math.floor(Math.random() * zombieTypes.length)
       ] as Record<string, unknown>,
-      transform: { position: [1_000, 300] },
+      transform: { position: rightSpawnPosition },
       tags: ['net/replicated'],
     })
 
