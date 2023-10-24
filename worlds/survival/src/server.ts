@@ -15,6 +15,33 @@ export const init: InitServer = async game => {
   let spawnInterval = 30 * 1_000
   let spawnTimeout: NodeJS.Timeout | number | string | undefined
 
+  const zombieTypes = [
+    {
+      width: 80,
+      height: 100,
+      maxHealth: 2,
+      speed: 5,
+    }, // babyZombie
+    {
+      width: 80,
+      height: 260,
+      maxHealth: 1,
+      speed: 2,
+    }, // weakZombie
+    {
+      width: 130,
+      height: 260,
+      maxHealth: 4,
+      speed: 3,
+    }, // zombie
+    {
+      width: 130,
+      height: 380,
+      maxHealth: 10,
+      speed: 2,
+    }, // strongZombie
+  ]
+
   const destroyAllMobs = async () => {
     clearTimeout(spawnTimeout)
 
@@ -30,20 +57,23 @@ export const init: InitServer = async game => {
   const spawnZombies = async () => {
     await game.spawn({
       entity: '@dreamlab/ZombieMob',
-      args: {},
+      args: zombieTypes[
+        Math.floor(Math.random() * zombieTypes.length)
+      ] as Record<string, unknown>,
       transform: { position: [-1_250, 300] },
       tags: ['net/replicated'],
     })
 
     await game.spawn({
       entity: '@dreamlab/ZombieMob',
-      args: {},
+      args: zombieTypes[
+        Math.floor(Math.random() * zombieTypes.length)
+      ] as Record<string, unknown>,
       transform: { position: [1_000, 300] },
       tags: ['net/replicated'],
     })
 
     spawnInterval *= 0.9
-
     spawnInterval = Math.max(5 * 1_000, spawnInterval)
 
     spawnTimeout = setTimeout(spawnZombies, spawnInterval)

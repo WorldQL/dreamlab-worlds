@@ -21,7 +21,13 @@ import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
-const ArgsSchema = z.object({})
+const ArgsSchema = z.object({
+  width: z.number().positive().min(1),
+  height: z.number().positive().min(1),
+  spriteSource: z.string().optional(),
+  maxHealth: z.number().positive().min(1),
+  speed: z.number().positive().min(1),
+})
 
 interface MobData {
   health: SyncedValue<number>
@@ -62,160 +68,233 @@ export const createArcherMob = createSpawnableEntity<
   SpawnableEntity<Data, Render>,
   Data,
   Render
->(ArgsSchema, ({ uid, tags, transform, zIndex }) => {
-  const HIT_CHANNEL = '@dreamlab/Hittable/hit'
-  const { position } = transform
+>(
+  ArgsSchema,
+  ({ uid, tags, transform, zIndex }, { width, height, maxHealth, speed }) => {
+    const HIT_CHANNEL = '@dreamlab/Hittable/hit'
+    const { position } = transform
 
-  const width = 130
-  const height = width * 2
-  const body = Matter.Bodies.rectangle(position.x, position.y, width, height, {
-    label: 'zombie',
-  })
+    const body = Matter.Bodies.rectangle(
+      position.x,
+      position.y,
+      width,
+      height,
+      {
+        label: 'zombie',
+      },
+    )
 
-  const maxHealth = 5
-  let mobHealth = maxHealth
-  const projectileCooldown = 2 * 60 // 2 seconds
-  const hitRadius = width / 2 + 120
-  const hitCooldown = 1 // Second(s)
-  let hitCooldownCounter = 0
+    let mobHealth = maxHealth
+    const projectileCooldown = 2 * 60 // 2 seconds
+    const hitRadius = width / 2 + 120
+    const hitCooldown = 1 // Second(s)
+    let hitCooldownCounter = 0
 
-  const healthIndicatorWidth = width + 50
-  const healthIndicatorHeight = 20
+    const healthIndicatorWidth = width + 50
+    const healthIndicatorHeight = 20
 
-  let damagedPlayer = false
+    let damagedPlayer = false
 
-  return {
-    get tags() {
-      return tags
-    },
+    return {
+      get tags() {
+        return tags
+      },
 
-    get transform() {
-      return cloneTransform(transform)
-    },
+      get transform() {
+        return cloneTransform(transform)
+      },
 
-    isInBounds(position) {
-      return Matter.Query.point([body], position).length > 0
-    },
+      isInBounds(position) {
+        return Matter.Query.point([body], position).length > 0
+      },
 
-    init({ game }) {
-      game.physics.register(this, body)
+      init({ game }) {
+        game.physics.register(this, body)
 
-      const netServer = onlyNetServer(game)
-      const netClient = onlyNetClient(game)
+        const netServer = onlyNetServer(game)
+        const netClient = onlyNetClient(game)
 
-      const direction = syncedValue(game, uid, 'direction', 1)
-      const health = syncedValue(game, uid, 'health', maxHealth)
-      const projectileCooldownCounter = syncedValue(
-        game,
-        uid,
-        'projectileCooldownCounter',
-        0,
-      )
+        const direction = syncedValue(game, uid, 'direction', 1)
+        const health = syncedValue(game, uid, 'health', maxHealth)
+        const projectileCooldownCounter = syncedValue(
+          game,
+          uid,
+          'projectileCooldownCounter',
+          0,
+        )
 
-      const mobData = {
-        health,
-        direction,
-        projectileCooldownCounter,
-      }
+        const mobData = {
+          health,
+          direction,
+          projectileCooldownCounter,
+        }
 
-      const onPlayerAttack: (
-        player: Player,
-        item: PlayerInventoryItem,
-      ) => void = (player, _item) => {
-        if (hitCooldownCounter <= 0) {
-          const xDiff = player.body.position.x - body.position.x
+        const onPlayerAttack: (
+          player: Player,
+          item: PlayerInventoryItem,
+        ) => void = (player, _item) => {
+          if (hitCooldownCounter <= 0) {
+            const xDiff = player.body.position.x - body.position.x
 
-          if (Math.abs(xDiff) <= hitRadius) {
-            netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
-            hitCooldownCounter = hitCooldown * 60
+            if (Math.abs(xDiff) <= hitRadius) {
+              netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              hitCooldownCounter = hitCooldown * 60
 
-            if (mobHealth - 1 <= 0) {
-              game.events.custom.emit('onPlayerKill')
+              if (mobHealth - 1 <= 0) {
+                game.events.custom.emit('onPlayerKill')
+              }
             }
           }
         }
-      }
 
-      const onCollisionStart = (
-        pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
-      ) => {
-        const [a, b] = pair
-        if ((a.uid === uid || b.uid === uid) && game.server) {
-          mobData.direction.value = -mobData.direction.value
+        const onCollisionStart = (
+          pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
+        ) => {
+          const [a, b] = pair
+          if ((a.uid === uid || b.uid === uid) && game.server) {
+            mobData.direction.value = -mobData.direction.value
+          }
         }
-      }
 
-      const onPlayerCollision = (
-        pair: readonly [player: Player, otherBody: Matter.Body],
-        _raw: unknown,
-      ) => {
-        const [_player, bodyCollided] = pair
-        if (body && bodyCollided === body) {
-          game.events.custom.emit('onPlayerDamage')
-          damagedPlayer = true
+        const onPlayerCollision = (
+          pair: readonly [player: Player, otherBody: Matter.Body],
+          _raw: unknown,
+        ) => {
+          const [_player, bodyCollided] = pair
+          if (body && bodyCollided === body) {
+            game.events.custom.emit('onPlayerDamage')
+            damagedPlayer = true
+          }
         }
-      }
 
-      game.events.common.addListener('onPlayerAttack', onPlayerAttack)
-      game.events.common.addListener('onCollisionStart', onCollisionStart)
-      game.events.common.addListener(
-        'onPlayerCollisionStart',
-        onPlayerCollision,
-      )
+        game.events.common.addListener('onPlayerAttack', onPlayerAttack)
+        game.events.common.addListener('onCollisionStart', onCollisionStart)
+        game.events.common.addListener(
+          'onPlayerCollisionStart',
+          onPlayerCollision,
+        )
 
-      const onHitServer: MessageListenerServer = async (
-        { peerID },
-        _,
-        data,
-      ) => {
-        const network = netServer
-        if (!network) throw new Error('missing network')
+        const onHitServer: MessageListenerServer = async (
+          { peerID },
+          _,
+          data,
+        ) => {
+          const network = netServer
+          if (!network) throw new Error('missing network')
 
-        if (!('uid' in data)) return
-        if (typeof data.uid !== 'string') return
-        if (data.uid !== uid) return
+          if (!('uid' in data)) return
+          if (typeof data.uid !== 'string') return
+          if (data.uid !== uid) return
 
-        const player = game.entities
-          .filter(isNetPlayer)
-          .find(netplayer => netplayer.peerID === peerID)
+          const player = game.entities
+            .filter(isNetPlayer)
+            .find(netplayer => netplayer.peerID === peerID)
 
-        if (!player) throw new Error('missing netplayer')
+          if (!player) throw new Error('missing netplayer')
 
-        mobData.direction.value = body.position.x > player.position.x ? 1 : -1
-        const force = 0.5 * mobData.direction.value
-        Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
+          mobData.direction.value = body.position.x > player.position.x ? 1 : -1
+          const force = 0.5 * mobData.direction.value
+          Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
-        mobData.health.value -= 1
-        if (mobData.health.value <= 0) {
-          await game.destroy(this as SpawnableEntity)
-        } else {
-          network.broadcastCustomMessage(HIT_CHANNEL, {
-            uid,
-            health: mobData.health.value,
-          })
+          mobData.health.value -= 1
+          if (mobData.health.value <= 0) {
+            await game.destroy(this as SpawnableEntity)
+          } else {
+            network.broadcastCustomMessage(HIT_CHANNEL, {
+              uid,
+              health: mobData.health.value,
+            })
+          }
         }
-      }
 
-      const onHitClient: MessageListenerClient = (_, data) => {
-        const network = netClient
-        if (!network) throw new Error('missing network')
+        const onHitClient: MessageListenerClient = (_, data) => {
+          const network = netClient
+          if (!network) throw new Error('missing network')
 
-        if (!('uid' in data)) return
-        if (typeof data.uid !== 'string') return
-        if (data.uid !== uid) return
+          if (!('uid' in data)) return
+          if (typeof data.uid !== 'string') return
+          if (data.uid !== uid) return
 
-        if (!('health' in data)) return
-        if (typeof data.health !== 'number') return
+          if (!('health' in data)) return
+          if (typeof data.health !== 'number') return
 
-        mobHealth = data.health
-      }
+          mobHealth = data.health
+        }
 
-      netClient?.addCustomMessageListener(HIT_CHANNEL, onHitClient)
-      netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
+        netClient?.addCustomMessageListener(HIT_CHANNEL, onHitClient)
+        netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
 
-      return {
+        return {
+          game,
+          body,
+          onHitServer,
+          onHitClient,
+          netServer,
+          netClient,
+          onPlayerAttack,
+          onCollisionStart,
+          onPlayerCollision,
+          mobData,
+        }
+      },
+
+      initRenderContext(_, { camera, stage }) {
+        const container = new Container()
+        container.sortableChildren = true
+        container.zIndex = zIndex
+
+        const gfxBounds = new Graphics()
+        const gfxHittest = new Graphics()
+
+        const ctrHealth = new Container()
+        ctrHealth.sortableChildren = true
+
+        gfxHittest.zIndex = -1
+        ctrHealth.zIndex = 1
+        ctrHealth.position.y = -height / 2 - 30
+
+        drawBox(gfxBounds, { width, height }, { stroke: '#00f' })
+        drawCircle(
+          gfxHittest,
+          { radius: hitRadius },
+          { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
+        )
+
+        const gfxHealthBorder = new Graphics()
+        const gfxHealthAmount = new Graphics()
+
+        drawBox(
+          gfxHealthBorder,
+          { width: healthIndicatorWidth, height: healthIndicatorHeight },
+          {
+            fill: 'white',
+            stroke: 'black',
+            fillAlpha: 1,
+            strokeAlign: 1,
+            strokeWidth: 4,
+          },
+        )
+
+        ctrHealth.addChild(gfxHealthBorder)
+        ctrHealth.addChild(gfxHealthAmount)
+
+        container.addChild(gfxBounds)
+        container.addChild(gfxHittest)
+        container.addChild(ctrHealth)
+        stage.addChild(container)
+
+        return {
+          camera,
+          container,
+          gfxBounds,
+          gfxHittest,
+          ctrHealth,
+          gfxHealthAmount,
+        }
+      },
+
+      teardown({
         game,
-        body,
         onHitServer,
         onHitClient,
         netServer,
@@ -223,180 +302,115 @@ export const createArcherMob = createSpawnableEntity<
         onPlayerAttack,
         onCollisionStart,
         onPlayerCollision,
-        mobData,
-      }
-    },
+      }) {
+        game.physics.unregister(this, body)
+        game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
+        game.events.common.removeListener('onCollisionStart', onCollisionStart)
+        game.events.common.removeListener(
+          'onPlayerCollisionStart',
+          onPlayerCollision,
+        )
 
-    initRenderContext(_, { camera, stage }) {
-      const container = new Container()
-      container.sortableChildren = true
-      container.zIndex = zIndex
+        netServer?.removeCustomMessageListener(HIT_CHANNEL, onHitServer)
+        netClient?.removeCustomMessageListener(HIT_CHANNEL, onHitClient)
+      },
 
-      const gfxBounds = new Graphics()
-      const gfxHittest = new Graphics()
+      teardownRenderContext({ container, ctrHealth }) {
+        container.destroy({ children: true })
+        ctrHealth.destroy({ children: true })
+      },
 
-      const ctrHealth = new Container()
-      ctrHealth.sortableChildren = true
+      async onPhysicsStep(_, { game, mobData }) {
+        Matter.Body.setAngle(body, 0)
+        Matter.Body.setAngularVelocity(body, 0)
+        const player = game.entities.find(isPlayer)
 
-      gfxHittest.zIndex = -1
-      ctrHealth.zIndex = 1
-      ctrHealth.position.y = -height / 2 - 30
-
-      drawBox(gfxBounds, { width, height }, { stroke: '#00f' })
-      drawCircle(
-        gfxHittest,
-        { radius: hitRadius },
-        { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
-      )
-
-      const gfxHealthBorder = new Graphics()
-      const gfxHealthAmount = new Graphics()
-
-      drawBox(
-        gfxHealthBorder,
-        { width: healthIndicatorWidth, height: healthIndicatorHeight },
-        {
-          fill: 'white',
-          stroke: 'black',
-          fillAlpha: 1,
-          strokeAlign: 1,
-          strokeWidth: 4,
-        },
-      )
-
-      ctrHealth.addChild(gfxHealthBorder)
-      ctrHealth.addChild(gfxHealthAmount)
-
-      container.addChild(gfxBounds)
-      container.addChild(gfxHittest)
-      container.addChild(ctrHealth)
-      stage.addChild(container)
-
-      return {
-        camera,
-        container,
-        gfxBounds,
-        gfxHittest,
-        ctrHealth,
-        gfxHealthAmount,
-      }
-    },
-
-    teardown({
-      game,
-      onHitServer,
-      onHitClient,
-      netServer,
-      netClient,
-      onPlayerAttack,
-      onCollisionStart,
-      onPlayerCollision,
-    }) {
-      game.physics.unregister(this, body)
-      game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
-      game.events.common.removeListener('onCollisionStart', onCollisionStart)
-      game.events.common.removeListener(
-        'onPlayerCollisionStart',
-        onPlayerCollision,
-      )
-
-      netServer?.removeCustomMessageListener(HIT_CHANNEL, onHitServer)
-      netClient?.removeCustomMessageListener(HIT_CHANNEL, onHitClient)
-    },
-
-    teardownRenderContext({ container, ctrHealth }) {
-      container.destroy({ children: true })
-      ctrHealth.destroy({ children: true })
-    },
-
-    async onPhysicsStep(_, { game, mobData }) {
-      Matter.Body.setAngle(body, 0)
-      Matter.Body.setAngularVelocity(body, 0)
-      const player = game.entities.find(isPlayer)
-
-      if (hitCooldownCounter > 0) {
-        hitCooldownCounter -= 1
-      }
-
-      if (damagedPlayer) {
-        if (player) {
-          const force = 4 * -player.facingDirection
-          Matter.Body.applyForce(player.body, player.body.position, {
-            x: force,
-            y: -1,
-          })
+        if (hitCooldownCounter > 0) {
+          hitCooldownCounter -= 1
         }
 
-        damagedPlayer = false
-      }
-
-      if (player) {
-        const dx = player.body.position.x - body.position.x
-        const dy = player.body.position.y - body.position.y
-
-        const distance = Math.hypot(dx, dy)
-        const unitX = dx / distance
-        const unitY = dy / distance
-
-        const speed = 2
-
-        Matter.Body.translate(body, {
-          x: speed * unitX,
-          y: speed * unitY,
-        })
-      }
-
-      if (game.server) {
-        if (mobData.projectileCooldownCounter.value === 0) {
-          const xOffset = mobData.direction.value === 1 ? 150 : -150
-          const yOffset = 75
-
-          await game.spawn({
-            entity: '@dreamlab/Projectile',
-            args: { width: 50, height: 10, direction: mobData.direction.value },
-            transform: {
-              position: {
-                x: body.position.x + xOffset,
-                y: body.position.y - yOffset,
-              },
-              rotation: 0,
-            },
-            tags: ['net/replicated'],
-          })
-
-          if (mobData.projectileCooldownCounter.value === 0) {
-            mobData.projectileCooldownCounter.value = projectileCooldown
+        if (damagedPlayer) {
+          if (player) {
+            const force = 4 * -player.facingDirection
+            Matter.Body.applyForce(player.body, player.body.position, {
+              x: force,
+              y: -1,
+            })
           }
-        } else {
-          mobData.projectileCooldownCounter.value -= 1
+
+          damagedPlayer = false
         }
-      }
-    },
 
-    onRenderFrame(
-      { smooth },
-      { game },
-      { camera, container, gfxHittest, gfxBounds, gfxHealthAmount },
-    ) {
-      const debug = game.debug
-      const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
-      const pos = Vec.add(smoothed, camera.offset)
+        if (player) {
+          const dx = player.body.position.x - body.position.x
+          const dy = player.body.position.y - body.position.y
 
-      container.position = pos
-      container.rotation = body.angle
+          const distance = Math.hypot(dx, dy)
+          const unitX = dx / distance
+          const unitY = dy / distance
 
-      const alpha = debug.value ? 0.5 : 0
-      gfxBounds.alpha = alpha
-      gfxHittest.alpha = hitCooldownCounter === 0 ? alpha / 3 : 0
+          Matter.Body.translate(body, {
+            x: speed * unitX,
+            y: speed * unitY,
+          })
+        }
 
-      drawBox(
-        gfxHealthAmount,
-        {
-          width: (mobHealth / maxHealth) * healthIndicatorWidth,
-          height: 20,
-        },
-        { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
-      )
-    },
-  }
-})
+        if (game.server) {
+          if (mobData.projectileCooldownCounter.value === 0) {
+            const xOffset = mobData.direction.value === 1 ? 150 : -150
+            const yOffset = 75
+
+            await game.spawn({
+              entity: '@dreamlab/Projectile',
+              args: {
+                width: 50,
+                height: 10,
+                direction: mobData.direction.value,
+              },
+              transform: {
+                position: {
+                  x: body.position.x + xOffset,
+                  y: body.position.y - yOffset,
+                },
+                rotation: 0,
+              },
+              tags: ['net/replicated'],
+            })
+
+            if (mobData.projectileCooldownCounter.value === 0) {
+              mobData.projectileCooldownCounter.value = projectileCooldown
+            }
+          } else {
+            mobData.projectileCooldownCounter.value -= 1
+          }
+        }
+      },
+
+      onRenderFrame(
+        { smooth },
+        { game },
+        { camera, container, gfxHittest, gfxBounds, gfxHealthAmount },
+      ) {
+        const debug = game.debug
+        const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
+        const pos = Vec.add(smoothed, camera.offset)
+
+        container.position = pos
+        container.rotation = body.angle
+
+        const alpha = debug.value ? 0.5 : 0
+        gfxBounds.alpha = alpha
+        gfxHittest.alpha = hitCooldownCounter === 0 ? alpha / 3 : 0
+
+        drawBox(
+          gfxHealthAmount,
+          {
+            width: (mobHealth / maxHealth) * healthIndicatorWidth,
+            height: 20,
+          },
+          { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
+        )
+      },
+    }
+  },
+)
