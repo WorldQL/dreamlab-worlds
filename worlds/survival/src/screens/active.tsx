@@ -9,7 +9,6 @@ export const GameScreen: React.FC<ScreenProps> = ({ game }) => {
 
   useEffect(() => {
     const killListener = () => {
-      console.log(`Killed a zombie!`)
       setKillCount(prev => prev + 1)
     }
 
@@ -38,7 +37,8 @@ export const GameScreen: React.FC<ScreenProps> = ({ game }) => {
         <span style={styles.gameScreenLabel}>Health:</span>
         {Array.from({ length: maxHealth }).map((_, index) => (
           <span
-            key={health}
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
             style={{
               ...styles.heartIcon,
               opacity: index < health ? 1 : 0.3,

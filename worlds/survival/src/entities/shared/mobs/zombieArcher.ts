@@ -310,19 +310,13 @@ export const createArcherMob = createSpawnableEntity<
     async onPhysicsStep(_, { game, mobData }) {
       Matter.Body.setAngle(body, 0)
       Matter.Body.setAngularVelocity(body, 0)
-
-      const speed = 2
-      Matter.Body.translate(body, {
-        x: speed * mobData.direction.value,
-        y: 0,
-      })
+      const player = game.entities.find(isPlayer)
 
       if (hitCooldownCounter > 0) {
         hitCooldownCounter -= 1
       }
 
       if (damagedPlayer) {
-        const player = game.entities.find(isPlayer)
         if (player) {
           const force = 4 * -player.facingDirection
           Matter.Body.applyForce(player.body, player.body.position, {
@@ -332,6 +326,22 @@ export const createArcherMob = createSpawnableEntity<
         }
 
         damagedPlayer = false
+      }
+
+      if (player) {
+        const dx = player.body.position.x - body.position.x
+        const dy = player.body.position.y - body.position.y
+
+        const distance = Math.hypot(dx, dy)
+        const unitX = dx / distance
+        const unitY = dy / distance
+
+        const speed = 2
+
+        Matter.Body.translate(body, {
+          x: speed * unitX,
+          y: speed * unitY,
+        })
       }
 
       if (game.server) {

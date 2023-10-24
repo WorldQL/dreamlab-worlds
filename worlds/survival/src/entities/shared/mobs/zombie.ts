@@ -3,7 +3,7 @@ import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import { z } from '@dreamlab.gg/core/dist/sdk'
 import type { Camera, Player } from '@dreamlab.gg/core/entities'
-import { isNetPlayer } from '@dreamlab.gg/core/entities'
+import { isNetPlayer, isPlayer } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import {
   onlyNetClient,
@@ -34,6 +34,10 @@ interface Data {
   onPlayerAttack(player: Player, item: PlayerInventoryItem): void
   onCollisionStart(
     pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
+  ): void
+  onPlayerCollision(
+    pair: readonly [player: Player, other: Matter.Body],
+    _raw?: unknown,
   ): void
 }
 
@@ -68,6 +72,7 @@ export const createZombieMob = createSpawnableEntity<
 
   const maxHealth = 10
   let health = maxHealth
+  let damagedPlayer = false
 
   return {
     get tags() {
@@ -116,8 +121,23 @@ export const createZombieMob = createSpawnableEntity<
         }
       }
 
+      const onPlayerCollision = (
+        pair: readonly [player: Player, otherBody: Matter.Body],
+        _raw: unknown,
+      ) => {
+        const [_player, bodyCollided] = pair
+        if (body && bodyCollided === body) {
+          game.events.custom.emit('onPlayerDamage')
+          damagedPlayer = true
+        }
+      }
+
       game.events.common.addListener('onPlayerAttack', onPlayerAttack)
       game.events.common.addListener('onCollisionStart', onCollisionStart)
+      game.events.common.addListener(
+        'onPlayerCollisionStart',
+        onPlayerCollision,
+      )
 
       const onHitServer: MessageListenerServer = async (
         { peerID },
@@ -176,6 +196,7 @@ export const createZombieMob = createSpawnableEntity<
         direction,
         onPlayerAttack,
         onCollisionStart,
+        onPlayerCollision,
       }
     },
 
@@ -242,10 +263,15 @@ export const createZombieMob = createSpawnableEntity<
       netClient,
       onPlayerAttack,
       onCollisionStart,
+      onPlayerCollision,
     }) {
       game.physics.unregister(this, body)
       game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
       game.events.common.removeListener('onCollisionStart', onCollisionStart)
+      game.events.common.removeListener(
+        'onPlayerCollisionStart',
+        onPlayerCollision,
+      )
 
       netServer?.removeCustomMessageListener(HIT_CHANNEL, onHitServer)
       netClient?.removeCustomMessageListener(HIT_CHANNEL, onHitClient)
@@ -256,19 +282,42 @@ export const createZombieMob = createSpawnableEntity<
       ctrHealth.destroy({ children: true })
     },
 
-    onPhysicsStep(_, { direction }) {
+    onPhysicsStep(_, { game }) {
       Matter.Body.setAngle(body, 0)
       Matter.Body.setAngularVelocity(body, 0)
+      const player = game.entities.find(isPlayer)
 
       if (hitCooldownCounter > 0) {
         hitCooldownCounter -= 1
       }
 
-      const speed = 2
-      Matter.Body.translate(body, {
-        x: speed * direction.value,
-        y: 0,
-      })
+      if (damagedPlayer) {
+        if (player) {
+          const force = 4 * -player.facingDirection
+          Matter.Body.applyForce(player.body, player.body.position, {
+            x: force,
+            y: -1,
+          })
+        }
+
+        damagedPlayer = false
+      }
+
+      if (player) {
+        const dx = player.body.position.x - body.position.x
+        const dy = player.body.position.y - body.position.y
+
+        const distance = Math.hypot(dx, dy)
+        const unitX = dx / distance
+        const unitY = dy / distance
+
+        const speed = 2
+
+        Matter.Body.translate(body, {
+          x: speed * unitX,
+          y: speed * unitY,
+        })
+      }
     },
 
     onRenderFrame(
