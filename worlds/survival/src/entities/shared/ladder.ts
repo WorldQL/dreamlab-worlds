@@ -1,27 +1,24 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
-import type { Camera } from '@dreamlab.gg/core/entities'
+import { isPlayer } from '@dreamlab.gg/core/entities'
+import type { Camera, Player } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
-import { Container, Graphics } from 'pixi.js'
 import type { Sprite } from 'pixi.js'
+import { Container, Graphics } from 'pixi.js'
 
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
-  direction: z.number(),
   spriteSource: SpriteSourceSchema,
 })
 
 interface Data {
   game: Game<boolean>
   body: Matter.Body
-  onCollisionStart(
-    pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
-  ): Promise<void>
 }
 
 interface Render {
@@ -31,17 +28,14 @@ interface Render {
   sprite: Sprite | undefined
 }
 
-export const createProjectile = createSpawnableEntity<
+export const createLadder = createSpawnableEntity<
   typeof ArgsSchema,
   SpawnableEntity<Data, Render>,
   Data,
   Render
 >(
   ArgsSchema,
-  (
-    { uid, tags, transform, zIndex },
-    { width, height, direction, spriteSource },
-  ) => {
+  ({ tags, transform, zIndex }, { width, height, spriteSource }) => {
     const { position } = transform
 
     const body = Matter.Bodies.rectangle(
@@ -49,39 +43,44 @@ export const createProjectile = createSpawnableEntity<
       position.y,
       width,
       height,
-      {
-        label: 'Projectile',
-        render: { visible: false },
-        density: 0.001,
-        frictionAir: 0,
-        friction: 1,
-        restitution: 0,
-      },
+      { isStatic: true },
     )
 
-    return {
-      tags,
+    let isClimbing = false
 
-      transform: cloneTransform(transform),
+    const onPlayerCollision = (
+      pair: readonly [player: Player, otherBody: Matter.Body],
+      eventType: 'end' | 'start',
+    ) => {
+      const [, bodyCollided] = pair
+      if (body && bodyCollided === body) {
+        isClimbing = eventType === 'start'
+      }
+    }
+
+    return {
+      get tags() {
+        return tags
+      },
+
+      get transform() {
+        return cloneTransform(transform)
+      },
 
       isInBounds(position) {
         return Matter.Query.point([body], position).length > 0
       },
 
       init({ game }) {
-        game.physics.register(this, body)  
+        game.physics.register(this, body)
+        game.events.common.addListener('onPlayerCollisionStart', pair =>
+          onPlayerCollision(pair, 'start'),
+        )
+        game.events.common.addListener('onPlayerCollisionEnd', pair =>
+          onPlayerCollision(pair, 'end'),
+        )
 
-        const onCollisionStart = async (
-          pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
-        ) => {
-          const [a, b] = pair
-          if (a.uid === uid || b.uid === uid)
-            await game.destroy(this as SpawnableEntity)
-        }
-
-        game.events.common.addListener('onCollisionStart', onCollisionStart)
-
-        return { game, body, onCollisionStart }
+        return { game, body }
       },
 
       initRenderContext(_, { camera, stage }) {
@@ -115,27 +114,37 @@ export const createProjectile = createSpawnableEntity<
         }
       },
 
-      teardown({ game, onCollisionStart }) {
+      teardown({ game }) {
         game.physics.unregister(this, body)
-        game.events.common.removeListener('onCollisionStart', onCollisionStart)
+        game.events.common.removeListener('onPlayerCollisionStart', pair =>
+          onPlayerCollision(pair, 'start'),
+        )
+        game.events.common.removeListener('onPlayerCollisionEnd', pair =>
+          onPlayerCollision(pair, 'end'),
+        )
       },
 
       teardownRenderContext({ container }) {
         container.destroy({ children: true })
       },
 
-      onPhysicsStep(_) {
+      onPhysicsStep(_, { game }) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
-
-        const speed = 50
-        const velocity = { x: speed * direction, y: 0 }
-        Matter.Body.setVelocity(body, velocity)
+        if (isClimbing) {
+          const player = game.entities.find(isPlayer)
+          if (player) {
+            Matter.Body.applyForce(player.body, player.position, {
+              x: 0,
+              y: -0.2,
+            })
+          }
+        }
       },
 
       onRenderFrame(_, { game }, { camera, container, gfxBounds }) {
         const debug = game.debug
-        const pos = Vec.add(body.position, camera.offset)
+        const pos = Vec.add(position, camera.offset)
 
         container.position = pos
         container.rotation = body.angle

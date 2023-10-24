@@ -1,0 +1,61 @@
+import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
+
+export const inventoryStyles: Record<string, CSSProperties> = {
+  inventory: {
+    pointerEvents: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    border: '3px solid #8c7ae6',
+    width: '475px',
+    backgroundColor: 'rgba(44, 42, 41, 0.9)',
+    padding: '10px',
+    borderRadius: '15px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  },
+  inventoryTitle: {
+    color: '#8c7ae6',
+    textAlign: 'center',
+    marginBottom: '10px',
+    fontSize: '24px',
+    fontWeight: 'bold',
+  },
+  inventoryRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '5px',
+  },
+  inventorySlot: {
+    width: '50px',
+    height: '50px',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    position: 'relative',
+    transition: 'background-color 0.3s ease, transform 0.3s ease',
+    borderRadius: '8px',
+  },
+  inventorySlotHover: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    transform: 'scale(1.05)',
+  },
+  hotbarSlots: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: '10px',
+    borderTop: '2px solid #8c7ae6',
+    paddingTop: '10px',
+  },
+  itemTooltip: {
+    position: 'absolute',
+    zIndex: 10,
+    top: '-25px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    padding: '5px',
+    borderRadius: '5px',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    color: '#fff',
+    fontSize: '14px',
+    pointerEvents: 'none',
+    whiteSpace: 'nowrap',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  },
+}
