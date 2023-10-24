@@ -1,12 +1,16 @@
+import { onlyNetClient } from '@dreamlab.gg/core/dist/network'
 import { useEffect, useState } from 'https://esm.sh/react@18.2.0'
 import { GameOver } from './end'
 import type { ScreenProps } from './start'
 import { styles } from './styles'
 
-export const GameScreen: React.FC<ScreenProps> = ({ game }) => {
+export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
   const [killCount, setKillCount] = useState(0)
   const [health, setHealth] = useState(5)
   const maxHealth = 5
+
+  const PLAY_CHANNEL = 'game/start'
+  const netClient = onlyNetClient(game)
 
   useEffect(() => {
     const killListener = () => {
@@ -32,15 +36,21 @@ export const GameScreen: React.FC<ScreenProps> = ({ game }) => {
     }
   }, [game])
 
-  const handleStartOver = () => {
+  const handleStartOver = async () => {
     setKillCount(0)
     setHealth(5)
+    player.teleport({ x: 0, y: 300 }, true)
+    netClient?.sendCustomMessage(PLAY_CHANNEL, {})
   }
 
   return (
     <>
       {health <= 0 ? (
-        <GameOver killCount={killCount} onStartOver={handleStartOver} />
+        <GameOver
+          game={game}
+          killCount={killCount}
+          onStartOver={handleStartOver}
+        />
       ) : (
         <div style={styles.gameScreenContainer}>
           <div style={styles.healthContainer}>

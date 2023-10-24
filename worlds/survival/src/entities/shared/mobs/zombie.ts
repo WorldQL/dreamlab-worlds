@@ -1,5 +1,5 @@
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
-import { createSpawnableEntity } from '@dreamlab.gg/core'
+import { createSpawnableEntity, isEntity } from '@dreamlab.gg/core'
 import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import { z } from '@dreamlab.gg/core/dist/sdk'
 import type { Camera, Player } from '@dreamlab.gg/core/entities'
@@ -50,6 +50,14 @@ interface Render {
   gfxHealthAmount: Graphics
 }
 
+const zombieSymbol = Symbol.for('@dreamlab/core/entities/zombie')
+export const isZombie = (
+  entity: unknown,
+): entity is SpawnableEntity<Data, Render> => {
+  if (!isEntity(entity)) return false
+  return zombieSymbol in entity && entity[zombieSymbol] === true
+}
+
 export const createZombieMob = createSpawnableEntity<
   typeof ArgsSchema,
   SpawnableEntity<Data, Render>,
@@ -61,7 +69,9 @@ export const createZombieMob = createSpawnableEntity<
 
   const width = 130
   const height = width * 2
-  const body = Matter.Bodies.rectangle(position.x, position.y, width, height)
+  const body = Matter.Bodies.rectangle(position.x, position.y, width, height, {
+    label: 'zombie',
+  })
 
   const hitRadius = width / 2 + 120
   const hitCooldown = 1 // Second(s)
@@ -75,6 +85,8 @@ export const createZombieMob = createSpawnableEntity<
   let damagedPlayer = false
 
   return {
+    [zombieSymbol]: true,
+
     get tags() {
       return tags
     },

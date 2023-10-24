@@ -68,7 +68,9 @@ export const createArcherMob = createSpawnableEntity<
 
   const width = 130
   const height = width * 2
-  const body = Matter.Bodies.rectangle(position.x, position.y, width, height)
+  const body = Matter.Bodies.rectangle(position.x, position.y, width, height, {
+    label: 'zombie',
+  })
 
   const maxHealth = 5
   let mobHealth = maxHealth

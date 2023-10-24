@@ -1,18 +1,27 @@
+import type { Game } from '@dreamlab.gg/core'
+import { onlyNetClient } from '@dreamlab.gg/core/dist/network'
 import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
 import React, { useState } from 'https://esm.sh/react@18.2.0'
 import { styles } from './styles'
 
 interface GameOverProps {
+  game: Game<false>
   killCount: number
   onStartOver(): void
 }
 
 export const GameOver: React.FC<GameOverProps> = ({
+  game,
   killCount,
   onStartOver,
 }) => {
   const [hovered, setHovered] = useState(false)
   const [active, setActive] = useState(false)
+
+  const END_CHANNEL = 'game/end'
+  const netClient = onlyNetClient(game)
+
+  netClient?.sendCustomMessage(END_CHANNEL, {})
 
   const getButtonStyles = (): CSSProperties => {
     const style: CSSProperties = { ...styles.button }
