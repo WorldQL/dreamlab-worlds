@@ -7,6 +7,7 @@ import { createArcherMob } from './entities/shared/mobs/zombieArcher.js'
 import { createPickupItem } from './entities/shared/pickupItem.js'
 import { createProjectile } from './entities/shared/projectile.js'
 import { level as home } from './level/shared/home.js'
+import { level as mainLevel } from './level/shared/level.js'
 import { initBow } from './managers/bow.js'
 
 export const sharedInit: InitShared = async game => {
@@ -19,7 +20,7 @@ export const sharedInit: InitShared = async game => {
   game.register('@dreamlab/Platform', createPlatform)
   game.register('@dreamlab/Projectile', createProjectile)
 
-  await game.spawnMany(...home)
+  await game.spawnMany(...home, ...mainLevel)
 
   initBow(game)
 }

@@ -119,6 +119,10 @@ export const createArcherMob = createSpawnableEntity<
           if (Math.abs(xDiff) <= hitRadius) {
             netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
             hitCooldownCounter = hitCooldown * 60
+
+            if (mobHealth - 1 <= 0) {
+              game.events.custom.emit('onPlayerKill')
+            }
           }
         }
       }
@@ -162,7 +166,6 @@ export const createArcherMob = createSpawnableEntity<
           const respawnPosition = { ...body.position }
 
           await game.destroy(this as SpawnableEntity)
-          game.events.custom.emit('onPlayerKill', player)
 
           setTimeout(async () => {
             await game.spawn({
@@ -194,8 +197,8 @@ export const createArcherMob = createSpawnableEntity<
         mobHealth = data.health
       }
 
-      netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
       netClient?.addCustomMessageListener(HIT_CHANNEL, onHitClient)
+      netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
 
       return {
         game,

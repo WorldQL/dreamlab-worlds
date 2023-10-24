@@ -99,6 +99,10 @@ export const createZombieMob = createSpawnableEntity<
           if (Math.abs(xDiff) <= hitRadius) {
             netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
             hitCooldownCounter = hitCooldown * 60
+
+            if (health - 1 <= 0) {
+              game.events.custom.emit('onPlayerKill')
+            }
           }
         }
       }
@@ -142,7 +146,6 @@ export const createZombieMob = createSpawnableEntity<
           const respawnPosition = { ...body.position }
 
           await game.destroy(this as SpawnableEntity)
-          game.events.custom.emit('onPlayerKill', player)
 
           setTimeout(async () => {
             await game.spawn({

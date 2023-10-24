@@ -3,8 +3,7 @@ import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
-import React, { useState } from 'https://esm.sh/react@18.2.0'
-import { level } from '../level/shared/level'
+import React, { useEffect, useState } from 'https://esm.sh/react@18.2.0'
 import { styles } from './styles'
 
 interface ScreenProps {
@@ -12,13 +11,24 @@ interface ScreenProps {
   player: Player
 }
 
-const Screen: React.FC<ScreenProps> = ({ game }) => {
+const StartScreen: React.FC<ScreenProps> = ({ game }) => {
   const [hovered, setHovered] = useState(false)
   const [active, setActive] = useState(false)
   const [visible, setVisible] = useState(true)
 
+  useEffect(() => {
+    const killListener = () => {
+      console.log(`Killed a zombie!`)
+    }
+
+    game.events.custom.addListener('onPlayerKill', killListener)
+
+    return () => {
+      game.events.custom.removeListener('onPlayerKill', killListener)
+    }
+  }, [game])
+
   const handlePlayClick = async () => {
-    await game.spawnMany(...level)
     setVisible(false)
   }
 
@@ -68,7 +78,9 @@ export const initializeStartScreen = (game: Game<false>) => {
     if (isPlayer(entity)) {
       const uiContainer = document.createElement('div')
       game.client.ui.add(uiContainer)
-      createRoot(uiContainer).render(<Screen game={game} player={entity} />)
+      createRoot(uiContainer).render(
+        <StartScreen game={game} player={entity} />,
+      )
     }
   })
 }
