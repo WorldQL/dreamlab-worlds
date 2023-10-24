@@ -11,7 +11,7 @@ import { level as mainLevel } from './level/shared/level.js'
 import { initBow } from './managers/bow.js'
 
 export const sharedInit: InitShared = async game => {
-  game.register('@dreamlab/PassiveMob', createZombieMob)
+  game.register('@dreamlab/ZombieMob', createZombieMob)
   game.register('@dreamlab/ArcherMob', createArcherMob)
 
   game.register('@dreamlab/Ladder', createLadder)

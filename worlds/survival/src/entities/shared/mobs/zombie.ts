@@ -143,18 +143,7 @@ export const createZombieMob = createSpawnableEntity<
 
         health -= 1
         if (health <= 0) {
-          const respawnPosition = { ...body.position }
-
           await game.destroy(this as SpawnableEntity)
-
-          setTimeout(async () => {
-            await game.spawn({
-              entity: '@dreamlab/PassiveMob',
-              args: {},
-              transform: { position: [respawnPosition.x, respawnPosition.y] },
-              tags: ['net/replicated'],
-            })
-          }, 10_000)
         } else {
           network.broadcastCustomMessage(HIT_CHANNEL, { uid, health })
         }

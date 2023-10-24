@@ -3,7 +3,7 @@ import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import { z } from '@dreamlab.gg/core/dist/sdk'
 import type { Camera, Player } from '@dreamlab.gg/core/entities'
-import { isNetPlayer } from '@dreamlab.gg/core/entities'
+import { isNetPlayer, isPlayer } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import {
   onlyNetClient,
@@ -40,6 +40,11 @@ interface Data {
   onCollisionStart(
     pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
   ): void
+  onPlayerCollision(
+    pair: readonly [player: Player, other: Matter.Body],
+    _raw?: unknown,
+  ): void
+
   mobData: MobData
 }
 
@@ -74,6 +79,8 @@ export const createArcherMob = createSpawnableEntity<
 
   const healthIndicatorWidth = width + 50
   const healthIndicatorHeight = 20
+
+  let damagedPlayer = false
 
   return {
     get tags() {
@@ -136,8 +143,23 @@ export const createArcherMob = createSpawnableEntity<
         }
       }
 
+      const onPlayerCollision = (
+        pair: readonly [player: Player, otherBody: Matter.Body],
+        _raw: unknown,
+      ) => {
+        const [_player, bodyCollided] = pair
+        if (body && bodyCollided === body) {
+          game.events.custom.emit('onPlayerDamage')
+          damagedPlayer = true
+        }
+      }
+
       game.events.common.addListener('onPlayerAttack', onPlayerAttack)
       game.events.common.addListener('onCollisionStart', onCollisionStart)
+      game.events.common.addListener(
+        'onPlayerCollisionStart',
+        onPlayerCollision,
+      )
 
       const onHitServer: MessageListenerServer = async (
         { peerID },
@@ -163,18 +185,7 @@ export const createArcherMob = createSpawnableEntity<
 
         mobData.health.value -= 1
         if (mobData.health.value <= 0) {
-          const respawnPosition = { ...body.position }
-
           await game.destroy(this as SpawnableEntity)
-
-          setTimeout(async () => {
-            await game.spawn({
-              entity: '@dreamlab/ArcherMob',
-              args: {},
-              transform: { position: [respawnPosition.x, respawnPosition.y] },
-              tags: ['net/replicated'],
-            })
-          }, 10_000)
         } else {
           network.broadcastCustomMessage(HIT_CHANNEL, {
             uid,
@@ -209,6 +220,7 @@ export const createArcherMob = createSpawnableEntity<
         netClient,
         onPlayerAttack,
         onCollisionStart,
+        onPlayerCollision,
         mobData,
       }
     },
@@ -276,10 +288,15 @@ export const createArcherMob = createSpawnableEntity<
       netClient,
       onPlayerAttack,
       onCollisionStart,
+      onPlayerCollision,
     }) {
       game.physics.unregister(this, body)
       game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
       game.events.common.removeListener('onCollisionStart', onCollisionStart)
+      game.events.common.removeListener(
+        'onPlayerCollisionStart',
+        onPlayerCollision,
+      )
 
       netServer?.removeCustomMessageListener(HIT_CHANNEL, onHitServer)
       netClient?.removeCustomMessageListener(HIT_CHANNEL, onHitClient)
@@ -302,6 +319,19 @@ export const createArcherMob = createSpawnableEntity<
 
       if (hitCooldownCounter > 0) {
         hitCooldownCounter -= 1
+      }
+
+      if (damagedPlayer) {
+        const player = game.entities.find(isPlayer)
+        if (player) {
+          const force = 4 * -player.facingDirection
+          Matter.Body.applyForce(player.body, player.body.position, {
+            x: force,
+            y: -1,
+          })
+        }
+
+        damagedPlayer = false
       }
 
       if (game.server) {
