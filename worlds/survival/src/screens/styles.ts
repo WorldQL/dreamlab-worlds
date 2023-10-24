@@ -27,6 +27,19 @@ export const styles: { [key: string]: CSSProperties } = {
   zombieIcon: {
     fontSize: '28px',
   },
+  gameOverOverlay: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2,
+  },
   gameScreenContainer: {
     position: 'absolute',
     top: '5%',

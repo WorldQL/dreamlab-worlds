@@ -47,7 +47,6 @@ const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
 
   return (
     <div style={styles.container}>
-      <div style={styles.bloodStain} />
       <div style={styles.content}>
         <div style={styles.title}>Zombie Survival</div>
         <button
