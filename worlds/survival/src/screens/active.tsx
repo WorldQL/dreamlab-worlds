@@ -5,6 +5,7 @@ import { styles } from './styles'
 export const GameScreen: React.FC<ScreenProps> = ({ game }) => {
   const [killCount, setKillCount] = useState(0)
   const [health, setHealth] = useState(5)
+  const maxHealth = 5
 
   useEffect(() => {
     const killListener = () => {
@@ -33,8 +34,25 @@ export const GameScreen: React.FC<ScreenProps> = ({ game }) => {
 
   return (
     <div style={styles.gameScreenContainer}>
-      <div style={styles.gameScreenTitle}>Health: {health}</div>
-      <div style={styles.gameScreenTitle}>Kills: {killCount}</div>
+      <div style={styles.healthContainer}>
+        <span style={styles.gameScreenLabel}>Health:</span>
+        {Array.from({ length: maxHealth }).map((_, index) => (
+          <span
+            key={health}
+            style={{
+              ...styles.heartIcon,
+              opacity: index < health ? 1 : 0.3,
+            }}
+          >
+            ❤️
+          </span>
+        ))}
+      </div>
+      <div style={styles.killContainer}>
+        <span style={styles.gameScreenLabel}>Kills:</span>
+        <span style={styles.killCount}>{killCount}</span>
+        <span style={styles.zombieIcon}>🧟</span>
+      </div>
     </div>
   )
 }

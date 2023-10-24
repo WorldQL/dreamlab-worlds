@@ -1,17 +1,43 @@
 import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
 
 export const styles: { [key: string]: CSSProperties } = {
+  gameScreenLabel: {
+    fontSize: '28px',
+    marginRight: '10px',
+    fontWeight: 'bold',
+  },
+  healthContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '10px',
+  },
+  heartIcon: {
+    fontSize: '28px',
+    marginLeft: '5px',
+  },
+  killContainer: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  killCount: {
+    fontSize: '28px',
+    marginRight: '10px',
+    fontWeight: 'bold',
+  },
+  zombieIcon: {
+    fontSize: '28px',
+  },
   gameScreenContainer: {
     position: 'absolute',
-    top: '10%',
+    top: '5%',
     width: '100%',
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     pointerEvents: 'none',
     background: 'transparent',
   },
-
   gameScreenTitle: {
     fontSize: '32px',
     color: 'white',
