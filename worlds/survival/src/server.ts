@@ -14,7 +14,6 @@ export const init: InitServer = async game => {
   const netServer = onlyNetServer(game)
 
   let spawnInterval = 30 * 1_000
-  let gameStarted = false
   let spawnTimeout: NodeJS.Timeout | number | string | undefined
 
   const zombieTypes = [
@@ -63,7 +62,6 @@ export const init: InitServer = async game => {
 
     if (players.length === 0) {
       console.warn('No players found! Ending game...')
-      gameStarted = false
       await destroyAllMobs()
       return
     }
@@ -114,16 +112,14 @@ export const init: InitServer = async game => {
   }
 
   const onStartGame: MessageListenerServer = async () => {
-    if (gameStarted) {
+    if (spawnTimeout) {
       return
     }
 
-    gameStarted = true
     await spawnZombies()
   }
 
   const onEndGame: MessageListenerServer = async () => {
-    gameStarted = false
     await destroyAllMobs()
   }
 
