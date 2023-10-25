@@ -95,6 +95,8 @@ export const createZombieMob = createSpawnableEntity<
     let health = maxHealth
     let damagedPlayer = false
 
+    let hitByPlayer: any = false;
+
     return {
       [zombieSymbol]: true,
 
@@ -181,8 +183,8 @@ export const createZombieMob = createSpawnableEntity<
           if (!player) throw new Error('missing netplayer')
 
           direction.value = body.position.x > player.position.x ? 1 : -1
-          const force = 0.5 * direction.value
-          Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
+          const force = 0.3 * direction.value
+          hitByPlayer = {body, 'position': body.position, vector: { x: force, y: -1.75 }}
 
           health -= 1
           if (health <= 0) {
@@ -324,6 +326,11 @@ export const createZombieMob = createSpawnableEntity<
           }
 
           damagedPlayer = false
+        }
+
+        if (hitByPlayer) {
+          Matter.Body.applyForce(hitByPlayer.body, hitByPlayer.position, hitByPlayer.vector)
+          hitByPlayer = false
         }
 
         if (player) {
