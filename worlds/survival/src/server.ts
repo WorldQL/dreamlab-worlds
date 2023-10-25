@@ -14,6 +14,7 @@ export const init: InitServer = async game => {
   const netServer = onlyNetServer(game)
 
   let spawnInterval = 30 * 1_000
+  let gameStarted = false
   let spawnTimeout: NodeJS.Timeout | number | string | undefined
 
   const zombieTypes = [
@@ -56,44 +57,49 @@ export const init: InitServer = async game => {
   }
 
   const spawnZombies = async () => {
-    const player = Matter.Composite.allBodies(game.physics.engine.world).find(
-      b => b.label === 'player',
-    )
+    const players = Matter.Composite.allBodies(
+      game.physics.engine.world,
+    ).filter(b => b.label === 'player')
 
-    if (!player) {
+    if (players.length === 0) {
       console.warn(
-        "No player found! Zombies can't be spawned relative to the player.",
+        "No players found! Zombies can't be spawned relative to the players.",
       )
       return
     }
 
-    const playerPosition = player.position
-    const leftSpawnPosition: [number, number] = [
-      playerPosition.x - 800,
-      playerPosition.y,
-    ]
-    const rightSpawnPosition: [number, number] = [
-      playerPosition.x + 800,
-      playerPosition.y,
-    ]
+    const spawnPromises = []
 
-    await game.spawn({
-      entity: '@dreamlab/ZombieMob',
-      args: zombieTypes[
-        Math.floor(Math.random() * zombieTypes.length)
-      ] as Record<string, unknown>,
-      transform: { position: leftSpawnPosition },
-      tags: ['net/replicated', 'net/server-authoritative'],
-    })
+    for (const player of players) {
+      const playerPosition = player.position
+      const leftSpawnPosition: [number, number] = [
+        playerPosition.x - 850,
+        playerPosition.y,
+      ]
+      const rightSpawnPosition: [number, number] = [
+        playerPosition.x + 850,
+        playerPosition.y,
+      ]
 
-    await game.spawn({
-      entity: '@dreamlab/ZombieMob',
-      args: zombieTypes[
-        Math.floor(Math.random() * zombieTypes.length)
-      ] as Record<string, unknown>,
-      transform: { position: rightSpawnPosition },
-      tags: ['net/replicated', 'net/server-authoritative'],
-    })
+      // queue two zombies for each player to be spawned
+      for (let index = 0; index < 2; index++) {
+        const randomZombieType =
+          zombieTypes[Math.floor(Math.random() * zombieTypes.length)]
+
+        const spawnPromise = game.spawn({
+          entity: '@dreamlab/ZombieMob',
+          args: randomZombieType as Record<string, unknown>,
+          transform: {
+            position: index % 2 === 0 ? leftSpawnPosition : rightSpawnPosition,
+          },
+          tags: ['net/replicated', 'net/server-authoritative'],
+        })
+
+        spawnPromises.push(spawnPromise)
+      }
+    }
+
+    await Promise.all(spawnPromises)
 
     spawnInterval *= 0.9
     spawnInterval = Math.max(5 * 1_000, spawnInterval)
@@ -102,10 +108,16 @@ export const init: InitServer = async game => {
   }
 
   const onStartGame: MessageListenerServer = async () => {
+    if (gameStarted) {
+      return
+    }
+
+    gameStarted = true
     await spawnZombies()
   }
 
   const onEndGame: MessageListenerServer = async () => {
+    gameStarted = false
     await destroyAllMobs()
   }
 
