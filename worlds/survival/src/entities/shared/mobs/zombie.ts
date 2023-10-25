@@ -17,7 +17,11 @@ import type {
   NetServer,
   SyncedValue,
 } from '@dreamlab.gg/core/network'
-import { deferUntilPhysicsStep, drawBox, drawCircle } from '@dreamlab.gg/core/utils'
+import {
+  deferUntilPhysicsStep,
+  drawBox,
+  drawCircle,
+} from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
@@ -363,7 +367,7 @@ export const createZombieMob = createSpawnableEntity<
           })
         }
 
-        if (!closestPlayer || minDistance > 4_000) {
+        if (game.server && (!closestPlayer || minDistance > 4_000)) {
           await game.destroy(this as SpawnableEntity)
         }
       },
