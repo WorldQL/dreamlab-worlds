@@ -3,7 +3,7 @@ import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import { z } from '@dreamlab.gg/core/dist/sdk'
 import type { Camera, Player } from '@dreamlab.gg/core/entities'
-import { isNetPlayer, isPlayer } from '@dreamlab.gg/core/entities'
+import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import {
   onlyNetClient,
@@ -93,8 +93,6 @@ export const createArcherMob = createSpawnableEntity<
     const healthIndicatorWidth = width + 50
     const healthIndicatorHeight = 20
 
-    let damagedPlayer = false
-
     return {
       get tags() {
         return tags
@@ -160,10 +158,14 @@ export const createArcherMob = createSpawnableEntity<
           pair: readonly [player: Player, otherBody: Matter.Body],
           _raw: unknown,
         ) => {
-          const [_player, bodyCollided] = pair
+          const [player, bodyCollided] = pair
           if (body && bodyCollided === body) {
             game.events.custom.emit('onPlayerDamage')
-            damagedPlayer = true
+            const force = 4 * -player.facingDirection
+            Matter.Body.applyForce(player.body, player.body.position, {
+              x: force,
+              y: -1,
+            })
           }
         }
 
