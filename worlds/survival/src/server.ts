@@ -62,9 +62,9 @@ export const init: InitServer = async game => {
     ).filter(b => b.label === 'player')
 
     if (players.length === 0) {
-      console.warn(
-        "No players found! Zombies can't be spawned relative to the players.",
-      )
+      console.warn('No players found! Ending game...')
+      gameStarted = false
+      await destroyAllMobs()
       return
     }
 

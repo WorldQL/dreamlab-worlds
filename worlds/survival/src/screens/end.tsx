@@ -11,17 +11,16 @@ interface GameOverProps {
 }
 
 export const GameOver: React.FC<GameOverProps> = ({
-  game,
   killCount,
   onStartOver,
 }) => {
   const [hovered, setHovered] = useState(false)
   const [active, setActive] = useState(false)
 
-  const END_CHANNEL = 'game/end'
-  const netClient = onlyNetClient(game)
+  // const END_CHANNEL = 'game/end'
+  // const netClient = onlyNetClient(game)
 
-  netClient?.sendCustomMessage(END_CHANNEL, {})
+  // netClient?.sendCustomMessage(END_CHANNEL, {})
 
   const getButtonStyles = (): CSSProperties => {
     const style: CSSProperties = { ...styles.button }
@@ -60,7 +59,7 @@ export const GameOver: React.FC<GameOverProps> = ({
           style={getButtonStyles()}
           type='button'
         >
-          Start Over
+          Play Again
         </button>
       </div>
     </div>

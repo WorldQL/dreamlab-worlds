@@ -19,7 +19,6 @@ const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
   const [gameStarted, setGameStarted] = useState(false)
 
   const PLAY_CHANNEL = 'game/start'
-  const END_CHANNEL = 'game/end'
   const netClient = onlyNetClient(game)
 
   const handlePlayClick = async () => {
@@ -45,8 +44,6 @@ const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
   if (gameStarted) {
     return <GameScreen game={game} player={player} />
   }
-
-  netClient?.sendCustomMessage(END_CHANNEL, {})
 
   return (
     <div style={styles.container}>

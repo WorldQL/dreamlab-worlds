@@ -368,7 +368,7 @@ export const createZombieMob = createSpawnableEntity<
           })
         }
 
-        if (!closestPlayer || minDistance > 2_000) {
+        if (!closestPlayer || minDistance > 4_000) {
           await game.destroy(this as SpawnableEntity)
         }
       },
