@@ -17,7 +17,7 @@ import type {
   NetServer,
   SyncedValue,
 } from '@dreamlab.gg/core/network'
-import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
+import { deferUntilPhysicsStep, drawBox, drawCircle } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 
@@ -93,7 +93,6 @@ export const createZombieMob = createSpawnableEntity<
     const healthIndicatorHeight = 20
 
     let health = maxHealth
-    let applyKnockback: [Matter.Body, number] | undefined
 
     return {
       [zombieSymbol]: true,
@@ -152,7 +151,12 @@ export const createZombieMob = createSpawnableEntity<
           if (body && bodyCollided === body) {
             game.events.custom.emit('onPlayerDamage')
             const force = 4 * -player.facingDirection
-            applyKnockback = [player.body, force]
+            deferUntilPhysicsStep(game, () => {
+              Matter.Body.applyForce(player.body, player.body.position, {
+                x: force,
+                y: -1,
+              })
+            })
           }
         }
 
@@ -312,15 +316,6 @@ export const createZombieMob = createSpawnableEntity<
 
         if (hitCooldownCounter > 0) {
           hitCooldownCounter -= 1
-        }
-
-        if (applyKnockback) {
-          const [knockbackBody, force] = applyKnockback
-          Matter.Body.applyForce(knockbackBody, knockbackBody.position, {
-            x: force,
-            y: -1,
-          })
-          applyKnockback = undefined
         }
 
         const allBodies = Matter.Composite.allBodies(game.physics.engine.world)
