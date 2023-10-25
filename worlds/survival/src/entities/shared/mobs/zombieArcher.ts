@@ -323,27 +323,31 @@ export const createArcherMob = createSpawnableEntity<
       async onPhysicsStep(_, { game, mobData }) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
-        const player = game.entities.find(isPlayer)
 
         if (hitCooldownCounter > 0) {
           hitCooldownCounter -= 1
         }
 
-        if (damagedPlayer) {
-          if (player) {
-            const force = 4 * -player.facingDirection
-            Matter.Body.applyForce(player.body, player.body.position, {
-              x: force,
-              y: -1,
-            })
-          }
+        const allBodies = Matter.Composite.allBodies(game.physics.engine.world)
+        let closestPlayer: Matter.Body | null = null
+        let minDistance = Number.POSITIVE_INFINITY
 
-          damagedPlayer = false
+        for (const player of allBodies) {
+          if (player.label === 'player') {
+            const dx = player.position.x - body.position.x
+            const dy = player.position.y - body.position.y
+            const distance = Math.hypot(dx, dy)
+
+            if (distance < minDistance) {
+              minDistance = distance
+              closestPlayer = player
+            }
+          }
         }
 
-        if (player) {
-          const dx = player.body.position.x - body.position.x
-          const dy = player.body.position.y - body.position.y
+        if (closestPlayer) {
+          const dx = closestPlayer.position.x - body.position.x
+          const dy = closestPlayer.position.y - body.position.y
 
           const distance = Math.hypot(dx, dy)
           const unitX = dx / distance
