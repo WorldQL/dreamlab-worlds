@@ -93,7 +93,6 @@ export const createZombieMob = createSpawnableEntity<
     const healthIndicatorHeight = 20
 
     let health = maxHealth
-
     let applyKnockback: [Matter.Body, number] | undefined
 
     return {

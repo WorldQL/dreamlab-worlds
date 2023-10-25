@@ -69,7 +69,7 @@ export const createProjectile = createSpawnableEntity<
       },
 
       init({ game }) {
-        game.physics.register(this, body)  
+        game.physics.register(this, body)
 
         const onCollisionStart = async (
           pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
