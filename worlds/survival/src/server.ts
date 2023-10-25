@@ -68,6 +68,12 @@ export const init: InitServer = async game => {
       return
     }
 
+    const zombies = Matter.Composite.allBodies(
+      game.physics.engine.world,
+    ).filter(b => b.label === 'zombie')
+
+    if (zombies.length >= 30) return
+
     const spawnPromises = []
 
     for (const player of players) {

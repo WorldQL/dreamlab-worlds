@@ -398,6 +398,10 @@ export const createArcherMob = createSpawnableEntity<
             mobData.projectileCooldownCounter.value -= 1
           }
         }
+
+        if (!closestPlayer || minDistance > 2_000) {
+          await game.destroy(this as SpawnableEntity)
+        }
       },
 
       onRenderFrame(

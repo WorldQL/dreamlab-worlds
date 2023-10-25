@@ -306,7 +306,7 @@ export const createZombieMob = createSpawnableEntity<
         ctrHealth.destroy({ children: true })
       },
 
-      onPhysicsStep(_, { game }) {
+      async onPhysicsStep(_, { game }) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
@@ -352,6 +352,24 @@ export const createZombieMob = createSpawnableEntity<
             x: speed * unitX,
             y: speed * unitY,
           })
+        }
+
+        if (closestPlayer) {
+          const dx = closestPlayer.position.x - body.position.x
+          const dy = closestPlayer.position.y - body.position.y
+
+          const distance = Math.hypot(dx, dy)
+          const unitX = dx / distance
+          const unitY = dy / distance
+
+          Matter.Body.translate(body, {
+            x: speed * unitX,
+            y: speed * unitY,
+          })
+        }
+
+        if (!closestPlayer || minDistance > 2_000) {
+          await game.destroy(this as SpawnableEntity)
         }
       },
 
