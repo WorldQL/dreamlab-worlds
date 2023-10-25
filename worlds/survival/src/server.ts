@@ -83,7 +83,7 @@ export const init: InitServer = async game => {
         Math.floor(Math.random() * zombieTypes.length)
       ] as Record<string, unknown>,
       transform: { position: leftSpawnPosition },
-      tags: ['net/replicated'],
+      tags: ['net/replicated', 'net/server-authoritative'],
     })
 
     await game.spawn({
@@ -92,7 +92,7 @@ export const init: InitServer = async game => {
         Math.floor(Math.random() * zombieTypes.length)
       ] as Record<string, unknown>,
       transform: { position: rightSpawnPosition },
-      tags: ['net/replicated'],
+      tags: ['net/replicated', 'net/server-authoritative'],
     })
 
     spawnInterval *= 0.9

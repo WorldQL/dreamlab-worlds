@@ -85,7 +85,7 @@ export const createZombieMob = createSpawnableEntity<
       },
     )
 
-    const hitRadius = width / 2 + 120
+    const hitRadius = width / 2 + 220
     const hitCooldown = 1 // Second(s)
     let hitCooldownCounter = 0
 
