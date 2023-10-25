@@ -94,6 +94,8 @@ export const createZombieMob = createSpawnableEntity<
 
     let health = maxHealth
 
+    let applyKnockback: [Matter.Body, number] | undefined
+
     return {
       [zombieSymbol]: true,
 
@@ -151,10 +153,7 @@ export const createZombieMob = createSpawnableEntity<
           if (body && bodyCollided === body) {
             game.events.custom.emit('onPlayerDamage')
             const force = 4 * -player.facingDirection
-            Matter.Body.applyForce(player.body, player.body.position, {
-              x: force,
-              y: -1,
-            })
+            applyKnockback = [player.body, force]
           }
         }
 
@@ -314,6 +313,15 @@ export const createZombieMob = createSpawnableEntity<
 
         if (hitCooldownCounter > 0) {
           hitCooldownCounter -= 1
+        }
+
+        if (applyKnockback) {
+          const [knockbackBody, force] = applyKnockback
+          Matter.Body.applyForce(knockbackBody, knockbackBody.position, {
+            x: force,
+            y: -1,
+          })
+          applyKnockback = undefined
         }
 
         const allBodies = Matter.Composite.allBodies(game.physics.engine.world)
