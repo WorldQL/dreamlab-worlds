@@ -1,6 +1,7 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { Camera } from '@dreamlab.gg/core/entities'
+import type { EventHandler } from '@dreamlab.gg/core/events'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
@@ -16,12 +17,12 @@ const ArgsSchema = z.object({
   spriteSource: SpriteSourceSchema,
 })
 
+type OnCollisionStart = EventHandler<'onCollisionStart'>
+
 interface Data {
   game: Game<boolean>
   body: Matter.Body
-  onCollisionStart(
-    pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
-  ): Promise<void>
+  onCollisionStart: OnCollisionStart
 }
 
 interface Render {
@@ -76,12 +77,10 @@ export const createProjectile = createSpawnableEntity<
       init({ game }) {
         game.physics.register(this, body)
 
-        const onCollisionStart = async (
-          pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
-        ) => {
-          const [a, b] = pair
-          if (a.uid === uid || b.uid === uid)
+        const onCollisionStart: OnCollisionStart = async ([a, b]) => {
+          if (a.uid === uid || b.uid === uid) {
             await game.destroy(this as SpawnableEntity)
+          }
         }
 
         game.events.common.addListener('onCollisionStart', onCollisionStart)

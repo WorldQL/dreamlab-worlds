@@ -1,5 +1,4 @@
 import type { Game } from '@dreamlab.gg/core'
-import { onlyNetClient } from '@dreamlab.gg/core/dist/network'
 import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
 import React, { useState } from 'https://esm.sh/react@18.2.0'
 import { styles } from './styles'

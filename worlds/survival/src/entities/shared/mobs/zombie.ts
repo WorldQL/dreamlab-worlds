@@ -1,9 +1,9 @@
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import { createSpawnableEntity, isEntity } from '@dreamlab.gg/core'
-import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import { z } from '@dreamlab.gg/core/dist/sdk'
-import type { Camera, Player } from '@dreamlab.gg/core/entities'
+import type { Camera } from '@dreamlab.gg/core/entities'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
+import type { EventHandler } from '@dreamlab.gg/core/events'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import {
   onlyNetClient,
@@ -24,6 +24,7 @@ import {
 } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
+import { events } from '../../../events'
 
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
@@ -33,6 +34,10 @@ const ArgsSchema = z.object({
   speed: z.number().positive().min(1),
 })
 
+type OnPlayerAttack = EventHandler<'onPlayerAttack'>
+type OnCollisionStart = EventHandler<'onCollisionStart'>
+type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
+
 interface Data {
   game: Game<boolean>
   body: Matter.Body
@@ -41,14 +46,9 @@ interface Data {
   netServer: NetServer | undefined
   netClient: NetClient | undefined
   direction: SyncedValue<number>
-  onPlayerAttack(player: Player, item: PlayerInventoryItem): void
-  onCollisionStart(
-    pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
-  ): void
-  onPlayerCollision(
-    pair: readonly [player: Player, other: Matter.Body],
-    _raw?: unknown,
-  ): void
+  onPlayerAttack: OnPlayerAttack
+  onCollisionStart: OnCollisionStart
+  onPlayerCollisionStart: OnPlayerCollisionStart
 }
 
 interface Render {
@@ -125,10 +125,7 @@ export const createZombieMob = createSpawnableEntity<
         const netClient = onlyNetClient(game)
         const direction = syncedValue(game, uid, 'direction', 1)
 
-        const onPlayerAttack: (
-          player: Player,
-          item: PlayerInventoryItem,
-        ) => void = (player, _item) => {
+        const onPlayerAttack: OnPlayerAttack = (player, _item) => {
           if (hitCooldownCounter <= 0) {
             const xDiff = player.body.position.x - body.position.x
 
@@ -137,28 +134,24 @@ export const createZombieMob = createSpawnableEntity<
               hitCooldownCounter = hitCooldown * 60
 
               if (health - 1 <= 0) {
-                game.events.custom.emit('onPlayerKill')
+                events.emit('onPlayerKill')
               }
             }
           }
         }
 
-        const onCollisionStart = (
-          pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
-        ) => {
-          const [a, b] = pair
+        const onCollisionStart: OnCollisionStart = ([a, b]) => {
           if ((a.uid === uid || b.uid === uid) && game.server) {
             direction.value = -direction.value
           }
         }
 
-        const onPlayerCollision = (
-          pair: readonly [player: Player, otherBody: Matter.Body],
-          _raw: unknown,
+        const onPlayerCollisionStart: OnPlayerCollisionStart = (
+          [player, bodyCollided],
+          _raw,
         ) => {
-          const [player, bodyCollided] = pair
           if (body && bodyCollided === body) {
-            game.events.custom.emit('onPlayerDamage')
+            events.emit('onPlayerDamage')
             const force = 4 * -player.facingDirection
             deferUntilPhysicsStep(game, () => {
               Matter.Body.applyForce(player.body, player.body.position, {
@@ -173,7 +166,7 @@ export const createZombieMob = createSpawnableEntity<
         game.events.common.addListener('onCollisionStart', onCollisionStart)
         game.events.common.addListener(
           'onPlayerCollisionStart',
-          onPlayerCollision,
+          onPlayerCollisionStart,
         )
 
         const onHitServer: MessageListenerServer = async (
@@ -233,7 +226,7 @@ export const createZombieMob = createSpawnableEntity<
           direction,
           onPlayerAttack,
           onCollisionStart,
-          onPlayerCollision,
+          onPlayerCollisionStart,
         }
       },
 
@@ -300,14 +293,14 @@ export const createZombieMob = createSpawnableEntity<
         netClient,
         onPlayerAttack,
         onCollisionStart,
-        onPlayerCollision,
+        onPlayerCollisionStart,
       }) {
         game.physics.unregister(this, body)
         game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
         game.events.common.removeListener('onCollisionStart', onCollisionStart)
         game.events.common.removeListener(
           'onPlayerCollisionStart',
-          onPlayerCollision,
+          onPlayerCollisionStart,
         )
 
         netServer?.removeCustomMessageListener(HIT_CHANNEL, onHitServer)

@@ -1,9 +1,9 @@
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import { z } from '@dreamlab.gg/core/dist/sdk'
-import type { Camera, Player } from '@dreamlab.gg/core/entities'
+import type { Camera } from '@dreamlab.gg/core/entities'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
+import type { EventHandler } from '@dreamlab.gg/core/events'
 import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import {
   onlyNetClient,
@@ -23,6 +23,9 @@ import { Container, Graphics } from 'pixi.js'
 
 const ArgsSchema = z.object({})
 
+type OnPlayerAttack = EventHandler<'onPlayerAttack'>
+type OnCollisionStart = EventHandler<'onCollisionStart'>
+
 interface Data {
   game: Game<boolean>
   body: Matter.Body
@@ -31,10 +34,8 @@ interface Data {
   netServer: NetServer | undefined
   netClient: NetClient | undefined
   direction: SyncedValue<number>
-  onPlayerAttack(player: Player, item: PlayerInventoryItem): void
-  onCollisionStart(
-    pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
-  ): void
+  onPlayerAttack: OnPlayerAttack
+  onCollisionStart: OnCollisionStart
 }
 
 interface Render {
@@ -94,10 +95,7 @@ export const createPassiveMob = createSpawnableEntity<
       const netClient = onlyNetClient(game)
       const direction = syncedValue(game, uid, 'direction', 1)
 
-      const onPlayerAttack: (
-        player: Player,
-        item: PlayerInventoryItem,
-      ) => void = (player, _item) => {
+      const onPlayerAttack: OnPlayerAttack = (player, _item) => {
         if (hitCooldownCounter <= 0) {
           const xDiff = player.body.position.x - body.position.x
 
@@ -108,10 +106,7 @@ export const createPassiveMob = createSpawnableEntity<
         }
       }
 
-      const onCollisionStart = (
-        pair: readonly [a: SpawnableEntity, b: SpawnableEntity],
-      ) => {
-        const [a, b] = pair
+      const onCollisionStart: OnCollisionStart = ([a, b]) => {
         if ((a.uid === uid || b.uid === uid) && game.server) {
           direction.value = -direction.value
         }

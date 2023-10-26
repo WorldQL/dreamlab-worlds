@@ -1,5 +1,6 @@
 import { onlyNetClient } from '@dreamlab.gg/core/dist/network'
 import { useEffect, useState } from 'https://esm.sh/react@18.2.0'
+import { events } from '../events'
 import { GameOver } from './end'
 import type { ScreenProps } from './start'
 import { styles } from './styles'
@@ -17,24 +18,18 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
       setKillCount(prev => prev + 1)
     }
 
-    game.events.custom.addListener('onPlayerKill', killListener)
-
-    return () => {
-      game.events.custom.removeListener('onPlayerKill', killListener)
-    }
-  }, [game])
-
-  useEffect(() => {
     const healthListener = () => {
       setHealth(prev => prev - 1)
     }
 
-    game.events.custom.addListener('onPlayerDamage', healthListener)
+    events.addListener('onPlayerKill', killListener)
+    events.addListener('onPlayerDamage', healthListener)
 
     return () => {
-      game.events.custom.removeListener('onPlayerDamage', healthListener)
+      events.removeListener('onPlayerKill', killListener)
+      events.removeListener('onPlayerDamage', healthListener)
     }
-  }, [game])
+  }, [])
 
   const handleStartOver = async () => {
     setKillCount(0)
