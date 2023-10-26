@@ -25,9 +25,10 @@ import { events } from '../../../events'
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
-  spriteSource: z.string().optional(),
   maxHealth: z.number().positive().min(1),
   speed: z.number().positive().min(1),
+  knockback: z.number().positive().min(0),
+  spriteSource: z.string().optional(),
 })
 
 interface MobData {
@@ -70,7 +71,10 @@ export const createArcherMob = createSpawnableEntity<
   Render
 >(
   ArgsSchema,
-  ({ uid, tags, transform, zIndex }, { width, height, maxHealth, speed }) => {
+  (
+    { uid, tags, transform, zIndex },
+    { width, height, maxHealth, speed, knockback },
+  ) => {
     const HIT_CHANNEL = '@dreamlab/Hittable/hit'
     const { position } = transform
 
@@ -192,7 +196,7 @@ export const createArcherMob = createSpawnableEntity<
           if (!player) throw new Error('missing netplayer')
 
           mobData.direction.value = body.position.x > player.position.x ? 1 : -1
-          const force = 0.5 * mobData.direction.value
+          const force = knockback * mobData.direction.value
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
           mobData.health.value -= 1

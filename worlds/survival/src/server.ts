@@ -22,24 +22,28 @@ export const init: InitServer = async game => {
       height: 100,
       maxHealth: 2,
       speed: 5,
+      knockback: 2,
     }, // babyZombie
     {
       width: 80,
       height: 260,
       maxHealth: 1,
       speed: 2,
+      knockback: 0.5,
     }, // weakZombie
     {
       width: 130,
       height: 260,
       maxHealth: 4,
       speed: 3,
+      knockback: 1.5,
     }, // zombie
     {
       width: 130,
       height: 380,
       maxHealth: 10,
       speed: 2,
+      knockback: 1,
     }, // strongZombie
   ]
 
