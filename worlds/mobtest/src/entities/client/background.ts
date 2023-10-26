@@ -53,7 +53,11 @@ export const createBackground = createSpawnableEntity<
         return cloneTransform(transform)
       },
 
-      isInBounds() {
+      rectangleBounds() {
+        return undefined
+      },
+
+      isPointInside() {
         return false
       },
 

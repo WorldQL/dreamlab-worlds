@@ -64,7 +64,12 @@ export const createProjectile = createSpawnableEntity<
 
       transform: cloneTransform(transform),
 
-      isInBounds(position) {
+      rectangleBounds() {
+        // TODO
+        return undefined
+      },
+
+      isPointInside(position) {
         return Matter.Query.point([body], position).length > 0
       },
 

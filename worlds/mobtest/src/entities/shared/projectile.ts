@@ -64,12 +64,17 @@ export const createProjectile = createSpawnableEntity<
 
       transform: cloneTransform(transform),
 
-      isInBounds(position) {
+      rectangleBounds() {
+        // TODO
+        return undefined
+      },
+
+      isPointInside(position) {
         return Matter.Query.point([body], position).length > 0
       },
 
       init({ game }) {
-        game.physics.register(this, body)  
+        game.physics.register(this, body)
 
         const onCollisionStart = async (
           pair: readonly [a: SpawnableEntity, b: SpawnableEntity],

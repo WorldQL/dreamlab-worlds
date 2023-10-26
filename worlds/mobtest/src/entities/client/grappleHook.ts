@@ -80,7 +80,11 @@ export const createGrappleHook = createSpawnableEntity<
         return zIndex
       },
 
-      isInBounds() {
+      rectangleBounds() {
+        return undefined
+      },
+
+      isPointInside() {
         return false
       },
 

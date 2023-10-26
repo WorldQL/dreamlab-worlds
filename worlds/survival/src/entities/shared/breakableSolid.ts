@@ -94,7 +94,12 @@ export const createBreakableSolid = createSpawnableEntity<
         return cloneTransform(transform)
       },
 
-      isInBounds(position) {
+      rectangleBounds() {
+        // TODO
+        return undefined
+      },
+
+      isPointInside(position) {
         return (
           Matter.Query.point([bodyLeft], position).length > 0 ||
           Matter.Query.point([bodyRight], position).length > 0

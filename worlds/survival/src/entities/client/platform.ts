@@ -1,7 +1,7 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { Camera } from '@dreamlab.gg/core/entities'
-import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import { cloneTransform, rectangleBounds, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
@@ -68,7 +68,11 @@ export const createPlatform = createSpawnableEntity<
         return cloneTransform(transform)
       },
 
-      isInBounds(position) {
+      rectangleBounds() {
+        return rectangleBounds(width, height, transform.rotation)
+      },
+
+      isPointInside(position) {
         return Matter.Query.point([body], position).length > 0
       },
 
