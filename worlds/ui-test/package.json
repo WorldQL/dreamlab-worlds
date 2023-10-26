@@ -11,7 +11,7 @@
     "fmt": "npm run format"
   },
   "devDependencies": {
-    "@dreamlab.gg/core": "^0.0.43",
+    "@dreamlab.gg/core": "^0.0.50",
     "@luludev/eslint-config": "^0.5.0",
     "@types/react": "^18.2.28",
     "@types/react-dom": "^18.2.13",
