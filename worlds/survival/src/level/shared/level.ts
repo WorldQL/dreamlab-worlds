@@ -163,36 +163,12 @@ export const level: LooseSpawnableDefinition[] = [
       rotation: 0,
     },
   },
-  // BOSS LEVEL BELOW
-  {
-    entity: '@dreamlab/Solid', // left wall
-    args: { width: 1_000, height: 100 },
-    transform: {
-      position: { x: -1_000, y: 4_170 },
-      rotation: 90,
-    },
-  },
+  // MOBS
   {
     entity: '@dreamlab/Solid', // floor
-    args: { width: 3_000, height: 100 },
+    args: { width: 25_000, height: 200 },
     transform: {
       position: { x: 550, y: 4_620 },
-      rotation: 0,
-    },
-  },
-  {
-    entity: '@dreamlab/Solid', // right wall
-    args: { width: 1_000, height: 100 },
-    transform: {
-      position: { x: 2_100, y: 4_170 },
-      rotation: 90,
-    },
-  },
-  {
-    entity: '@dreamlab/Solid', // ceiling
-    args: { width: 2_750, height: 100 },
-    transform: {
-      position: { x: 775, y: 3_620 },
       rotation: 0,
     },
   },

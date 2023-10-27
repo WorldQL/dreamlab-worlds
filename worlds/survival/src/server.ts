@@ -13,7 +13,7 @@ export const init: InitServer = async game => {
   const END_CHANNEL = 'game/end'
   const netServer = onlyNetServer(game)
 
-  let spawnInterval = 30 * 1_000
+  let spawnInterval = 20 * 1_000
   let spawnTimeout: NodeJS.Timeout | number | string | undefined
 
   const zombieTypes = [
@@ -80,30 +80,35 @@ export const init: InitServer = async game => {
 
     for (const player of players) {
       const playerPosition = player.position
-      const leftSpawnPosition: [number, number] = [
-        playerPosition.x - 850,
-        playerPosition.y,
-      ]
-      const rightSpawnPosition: [number, number] = [
-        playerPosition.x + 850,
-        playerPosition.y,
-      ]
 
-      // queue two zombies for each player to be spawned
-      for (let index = 0; index < 2; index++) {
-        const randomZombieType =
-          zombieTypes[Math.floor(Math.random() * zombieTypes.length)]
+      // Check if player's y position is greater than 3600
+      if (playerPosition.y > 3_600) {
+        const leftSpawnPosition: [number, number] = [
+          playerPosition.x - 850,
+          playerPosition.y,
+        ]
+        const rightSpawnPosition: [number, number] = [
+          playerPosition.x + 850,
+          playerPosition.y,
+        ]
 
-        const spawnPromise = game.spawn({
-          entity: '@dreamlab/ZombieMob',
-          args: randomZombieType as Record<string, unknown>,
-          transform: {
-            position: index % 2 === 0 ? leftSpawnPosition : rightSpawnPosition,
-          },
-          tags: ['net/replicated', 'net/server-authoritative'],
-        })
+        // queue two zombies for each player to be spawned
+        for (let index = 0; index < 2; index++) {
+          const randomZombieType =
+            zombieTypes[Math.floor(Math.random() * zombieTypes.length)]
 
-        spawnPromises.push(spawnPromise)
+          const spawnPromise = game.spawn({
+            entity: '@dreamlab/ZombieMob',
+            args: randomZombieType as Record<string, unknown>,
+            transform: {
+              position:
+                index % 2 === 0 ? leftSpawnPosition : rightSpawnPosition,
+            },
+            tags: ['net/replicated', 'net/server-authoritative'],
+          })
+
+          spawnPromises.push(spawnPromise)
+        }
       }
     }
 
