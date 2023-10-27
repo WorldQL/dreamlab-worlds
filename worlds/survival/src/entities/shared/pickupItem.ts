@@ -1,11 +1,8 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { EventHandler } from '@dreamlab.gg/core/dist/events'
-import type { Camera, Player } from '@dreamlab.gg/core/entities'
-import type {
-  ItemOptions,
-  PlayerInventoryItem,
-} from '@dreamlab.gg/core/managers'
+import type { Camera } from '@dreamlab.gg/core/entities'
+import type { ItemOptions } from '@dreamlab.gg/core/managers'
 import { cloneTransform, rectangleBounds, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite } from '@dreamlab.gg/core/textures'
@@ -38,11 +35,6 @@ interface Render {
   container: Container
   gfxBounds: Graphics | Sprite
   sprite: Sprite | undefined
-}
-
-const itemListener = (player: Player, item: PlayerInventoryItem) => {
-  const inventory = player.inventory
-  inventory.addItem(item)
 }
 
 export const createPickupItem = createSpawnableEntity<
@@ -121,8 +113,6 @@ export const createPickupItem = createSpawnableEntity<
             events.emit('onPlayerNearItem', player, undefined)
           }
         }
-
-        events.addListener('onPlayerAttemptPickup', itemListener)
 
         game.events.common.addListener(
           'onPlayerCollisionStart',

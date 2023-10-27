@@ -126,7 +126,7 @@ export const level: LooseSpawnableDefinition[] = [
     args: {
       width: 200,
       height: 200,
-      spriteSource: '/worlds/mobtest/assets/img/bow.png',
+      spriteSource: '/worlds/survival/assets/items/bow.png',
       itemDisplayName: 'Gold Bow',
       animationName: 'bow',
     },
@@ -140,9 +140,9 @@ export const level: LooseSpawnableDefinition[] = [
     args: {
       width: 200,
       height: 200,
-      spriteSource: '/worlds/mobtest/assets/img/bow.png',
-      itemDisplayName: 'Gold Bow',
-      animationName: 'bow',
+      spriteSource: '/worlds/survival/assets/items/katana.png',
+      itemDisplayName: 'Katana',
+      animationName: 'greatsword',
     },
     transform: {
       position: { x: 1_300, y: 300 },
@@ -154,7 +154,7 @@ export const level: LooseSpawnableDefinition[] = [
     args: {
       width: 200,
       height: 200,
-      spriteSource: '/worlds/mobtest/assets/img/bow.png',
+      spriteSource: '/worlds/survival/assets/items/bow.png',
       itemDisplayName: 'Gold Bow',
       animationName: 'bow',
     },
