@@ -18,33 +18,20 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
   player,
   item,
 }) => {
+  const [keyPressed, setKeyPressed] = useState(false)
   const [currentItem, setCurrentItem] = useState<
     PlayerInventoryItem | undefined
   >(item)
   const itemRef = useRef<PlayerInventoryItem | undefined>(item)
-  const keyFPressed = useRef(false)
 
   game.client?.inputs.registerInput('@survival/pickup', 'KeyF')
 
   useEffect(() => {
     const itemConfirmListener = () => {
-      if (!keyFPressed.current && itemRef.current) {
-        console.log('emitted')
-        keyFPressed.current = true
+      if (!keyPressed && itemRef.current) {
+        setKeyPressed(true)
         const inventory = player.inventory
         inventory.addItem(itemRef.current)
-      }
-    }
-
-    const keyDownListener = (event: KeyboardEvent) => {
-      if (event.code === 'KeyF' && !keyFPressed.current) {
-        itemConfirmListener()
-      }
-    }
-
-    const keyUpListener = (event: KeyboardEvent) => {
-      if (event.code === 'KeyF') {
-        keyFPressed.current = false
       }
     }
 
@@ -54,18 +41,16 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
     ) => {
       itemRef.current = item
       setCurrentItem(item)
+      setKeyPressed(false)
     }
 
     events.addListener('onPlayerNearItem', itemListener)
-    document.addEventListener('keydown', keyDownListener)
-    document.addEventListener('keyup', keyUpListener)
+    game.client.inputs.addListener('@survival/pickup', itemConfirmListener)
 
     return () => {
-      events.removeListener('onPlayerNearItem', itemListener)
-      document.removeEventListener('keydown', keyDownListener)
-      document.removeEventListener('keyup', keyUpListener)
+      game.client.inputs.removeListener('@survival/pickup', itemConfirmListener)
     }
-  }, [game.client.inputs, player])
+  }, [game.client.inputs, keyPressed, player])
 
   if (!currentItem) return null
 

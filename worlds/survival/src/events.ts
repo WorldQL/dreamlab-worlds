@@ -6,7 +6,6 @@ interface Events {
   onPlayerKill: []
   onPlayerDamage: []
   onPlayerNearItem: [Player, PlayerInventoryItem | undefined]
-  onPlayerAttemptPickup: [Player, PlayerInventoryItem]
 }
 
 export const events = new EventEmitter<Events>()
