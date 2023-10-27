@@ -89,6 +89,17 @@ export const styles: { [key: string]: CSSProperties } = {
     alignItems: 'flex-end',
     zIndex: 2,
   },
+  damageOverlay: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    background: `radial-gradient(circle at center, transparent, transparent 40%, rgba(255, 0, 0, 0.7) 100%)`,
+    transition: 'opacity 0.5s ease-in-out',
+    opacity: 0,
+    pointerEvents: 'none',
+  },
   gameScreenContainer: {
     position: 'absolute',
     top: '5%',

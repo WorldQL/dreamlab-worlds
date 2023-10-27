@@ -8,6 +8,7 @@ import { styles } from './styles'
 export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
   const [killCount, setKillCount] = useState(0)
   const [health, setHealth] = useState(5)
+  const [showDamage, setShowDamage] = useState(false)
   const maxHealth = 5
 
   const PLAY_CHANNEL = 'game/start'
@@ -20,6 +21,8 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
 
     const healthListener = () => {
       setHealth(prev => prev - 1)
+      setShowDamage(true)
+      setTimeout(() => setShowDamage(false), 300)
     }
 
     events.addListener('onPlayerKill', killListener)
@@ -34,12 +37,15 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
   const handleStartOver = async () => {
     setKillCount(0)
     setHealth(5)
-    player.teleport({ x: 0, y: 300 }, true)
+    player.teleport({ x: 0, y: 500 }, true)
     netClient?.sendCustomMessage(PLAY_CHANNEL, {})
   }
 
   return (
     <>
+      {showDamage && (
+        <div style={{ ...styles.damageOverlay, opacity: showDamage ? 1 : 0 }} />
+      )}
       {health <= 0 ? (
         <DeathScreen
           game={game}
