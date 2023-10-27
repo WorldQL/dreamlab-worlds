@@ -85,8 +85,8 @@ export const styles: { [key: string]: CSSProperties } = {
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
     zIndex: 2,
   },
   gameScreenContainer: {
@@ -95,11 +95,12 @@ export const styles: { [key: string]: CSSProperties } = {
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
     pointerEvents: 'none',
     background: 'transparent',
   },
+
   gameScreenTitle: {
     fontSize: '32px',
     color: 'white',

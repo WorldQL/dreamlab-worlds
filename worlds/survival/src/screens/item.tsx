@@ -19,7 +19,6 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
   item,
 }) => {
   const [keyPressed, setKeyPressed] = useState(false)
-  const [itemAdded, setItemAdded] = useState(false)
   const [currentItem, setCurrentItem] = useState<
     PlayerInventoryItem | undefined
   >(item)
@@ -33,7 +32,6 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
         setKeyPressed(true)
         const inventory = player.inventory
         inventory.addItem(itemRef.current)
-        setItemAdded(true)
       }
     }
 
@@ -44,7 +42,6 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
       itemRef.current = item
       setCurrentItem(item)
       setKeyPressed(false)
-      setItemAdded(false)
     }
 
     events.addListener('onPlayerNearItem', itemListener)

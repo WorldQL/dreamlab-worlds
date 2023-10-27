@@ -49,7 +49,6 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
       ) : (
         <div style={styles.gameScreenContainer}>
           <div style={styles.healthContainer}>
-            <span style={styles.gameScreenLabel}>Health:</span>
             {Array.from({ length: maxHealth }).map((_, index) => (
               <span
                 // eslint-disable-next-line react/no-array-index-key
