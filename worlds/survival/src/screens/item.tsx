@@ -19,6 +19,7 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
   item,
 }) => {
   const [keyPressed, setKeyPressed] = useState(false)
+  const [itemAdded, setItemAdded] = useState(false)
   const [currentItem, setCurrentItem] = useState<
     PlayerInventoryItem | undefined
   >(item)
@@ -32,6 +33,7 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
         setKeyPressed(true)
         const inventory = player.inventory
         inventory.addItem(itemRef.current)
+        setItemAdded(true)
       }
     }
 
@@ -42,6 +44,7 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
       itemRef.current = item
       setCurrentItem(item)
       setKeyPressed(false)
+      setItemAdded(false)
     }
 
     events.addListener('onPlayerNearItem', itemListener)
@@ -53,9 +56,13 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
   }, [game.client.inputs, keyPressed, player])
 
   if (!currentItem) return null
+  const overlayStyle = keyPressed
+    ? styles.itemAddedOverlay
+    : styles.pickupOverlay
+  const promptMessage = keyPressed ? 'Item Added!' : 'Press F to pickup'
 
   return (
-    <div style={styles.pickupOverlay}>
+    <div style={overlayStyle}>
       <img
         alt={currentItem.displayName}
         src={currentItem.textureURL}
@@ -63,7 +70,7 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
       />
       <div style={styles.itemInfo}>
         <span style={styles.itemName}>{currentItem.displayName}</span>
-        <span style={styles.pickupPrompt}>Press F to pickup</span>
+        <span style={styles.pickupPrompt}>{promptMessage}</span>
       </div>
     </div>
   )
