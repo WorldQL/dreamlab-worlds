@@ -3,13 +3,13 @@ import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
 import React, { useState } from 'https://esm.sh/react@18.2.0'
 import { styles } from './styles'
 
-interface GameOverProps {
+interface DeathScreenProps {
   game: Game<false>
   killCount: number
   onStartOver(): void
 }
 
-export const GameOver: React.FC<GameOverProps> = ({
+export const DeathScreen: React.FC<DeathScreenProps> = ({
   killCount,
   onStartOver,
 }) => {

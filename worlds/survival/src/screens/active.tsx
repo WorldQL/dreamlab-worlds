@@ -1,7 +1,7 @@
 import { onlyNetClient } from '@dreamlab.gg/core/dist/network'
 import { useEffect, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events'
-import { GameOver } from './end'
+import { DeathScreen } from './death'
 import type { ScreenProps } from './start'
 import { styles } from './styles'
 
@@ -41,7 +41,7 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
   return (
     <>
       {health <= 0 ? (
-        <GameOver
+        <DeathScreen
           game={game}
           killCount={killCount}
           onStartOver={handleStartOver}

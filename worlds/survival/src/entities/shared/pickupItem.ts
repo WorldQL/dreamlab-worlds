@@ -1,7 +1,11 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
+import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import type { Camera, Player } from '@dreamlab.gg/core/entities'
-import type { ItemOptions } from '@dreamlab.gg/core/managers'
+import type {
+  ItemOptions,
+  PlayerInventoryItem,
+} from '@dreamlab.gg/core/managers'
 import { cloneTransform, rectangleBounds, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite } from '@dreamlab.gg/core/textures'
@@ -9,6 +13,7 @@ import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 import type { Sprite } from 'pixi.js'
+import { events } from '../../events'
 
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
@@ -18,9 +23,14 @@ const ArgsSchema = z.object({
   animationName: z.string(),
 })
 
+type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
+type OnPlayerCollisionEnd = EventHandler<'onPlayerCollisionEnd'>
+
 interface Data {
   game: Game<boolean>
   body: Matter.Body
+  onPlayerCollisionStart: OnPlayerCollisionStart
+  onPlayerCollisionEnd: OnPlayerCollisionEnd
 }
 
 interface Render {
@@ -28,6 +38,11 @@ interface Render {
   container: Container
   gfxBounds: Graphics | Sprite
   sprite: Sprite | undefined
+}
+
+const itemListener = (player: Player, item: PlayerInventoryItem) => {
+  const inventory = player.inventory
+  inventory.addItem(item)
 }
 
 export const createPickupItem = createSpawnableEntity<
@@ -51,40 +66,9 @@ export const createPickupItem = createSpawnableEntity<
       { isStatic: true, render: { visible: false }, isSensor: true },
     )
 
-    let pickedUp = false
     let time = 0
     const floatHeight = 5
     const rotationSpeed = 0.01
-
-    const onPlayerCollision = (
-      pair: readonly [player: Player, otherBody: Matter.Body],
-    ) => {
-      const [player, bodyCollided] = pair
-      if (body && bodyCollided === body) {
-        const inventory = player.inventory
-
-        // Create a new item with the following structure:
-        // - displayName: string
-        // - textureURL: string
-        // - animationName: string (See KnownAnimation from '@dreamlab.gg/core/dist/entities')
-        // - itemOptions?: ItemOptions
-        const itemOptions: ItemOptions = {
-          anchorX: 0.5,
-          anchorY: 0.5,
-          hand: 'right',
-        }
-
-        const newItem = inventory.createNewItem(
-          itemDisplayName,
-          spriteSource,
-          animationName,
-          itemOptions,
-        )
-
-        inventory.addItem(newItem)
-        pickedUp = true
-      }
-    }
 
     return {
       get tags() {
@@ -105,12 +89,51 @@ export const createPickupItem = createSpawnableEntity<
 
       init({ game }) {
         game.physics.register(this, body)
+
+        const onPlayerCollisionStart: OnPlayerCollisionStart = (
+          [player, bodyCollided],
+          _raw,
+        ) => {
+          if (body && bodyCollided === body && game.client) {
+            const inventory = player.inventory
+
+            const itemOptions: ItemOptions = {
+              anchorX: 0.5,
+              anchorY: 0.5,
+              hand: 'right',
+            }
+
+            const newItem = inventory.createNewItem(
+              itemDisplayName,
+              spriteSource,
+              animationName,
+              itemOptions,
+            )
+            events.emit('onPlayerNearItem', player, newItem)
+          }
+        }
+
+        const onPlayerCollisionEnd: OnPlayerCollisionEnd = (
+          [player, bodyCollided],
+          _raw,
+        ) => {
+          if (body && bodyCollided === body) {
+            events.emit('onPlayerNearItem', player, undefined)
+          }
+        }
+
+        events.addListener('onPlayerAttemptPickup', itemListener)
+
         game.events.common.addListener(
           'onPlayerCollisionStart',
-          onPlayerCollision,
+          onPlayerCollisionStart,
+        )
+        game.events.common.addListener(
+          'onPlayerCollisionEnd',
+          onPlayerCollisionEnd,
         )
 
-        return { game, body }
+        return { game, body, onPlayerCollisionStart, onPlayerCollisionEnd }
       },
 
       initRenderContext(_, { camera, stage }) {
@@ -144,11 +167,15 @@ export const createPickupItem = createSpawnableEntity<
         }
       },
 
-      teardown({ game }) {
+      teardown({ game, onPlayerCollisionStart, onPlayerCollisionEnd }) {
         game.physics.unregister(this, body)
         game.events.common.removeListener(
           'onPlayerCollisionStart',
-          onPlayerCollision,
+          onPlayerCollisionStart,
+        )
+        game.events.common.removeListener(
+          'onPlayerCollisionEnd',
+          onPlayerCollisionEnd,
         )
       },
 
@@ -156,23 +183,12 @@ export const createPickupItem = createSpawnableEntity<
         container.destroy({ children: true })
       },
 
-      onPhysicsStep(_, { game }) {
-        if (pickedUp) {
-          Matter.World.remove(game.physics.engine.world, body)
-          return
-        }
-
+      onPhysicsStep() {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
       },
 
-      onRenderFrame(_, { game }, { camera, container, gfxBounds, sprite }) {
-        if (pickedUp) {
-          if (gfxBounds.visible) gfxBounds.visible = false
-          if (sprite) sprite.visible = false
-          return
-        }
-
+      onRenderFrame(_, { game }, { camera, container, gfxBounds }) {
         time += 0.05
 
         const yOffset = Math.sin(time) * floatHeight

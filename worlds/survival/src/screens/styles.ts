@@ -1,6 +1,42 @@
 import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
 
 export const styles: { [key: string]: CSSProperties } = {
+  pickupOverlay: {
+    position: 'absolute',
+    bottom: '10%',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: '10px',
+    padding: '10px',
+    boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.5)',
+  },
+  itemTexture: {
+    width: '100px',
+    height: '100px',
+    objectFit: 'cover',
+    borderRadius: '50%',
+    marginBottom: '10px',
+  },
+  itemInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  itemName: {
+    fontSize: '18px',
+    color: 'white',
+    fontWeight: 'bold',
+    marginBottom: '5px',
+  },
+  pickupPrompt: {
+    fontSize: '14px',
+    color: 'white',
+    fontStyle: 'italic',
+  },
   gameScreenLabel: {
     fontSize: '28px',
     marginRight: '10px',
