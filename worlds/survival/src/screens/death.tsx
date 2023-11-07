@@ -5,12 +5,12 @@ import { styles } from './styles'
 
 interface DeathScreenProps {
   game: Game<false>
-  killCount: number
+  score: number
   onStartOver(): void
 }
 
 export const DeathScreen: React.FC<DeathScreenProps> = ({
-  killCount,
+  score,
   onStartOver,
 }) => {
   const [hovered, setHovered] = useState(false)
@@ -36,10 +36,9 @@ export const DeathScreen: React.FC<DeathScreenProps> = ({
       <div style={styles.bloodStain} />
       <div style={styles.content}>
         <div style={styles.title}>You Died</div>
-        <div style={{ ...styles.killContainer, marginBottom: '20px' }}>
-          <span style={styles.gameScreenLabel}>Kills:</span>
-          <span style={styles.killCount}>{killCount}</span>
-          <span style={styles.zombieIcon}>🧟</span>
+        <div style={{ ...styles.scoreContainer, marginBottom: '20px' }}>
+          <span style={styles.gameScreenLabel}>Score:</span>
+          <span style={styles.score}>{score}</span>
         </div>
         <button
           onClick={onStartOver}

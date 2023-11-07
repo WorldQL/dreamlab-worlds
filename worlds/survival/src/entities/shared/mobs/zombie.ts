@@ -138,7 +138,7 @@ export const createZombieMob = createSpawnableEntity<
               hitCooldownCounter = hitCooldown * 60
 
               if (health - 1 <= 0) {
-                events.emit('onPlayerKill')
+                events.emit('onPlayerScore', maxHealth * 20)
               }
             }
           }
@@ -155,7 +155,7 @@ export const createZombieMob = createSpawnableEntity<
           _raw,
         ) => {
           if (body && bodyCollided === body) {
-            events.emit('onPlayerDamage')
+            events.emit('onPlayerDamage', 1)
             const force = 4 * -player.facingDirection
             deferUntilPhysicsStep(game, () => {
               Matter.Body.applyForce(player.body, player.body.position, {

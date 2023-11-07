@@ -64,11 +64,11 @@ export const styles: { [key: string]: CSSProperties } = {
     fontSize: '28px',
     marginLeft: '5px',
   },
-  killContainer: {
+  scoreContainer: {
     display: 'flex',
     alignItems: 'center',
   },
-  killCount: {
+  score: {
     fontSize: '28px',
     marginRight: '10px',
     fontWeight: 'bold',

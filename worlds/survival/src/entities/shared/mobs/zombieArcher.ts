@@ -147,7 +147,7 @@ export const createArcherMob = createSpawnableEntity<
               hitCooldownCounter = hitCooldown * 60
 
               if (mobHealth - 1 <= 0) {
-                events.emit('onPlayerKill')
+                events.emit('onPlayerScore', maxHealth * 25)
               }
             }
           }
@@ -164,7 +164,7 @@ export const createArcherMob = createSpawnableEntity<
           _raw,
         ) => {
           if (body && bodyCollided === body) {
-            events.emit('onPlayerDamage')
+            events.emit('onPlayerDamage', 1)
             const force = 4 * -player.facingDirection
             applyKnockback = [player.body, force]
           }
