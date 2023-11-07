@@ -24,7 +24,7 @@ interface Data {
 
 interface Render {
   camera: Camera
-  container: Container
+  stage: Container
   gfxBoundsLeft: Graphics | Sprite
   gfxBoundsRight: Graphics | Sprite
 }
@@ -34,10 +34,10 @@ export const createBreakableSolid = createSpawnableEntity<
   SpawnableEntity<Data, Render, Args>,
   Data,
   Render
->(ArgsSchema, ({ tags, transform }, { width, height, spriteSource }) => {
+>(ArgsSchema, ({ tags, transform }, args) => {
   const { position, rotation, zIndex } = transform
 
-  const halfWidth = width / 2
+  const halfWidth = args.width / 2
 
   const bodyOptions = {
     label: 'breakable_solid_piece',
@@ -59,20 +59,20 @@ export const createBreakableSolid = createSpawnableEntity<
   let bodyRight: Matter.Body
 
   if (splitVertically) {
-    bodyLeft = createBody(position.x, position.y, halfWidth, height)
+    bodyLeft = createBody(position.x, position.y, halfWidth, args.height)
     bodyRight = createBody(
       position.x,
       position.y + halfWidth,
       halfWidth,
-      height,
+      args.height,
     )
   } else {
-    bodyLeft = createBody(position.x, position.y, halfWidth, height)
+    bodyLeft = createBody(position.x, position.y, halfWidth, args.height)
     bodyRight = createBody(
       position.x + halfWidth,
       position.y,
       halfWidth,
-      height,
+      args.height,
     )
   }
 
@@ -94,8 +94,7 @@ export const createBreakableSolid = createSpawnableEntity<
     },
 
     rectangleBounds() {
-      // TODO
-      return undefined
+      return { width: args.width, height: args.height }
     },
 
     isPointInside(position) {
@@ -103,6 +102,54 @@ export const createBreakableSolid = createSpawnableEntity<
         Matter.Query.point([bodyLeft], position).length > 0 ||
         Matter.Query.point([bodyRight], position).length > 0
       )
+    },
+
+    onArgsUpdate(path, _data, render) {
+      if (render && path === 'spriteSource') {
+        const { width, height, spriteSource } = args
+        if (spriteSource) {
+          render.gfxBoundsRight?.destroy()
+          render.gfxBoundsLeft?.destroy()
+          render.gfxBoundsRight = createSprite(spriteSource, {
+            width,
+            height,
+            zIndex: transform.zIndex,
+          })
+
+          if (render.gfxBoundsRight)
+            render.stage.addChild(render.gfxBoundsRight)
+          if (render.gfxBoundsLeft) render.stage.addChild(render.gfxBoundsLeft)
+        }
+      }
+    },
+
+    onResize({ width, height }, data, render) {
+      const originalWidth = args.width
+      const originalHeight = args.height
+
+      args.width = width
+      args.height = height
+
+      const scaleX = width / originalWidth
+      const scaleY = height / originalHeight
+
+      Matter.Body.setAngle(data.bodyRight, 0)
+      Matter.Body.scale(data.bodyRight, scaleX, scaleY)
+      Matter.Body.setAngle(bodyRight, toRadians(transform.rotation))
+
+      Matter.Body.setAngle(data.bodyLeft, 0)
+      Matter.Body.scale(data.bodyLeft, scaleX, scaleY)
+      Matter.Body.setAngle(bodyLeft, toRadians(transform.rotation))
+
+      if (!render) return
+      drawBox(render.gfxBoundsRight as Graphics, { width, height })
+      drawBox(render.gfxBoundsLeft as Graphics, { width, height })
+      if (args.spriteSource) {
+        render.gfxBoundsRight.width = width
+        render.gfxBoundsRight.height = height
+        render.gfxBoundsLeft.width = width
+        render.gfxBoundsLeft.height = height
+      }
     },
 
     init({ game }) {
@@ -119,14 +166,16 @@ export const createBreakableSolid = createSpawnableEntity<
       let gfxBoundsLeft
       let gfxBoundsRight
 
-      if (spriteSource) {
-        gfxBoundsLeft = createSprite(spriteSource, {
+      if (args.spriteSource) {
+        gfxBoundsLeft = createSprite(args.spriteSource, {
           width: halfWidth,
-          height,
+          height: args.height,
+          zIndex,
         })
-        gfxBoundsRight = createSprite(spriteSource, {
+        gfxBoundsRight = createSprite(args.spriteSource, {
           width: halfWidth,
-          height,
+          height: args.height,
+          zIndex,
         })
 
         gfxBoundsLeft.anchor.set(0.5, 0.5)
@@ -136,12 +185,12 @@ export const createBreakableSolid = createSpawnableEntity<
         gfxBoundsRight = new Graphics()
         drawBox(
           gfxBoundsLeft,
-          { width: halfWidth, height },
+          { width: halfWidth, height: args.height },
           { stroke: '#964B00' },
         )
         drawBox(
           gfxBoundsRight,
-          { width: halfWidth, height },
+          { width: halfWidth, height: args.height },
           { stroke: '#964B00' },
         )
       }
@@ -151,7 +200,7 @@ export const createBreakableSolid = createSpawnableEntity<
 
       return {
         camera,
-        container,
+        stage: container,
         gfxBoundsLeft,
         gfxBoundsRight,
       }
@@ -162,7 +211,7 @@ export const createBreakableSolid = createSpawnableEntity<
       game.physics.unregister(this, bodyRight)
     },
 
-    teardownRenderContext({ container }) {
+    teardownRenderContext({ stage: container }) {
       container.destroy({ children: true })
     },
 
@@ -184,12 +233,12 @@ export const createBreakableSolid = createSpawnableEntity<
       const entitiesInAreaLeft = getEntitiesInAreaOfBody(
         bodyLeft,
         halfWidth,
-        height,
+        args.height,
       )
       const entitiesInAreaRight = getEntitiesInAreaOfBody(
         bodyRight,
         halfWidth,
-        height,
+        args.height,
       )
 
       if (
@@ -223,7 +272,7 @@ export const createBreakableSolid = createSpawnableEntity<
       gfxBoundsLeft.rotation = bodyLeft.angle
       gfxBoundsRight.rotation = bodyRight.angle
 
-      if (!spriteSource) {
+      if (!args.spriteSource) {
         const alpha = debug.value ? 0.5 : 0
         gfxBoundsLeft.alpha = alpha
         gfxBoundsRight.alpha = alpha
