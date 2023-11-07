@@ -7,6 +7,7 @@ interface Events {
   onPlayerDamage: [number]
   onPlayerHeal: [number]
   onPlayerNearItem: [Player, PlayerItem | undefined]
+  onInventoryAdd: [PlayerItem]
 }
 
 export const events = new EventEmitter<Events>()

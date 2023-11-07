@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Game } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
@@ -11,6 +12,7 @@ import React, {
   useEffect,
   useState,
 } from 'https://esm.sh/react@18.2.0'
+import { events } from '../events.js'
 import Inventory from './Inventory.js'
 import type { InventoryClickEvent } from './events/InventoryClickEvent.js'
 import type {
@@ -26,11 +28,10 @@ import {
 export type InventoryData = (PlayerItem | undefined)[]
 const TOTAL_SLOTS = 36
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const GameContext = createContext<any | null>(null)
 
 const useGameEventListener = (
-  source: 'common' | 'inputs',
+  source: 'common' | 'custom' | 'inputs',
   event: unknown,
   handler: unknown,
 ) => {
@@ -44,6 +45,9 @@ const useGameEventListener = (
       case 'common':
         game.events.common.addListener(event, handler)
         return () => game.events.common.removeListener(event, handler)
+      case 'custom':
+        events.addListener(event as any, handler as any)
+        return () => events.removeListener(event as any, handler as any)
       default:
         throw new Error(`Unsupported event source: ${source}`)
     }
@@ -82,8 +86,27 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
     [player, data, setActiveSlot],
   )
 
+  const onItemAdd = useCallback(
+    (item: PlayerItem) => {
+      setData(prev => {
+        const newData = [...prev]
+        const slotIndex = newData.indexOf(undefined)
+        if (slotIndex !== -1) {
+          newData[slotIndex] = item
+          if (slotIndex === activeSlot) {
+            player.setItemInHand(newData[slotIndex])
+          }
+        }
+
+        return newData
+      })
+    },
+    [activeSlot, player],
+  )
+
   // listen to the events
   useGameEventListener('inputs', '@inventory/open', onInventoryOpen)
+  useGameEventListener('custom', 'onInventoryAdd', onItemAdd)
   for (let index = 0; index <= 9; index++) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useGameEventListener('inputs', `@inventory/digit${index}`, (va: boolean) =>

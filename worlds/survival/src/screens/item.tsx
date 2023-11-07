@@ -1,7 +1,7 @@
 import type { Game } from '@dreamlab.gg/core'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
-import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
+import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import React, { useEffect, useRef, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events'
@@ -10,7 +10,7 @@ import { styles } from './styles'
 interface ItemScreenProps {
   game: Game<false>
   player: Player
-  item: PlayerInventoryItem | undefined
+  item: PlayerItem | undefined
 }
 
 export const ItemScreen: React.FC<ItemScreenProps> = ({
@@ -19,10 +19,8 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
   item,
 }) => {
   const [keyPressed, setKeyPressed] = useState(false)
-  const [currentItem, setCurrentItem] = useState<
-    PlayerInventoryItem | undefined
-  >(item)
-  const itemRef = useRef<PlayerInventoryItem | undefined>(item)
+  const [currentItem, setCurrentItem] = useState<PlayerItem | undefined>(item)
+  const itemRef = useRef<PlayerItem | undefined>(item)
 
   game.client?.inputs.registerInput('@survival/pickup', 'KeyF')
 
@@ -30,15 +28,11 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
     const itemConfirmListener = () => {
       if (!keyPressed && itemRef.current) {
         setKeyPressed(true)
-        const inventory = player.inventory
-        inventory.addItem(itemRef.current)
+        events.emit('onInventoryAdd', itemRef.current)
       }
     }
 
-    const itemListener = (
-      _player: Player,
-      item: PlayerInventoryItem | undefined,
-    ) => {
+    const itemListener = (_player: Player, item: PlayerItem | undefined) => {
       itemRef.current = item
       setCurrentItem(item)
       setKeyPressed(false)
