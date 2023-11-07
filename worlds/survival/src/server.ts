@@ -104,7 +104,11 @@ export const init: InitServer = async game => {
               position:
                 index % 2 === 0 ? leftSpawnPosition : rightSpawnPosition,
             },
-            tags: ['net/replicated', 'net/server-authoritative'],
+            tags: [
+              'net/replicated',
+              'net/server-authoritative',
+              'editor/doNotSave',
+            ],
           })
 
           spawnPromises.push(spawnPromise)
