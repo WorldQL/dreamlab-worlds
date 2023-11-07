@@ -1,7 +1,7 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { Camera } from '@dreamlab.gg/core/entities'
-import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
+import { cloneTransform, toRadians, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
@@ -23,8 +23,8 @@ interface Data {
 
 interface Render {
   camera: Camera
-  container: Container
-  gfxBounds: Graphics
+  stage: Container
+  gfx: Graphics
   sprite: Sprite | undefined
 }
 
@@ -33,22 +33,28 @@ export const createPlatform = createSpawnableEntity<
   SpawnableEntity<Data, Render, Args>,
   Data,
   Render
->(ArgsSchema, ({ tags, transform }, { width, height, spriteSource }) => {
+>(ArgsSchema, ({ tags, transform }, args) => {
   const { position, zIndex } = transform
 
   const PLAYER_CATEGORY = 0x0001
   const PLATFORM_CATEGORY = 0x0002
 
-  const body = Matter.Bodies.rectangle(position.x, position.y, width, height, {
-    label: 'platform',
-    render: { visible: true },
-    isStatic: true,
-    collisionFilter: {
-      category: PLATFORM_CATEGORY,
-      mask: PLAYER_CATEGORY,
+  const body = Matter.Bodies.rectangle(
+    position.x,
+    position.y,
+    args.width,
+    args.height,
+    {
+      label: 'platform',
+      render: { visible: true },
+      isStatic: true,
+      collisionFilter: {
+        category: PLATFORM_CATEGORY,
+        mask: PLAYER_CATEGORY,
+      },
+      friction: 0,
     },
-    friction: 0,
-  })
+  )
 
   let isPlatformActive = false
 
@@ -62,11 +68,50 @@ export const createPlatform = createSpawnableEntity<
     },
 
     rectangleBounds() {
-      return { width, height }
+      return { width: args.width, height: args.height }
     },
 
     isPointInside(position) {
       return Matter.Query.point([body], position).length > 0
+    },
+
+    onArgsUpdate(path, _data, render) {
+      if (render && path === 'spriteSource') {
+        const { width, height, spriteSource } = args
+
+        render.sprite?.destroy()
+        render.sprite = spriteSource
+          ? createSprite(spriteSource, {
+              width,
+              height,
+              zIndex: transform.zIndex,
+            })
+          : undefined
+
+        if (render.sprite) render.stage.addChild(render.sprite)
+      }
+    },
+
+    onResize({ width, height }, data, render) {
+      const originalWidth = args.width
+      const originalHeight = args.height
+
+      args.width = width
+      args.height = height
+
+      const scaleX = width / originalWidth
+      const scaleY = height / originalHeight
+
+      Matter.Body.setAngle(data.body, 0)
+      Matter.Body.scale(data.body, scaleX, scaleY)
+      Matter.Body.setAngle(body, toRadians(transform.rotation))
+
+      if (!render) return
+      drawBox(render.gfx, { width, height })
+      if (render.sprite) {
+        render.sprite.width = width
+        render.sprite.height = height
+      }
     },
 
     init({ game }) {
@@ -81,10 +126,10 @@ export const createPlatform = createSpawnableEntity<
       container.zIndex = zIndex
       const gfxBounds = new Graphics()
       gfxBounds.zIndex = zIndex
-      const sprite = spriteSource
-        ? createSprite(spriteSource, {
-            width,
-            height,
+      const sprite = args.spriteSource
+        ? createSprite(args.spriteSource, {
+            width: args.width,
+            height: args.height,
             zIndex,
           })
         : undefined
@@ -92,7 +137,11 @@ export const createPlatform = createSpawnableEntity<
       if (sprite) {
         container.addChild(sprite)
       } else {
-        drawBox(gfxBounds, { width, height }, { stroke: '#00f' })
+        drawBox(
+          gfxBounds,
+          { width: args.width, height: args.height },
+          { stroke: '#00f' },
+        )
         container.addChild(gfxBounds)
       }
 
@@ -100,8 +149,8 @@ export const createPlatform = createSpawnableEntity<
 
       return {
         camera,
-        container,
-        gfxBounds,
+        stage: container,
+        gfx: gfxBounds,
         sprite,
       }
     },
@@ -110,7 +159,7 @@ export const createPlatform = createSpawnableEntity<
       game.physics.unregister(this, body)
     },
 
-    teardownRenderContext({ container }) {
+    teardownRenderContext({ stage: container }) {
       container.destroy({ children: true })
     },
 
@@ -152,7 +201,7 @@ export const createPlatform = createSpawnableEntity<
     onRenderFrame(
       { smooth },
       { game },
-      { camera, container, gfxBounds, sprite },
+      { camera, stage: container, gfx: gfxBounds, sprite },
     ) {
       const debug = game.debug
       const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
