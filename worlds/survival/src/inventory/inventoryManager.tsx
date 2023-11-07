@@ -2,7 +2,7 @@ import type { Game } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 import type { InputCode } from '@dreamlab.gg/core/dist/input'
-import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
+import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import React, {
   createContext,
@@ -23,18 +23,7 @@ import {
   handleInventoryDragStart,
 } from './listeners/InventoryDrag.js'
 
-interface ProjectileItem {
-  projectiles: number
-  explosive: boolean
-  damage: number
-}
-
-interface InventoryItem extends PlayerInventoryItem {
-  damage?: number
-  projecile?: ProjectileItem
-}
-
-export type InventoryData = (InventoryItem | undefined)[]
+export type InventoryData = (PlayerItem | undefined)[]
 const TOTAL_SLOTS = 36
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,17 +64,6 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
     activeSlot,
   }
 
-  useEffect(() => {
-    const playerItems = player.inventory.getItems().map(item => {
-      const newItem: InventoryItem = {
-        ...item,
-        damage: 1,
-      }
-      return newItem
-    })
-    setData(playerItems as InventoryData)
-  }, [player])
-
   const onInventoryOpen = useCallback(
     (pressed: boolean) => {
       if (!pressed) return
@@ -99,49 +77,9 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
       if (!pressed) return
       const idx = digit - 1
       setActiveSlot(idx)
-      player.inventory.setItemInHand(data[idx])
+      player.setItemInHand(data[idx])
     },
     [player, data, setActiveSlot],
-  )
-
-  const onItemAdd = useCallback(
-    (item: PlayerInventoryItem) => {
-      setData(prev => {
-        const newData = [...prev]
-        const slotIndex = newData.indexOf(undefined)
-        if (slotIndex !== -1) {
-          const newItem: InventoryItem = {
-            ...item,
-            damage: 1,
-          }
-          newData[slotIndex] = newItem
-          if (slotIndex === activeSlot) {
-            player.inventory.setItemInHand(newData[slotIndex] as InventoryItem)
-          }
-        }
-
-        return newData
-      })
-    },
-    [setData, activeSlot, player.inventory],
-  )
-
-  const onItemRemove = useCallback(
-    (item: PlayerInventoryItem) => {
-      setData(prev => {
-        const newData = [...prev]
-        const slotIndex = newData.findIndex(slot => slot && slot.id === item.id)
-        if (slotIndex !== -1) {
-          newData[slotIndex] = undefined
-          if (slotIndex === activeSlot) {
-            player.inventory.setItemInHand(undefined)
-          }
-        }
-
-        return newData
-      })
-    },
-    [setData, activeSlot, player.inventory],
   )
 
   // listen to the events
@@ -152,9 +90,6 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
       onInventoryDigits(index, va),
     )
   }
-
-  useGameEventListener('common', 'onInventoryAddItem', onItemAdd)
-  useGameEventListener('common', 'onInventoryRemoveItem', onItemRemove)
 
   const handleClick = (slotIndex: number) => {
     const event: InventoryClickEvent = {

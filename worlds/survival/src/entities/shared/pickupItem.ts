@@ -2,6 +2,7 @@ import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import type { Camera } from '@dreamlab.gg/core/entities'
+import { createItem } from '@dreamlab.gg/core/managers'
 import type { ItemOptions } from '@dreamlab.gg/core/managers'
 import { cloneTransform, toRadians, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
@@ -126,15 +127,13 @@ export const createPickupItem = createSpawnableEntity<
         _raw,
       ) => {
         if (body && bodyCollided === body && game.client) {
-          const inventory = player.inventory
-
           const itemOptions: ItemOptions = {
             anchorX: 0.5,
             anchorY: 0.5,
             hand: 'right',
           }
 
-          const newItem = inventory.createNewItem(
+          const newItem = createItem(
             args.itemDisplayName,
             args.spriteSource,
             args.animationName,

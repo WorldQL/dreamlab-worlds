@@ -1,13 +1,13 @@
 import type { Game } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
-import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
+import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
 
 export const initGun = (game: Game<false>) => {
   let lastSpawnedTime: number | null = null
 
   game.events.common.addListener(
     'onPlayerAttack',
-    async (player: Player, _item: PlayerInventoryItem) => {
+    async (player: Player, _item: PlayerItem) => {
       if (player.currentAnimation !== 'gun') return
 
       const currentTime = Date.now()
