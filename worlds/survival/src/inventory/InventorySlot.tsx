@@ -16,6 +16,27 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
     border: slot ? '2px solid #8c7ae6' : '2px solid transparent',
   }
 
+  const renderTooltipContent = () => {
+    if (!slot?.baseItem) return null
+
+    const { baseItem, damage, projectileOptions } = slot
+    const { displayName, itemOptions } = baseItem
+
+    return (
+      <div>
+        <div>{displayName}</div>
+        <div>Damage: {damage}</div>
+        <div>Attack Speed: {itemOptions?.speedMultiplier ?? 1}</div>
+        {projectileOptions && (
+          <>
+            <div>Projectiles: {projectileOptions.projectiles}</div>
+            <div>Explosive: {projectileOptions.explosive ? 'Yes' : 'No'}</div>
+          </>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div
       onDragEnd={() => setIsDragging(false)}
@@ -34,9 +55,10 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
           width='50'
         />
       )}
-
-      {isHovered && !isDragging && slot?.baseItem?.displayName && (
-        <div style={styles.itemTooltip}>{slot.baseItem?.displayName}</div>
+      {isHovered && !isDragging && (
+        <div style={{ ...styles.itemTooltip, opacity: 1 }}>
+          {renderTooltipContent()}
+        </div>
       )}
     </div>
   )

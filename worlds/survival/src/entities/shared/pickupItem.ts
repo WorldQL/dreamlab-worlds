@@ -141,8 +141,6 @@ export const createPickupItem = createSpawnableEntity<
             itemOptions,
           )
 
-          console.log(newItem)
-
           const inventoryItem: InventoryItem = {
             baseItem: newItem,
             damage: 1,
