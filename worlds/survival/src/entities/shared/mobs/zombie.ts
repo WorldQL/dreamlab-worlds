@@ -1,6 +1,7 @@
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import { createSpawnableEntity, isEntity } from '@dreamlab.gg/core'
 import { z } from '@dreamlab.gg/core/dist/sdk'
+import { SpriteSourceSchema } from '@dreamlab.gg/core/dist/textures'
 import type { Camera } from '@dreamlab.gg/core/entities'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import type { EventHandler } from '@dreamlab.gg/core/events'
@@ -33,7 +34,7 @@ const ArgsSchema = z.object({
   maxHealth: z.number().positive().min(1),
   speed: z.number().positive().min(1),
   knockback: z.number().positive().min(0),
-  spriteSource: z.string().optional(),
+  spriteSource: SpriteSourceSchema.optional(),
 })
 
 type OnPlayerAttack = EventHandler<'onPlayerAttack'>

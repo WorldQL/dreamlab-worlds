@@ -15,7 +15,7 @@ const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
   direction: z.number(),
-  spriteSource: SpriteSourceSchema,
+  spriteSource: SpriteSourceSchema.optional(),
 })
 
 type OnCollisionStart = EventHandler<'onCollisionStart'>

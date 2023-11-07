@@ -13,7 +13,7 @@ type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
-  spriteSource: SpriteSourceSchema,
+  spriteSource: SpriteSourceSchema.optional(),
 })
 
 interface Data {

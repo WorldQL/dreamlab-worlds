@@ -25,7 +25,7 @@ const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
   mustConnectWithBody: z.boolean().default(false),
-  spriteSource: SpriteSourceSchema,
+  spriteSource: SpriteSourceSchema.optional(),
 })
 
 interface Data {
