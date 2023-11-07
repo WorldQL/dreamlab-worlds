@@ -1,7 +1,7 @@
 import type { Game } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
-import type { KeyCode } from '@dreamlab.gg/core/dist/input'
+import type { InputCode } from '@dreamlab.gg/core/dist/input'
 import type { PlayerInventoryItem } from '@dreamlab.gg/core/dist/managers'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import React, {
@@ -23,7 +23,18 @@ import {
   handleInventoryDragStart,
 } from './listeners/InventoryDrag.js'
 
-export type InventoryData = (PlayerInventoryItem | undefined)[]
+interface ProjectileItem {
+  projectiles: number
+  explosive: boolean
+  damage: number
+}
+
+interface InventoryItem extends PlayerInventoryItem {
+  damage?: number
+  projecile?: ProjectileItem
+}
+
+export type InventoryData = (InventoryItem | undefined)[]
 const TOTAL_SLOTS = 36
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -65,16 +76,14 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
   }
 
   useEffect(() => {
-    const playerItems = player.inventory.getItems()
-    setData(prev => {
-      const newData = [...prev]
-
-      for (const [index, item] of playerItems.entries()) {
-        newData[index] = item
+    const playerItems = player.inventory.getItems().map(item => {
+      const newItem: InventoryItem = {
+        ...item,
+        damage: 1,
       }
-
-      return newData
+      return newItem
     })
+    setData(playerItems as InventoryData)
   }, [player])
 
   const onInventoryOpen = useCallback(
@@ -101,9 +110,13 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
         const newData = [...prev]
         const slotIndex = newData.indexOf(undefined)
         if (slotIndex !== -1) {
-          newData[slotIndex] = item
+          const newItem: InventoryItem = {
+            ...item,
+            damage: 1,
+          }
+          newData[slotIndex] = newItem
           if (slotIndex === activeSlot) {
-            player.inventory.setItemInHand(item)
+            player.inventory.setItemInHand(newData[slotIndex] as InventoryItem)
           }
         }
 
@@ -191,13 +204,16 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
 
 export const initializeGameUI = (game: Game<false>) => {
   // here we register the inputs
-  const registerInput = (input: string, key: KeyCode) =>
+  const registerInput = (input: string, key: InputCode) =>
     game.client?.inputs.registerInput(input, key)
 
   const digits = Array.from({ length: 9 }, (_, index) => 'digit' + (index + 1))
-  const keys: KeyCode[] = [
+  const keys: InputCode[] = [
     'KeyE',
-    ...Array.from({ length: 9 }, (_, index) => `Digit${index + 1}` as KeyCode),
+    ...Array.from(
+      { length: 9 },
+      (_, index) => `Digit${index + 1}` as InputCode,
+    ),
   ]
 
   for (const [index, input] of ['open', ...digits].entries()) {

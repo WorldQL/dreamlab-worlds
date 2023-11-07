@@ -65,8 +65,7 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
           <div style={styles.healthContainer}>
             {Array.from({ length: maxHealth }).map((_, index) => (
               <span
-                // eslint-disable-next-line react/no-array-index-key
-                key={index}
+                key={`heart-${maxHealth - index}`}
                 style={{
                   ...styles.heartIcon,
                   opacity: index < health ? 1 : 0.3,
