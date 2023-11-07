@@ -10,6 +10,7 @@ import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 import type { Sprite } from 'pixi.js'
 
+type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
@@ -33,17 +34,14 @@ interface Render {
 }
 
 export const createProjectile = createSpawnableEntity<
-  typeof ArgsSchema,
-  SpawnableEntity<Data, Render>,
+  Args,
+  SpawnableEntity<Data, Render, Args>,
   Data,
   Render
 >(
   ArgsSchema,
-  (
-    { uid, tags, transform, zIndex },
-    { width, height, direction, spriteSource },
-  ) => {
-    const { position } = transform
+  ({ uid, tags, transform }, { width, height, direction, spriteSource }) => {
+    const { position, zIndex } = transform
 
     const body = Matter.Bodies.rectangle(
       position.x,

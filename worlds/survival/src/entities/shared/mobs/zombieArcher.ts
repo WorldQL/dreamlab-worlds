@@ -22,6 +22,7 @@ import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 import { events } from '../../../events'
 
+type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
@@ -65,18 +66,18 @@ interface Render {
 }
 
 export const createArcherMob = createSpawnableEntity<
-  typeof ArgsSchema,
-  SpawnableEntity<Data, Render>,
+  Args,
+  SpawnableEntity<Data, Render, Args>,
   Data,
   Render
 >(
   ArgsSchema,
   (
-    { uid, tags, transform, zIndex },
+    { uid, tags, transform },
     { width, height, maxHealth, speed, knockback },
   ) => {
     const HIT_CHANNEL = '@dreamlab/Hittable/hit'
-    const { position } = transform
+    const { position, zIndex } = transform
 
     const body = Matter.Bodies.rectangle(
       position.x,

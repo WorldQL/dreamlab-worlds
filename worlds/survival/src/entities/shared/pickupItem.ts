@@ -3,7 +3,7 @@ import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import type { Camera } from '@dreamlab.gg/core/entities'
 import type { ItemOptions } from '@dreamlab.gg/core/managers'
-import { cloneTransform, rectangleBounds, Vec } from '@dreamlab.gg/core/math'
+import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
@@ -12,6 +12,7 @@ import { Container, Graphics } from 'pixi.js'
 import type { Sprite } from 'pixi.js'
 import { events } from '../../events'
 
+type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
@@ -38,17 +39,17 @@ interface Render {
 }
 
 export const createPickupItem = createSpawnableEntity<
-  typeof ArgsSchema,
-  SpawnableEntity<Data, Render>,
+  Args,
+  SpawnableEntity<Data, Render, Args>,
   Data,
   Render
 >(
   ArgsSchema,
   (
-    { tags, transform, zIndex },
+    { tags, transform },
     { width, height, spriteSource, itemDisplayName, animationName },
   ) => {
-    const { position } = transform
+    const { position, zIndex } = transform
 
     const body = Matter.Bodies.rectangle(
       position.x,
@@ -72,7 +73,7 @@ export const createPickupItem = createSpawnableEntity<
       },
 
       rectangleBounds() {
-        return rectangleBounds(width, height, transform.rotation)
+        return { width, height }
       },
 
       isPointInside(position) {

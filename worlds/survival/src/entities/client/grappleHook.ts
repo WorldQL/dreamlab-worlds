@@ -20,6 +20,7 @@ const onPointerMove = (ev: PointerEvent, camera: Camera): void => {
   cursorPosition = camera.localToWorld(screenPosition)
 }
 
+type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
@@ -40,17 +41,17 @@ interface Render {
 }
 
 export const createGrappleHook = createSpawnableEntity<
-  typeof ArgsSchema,
-  SpawnableEntity<Data, Render>,
+  Args,
+  SpawnableEntity<Data, Render, Args>,
   Data,
   Render
 >(
   ArgsSchema,
   (
-    { tags, transform, zIndex },
+    { tags, transform },
     { width, height, mustConnectWithBody, spriteSource },
   ) => {
-    const { position } = transform
+    const { position, zIndex } = transform
 
     const HOOK_CATEGORY = 0x0004
 
