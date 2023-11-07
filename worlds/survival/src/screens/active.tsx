@@ -19,18 +19,30 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
       setKillCount(prev => prev + 1)
     }
 
-    const healthListener = () => {
-      setHealth(prev => prev - 1)
+    const healthListener = (healthChange: number, isHealing = false) => {
+      setHealth(prev => {
+        return isHealing
+          ? Math.min(prev + healthChange, 5)
+          : Math.max(prev - healthChange, 0)
+      })
       setShowDamage(true)
       setTimeout(() => setShowDamage(false), 300)
     }
 
+    const damageListener = (healthChange: number) =>
+      healthListener(healthChange)
+
+    const healListener = (healthChange: number) =>
+      healthListener(healthChange, true)
+
     events.addListener('onPlayerKill', killListener)
-    events.addListener('onPlayerDamage', healthListener)
+    events.addListener('onPlayerDamage', damageListener)
+    events.addListener('onPlayerHeal', healListener)
 
     return () => {
       events.removeListener('onPlayerKill', killListener)
-      events.removeListener('onPlayerDamage', healthListener)
+      events.removeListener('onPlayerDamage', damageListener)
+      events.removeListener('onPlayerHeal', healListener)
     }
   }, [])
 

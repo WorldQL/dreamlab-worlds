@@ -4,7 +4,8 @@ import { EventEmitter } from '@dreamlab.gg/core/events'
 
 interface Events {
   onPlayerKill: []
-  onPlayerDamage: []
+  onPlayerDamage: [number]
+  onPlayerHeal: [number]
   onPlayerNearItem: [Player, PlayerInventoryItem | undefined]
 }
 

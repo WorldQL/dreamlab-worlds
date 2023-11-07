@@ -16,11 +16,6 @@ export const DeathScreen: React.FC<DeathScreenProps> = ({
   const [hovered, setHovered] = useState(false)
   const [active, setActive] = useState(false)
 
-  // const END_CHANNEL = 'game/end'
-  // const netClient = onlyNetClient(game)
-
-  // netClient?.sendCustomMessage(END_CHANNEL, {})
-
   const getButtonStyles = (): CSSProperties => {
     const style: CSSProperties = { ...styles.button }
 
@@ -40,7 +35,7 @@ export const DeathScreen: React.FC<DeathScreenProps> = ({
     <div style={styles.container}>
       <div style={styles.bloodStain} />
       <div style={styles.content}>
-        <div style={styles.title}>Game Over</div>
+        <div style={styles.title}>You Died</div>
         <div style={{ ...styles.killContainer, marginBottom: '20px' }}>
           <span style={styles.gameScreenLabel}>Kills:</span>
           <span style={styles.killCount}>{killCount}</span>
