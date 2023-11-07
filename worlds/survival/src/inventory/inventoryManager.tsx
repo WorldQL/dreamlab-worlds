@@ -25,7 +25,18 @@ import {
   handleInventoryDragStart,
 } from './listeners/InventoryDrag.js'
 
-export type InventoryData = (PlayerItem | undefined)[]
+export interface ProjectileOptions {
+  projectiles: number
+  explosive: boolean
+}
+
+export interface InventoryItem {
+  baseItem: PlayerItem
+  damage: number
+  projectileOptions?: ProjectileOptions
+}
+
+export type InventoryData = (InventoryItem | undefined)[]
 const TOTAL_SLOTS = 36
 
 const GameContext = createContext<any | null>(null)
@@ -81,20 +92,20 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
       if (!pressed) return
       const idx = digit - 1
       setActiveSlot(idx)
-      player.setItemInHand(data[idx])
+      player.setItemInHand(data[idx]?.baseItem)
     },
     [player, data, setActiveSlot],
   )
 
   const onItemAdd = useCallback(
-    (item: PlayerItem) => {
+    (item: InventoryItem) => {
       setData(prev => {
         const newData = [...prev]
         const slotIndex = newData.indexOf(undefined)
         if (slotIndex !== -1) {
           newData[slotIndex] = item
           if (slotIndex === activeSlot) {
-            player.setItemInHand(newData[slotIndex])
+            player.setItemInHand(newData[slotIndex]?.baseItem)
           }
         }
 

@@ -2,7 +2,7 @@ import type { Game } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
 import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
 
-export const initGun = (game: Game<false>) => {
+export const initProjectileWeapons = (game: Game<false>) => {
   let lastSpawnedTime: number | null = null
 
   game.events.common.addListener(

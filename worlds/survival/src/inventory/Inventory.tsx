@@ -1,8 +1,7 @@
-import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
 import React from 'https://esm.sh/react@18.2.0'
 import InventorySlot from './InventorySlot.js'
 import { inventoryStyles as styles } from './InventoryStyle.js'
-import type { InventoryData } from './inventoryManager.js'
+import type { InventoryData, InventoryItem } from './inventoryManager.js'
 
 interface Props {
   data: InventoryData
@@ -30,7 +29,7 @@ const Inventory: React.FC<Props> = ({
   const chunkedData = chunkArray(data, numCols)
 
   const createSlot = (
-    slot: PlayerItem | undefined,
+    slot: InventoryItem | undefined,
     slotIndex: number,
     offset = 0,
   ) => {

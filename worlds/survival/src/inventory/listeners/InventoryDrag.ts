@@ -22,9 +22,9 @@ export const handleInventoryDragEnd = (event: InventoryDragEndEvent) => {
 
   // change item in hand if active slot is changed
   if (event.activeSlot === event.sourceSlot) {
-    event.player.setItemInHand(newData[event.sourceSlot])
+    event.player.setItemInHand(newData[event.sourceSlot]?.baseItem)
   } else if (event.activeSlot === event.targetSlot) {
-    event.player.setItemInHand(newData[event.targetSlot])
+    event.player.setItemInHand(newData[event.targetSlot]?.baseItem)
   }
 
   // update inventory data

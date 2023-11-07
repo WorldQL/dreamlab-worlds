@@ -1,9 +1,9 @@
-import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
 import React, { useState } from 'https://esm.sh/react@18.2.0'
 import { inventoryStyles as styles } from './InventoryStyle.js'
+import type { InventoryItem } from './inventoryManager.js'
 
 interface Props {
-  slot: PlayerItem
+  slot: InventoryItem
 }
 
 const InventorySlot: React.FC<Props> = ({ slot }) => {
@@ -24,19 +24,19 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
       onMouseLeave={() => setIsHovered(false)}
       style={combinedStyles}
     >
-      {slot?.textureURL && (
+      {slot?.baseItem?.textureURL && (
         <img
-          alt={slot.displayName}
+          alt={slot.baseItem?.displayName}
           className='inventorySprite'
           draggable
           height='50'
-          src={slot.textureURL}
+          src={slot.baseItem?.textureURL}
           width='50'
         />
       )}
 
-      {isHovered && !isDragging && slot?.displayName && (
-        <div style={styles.itemTooltip}>{slot.displayName}</div>
+      {isHovered && !isDragging && slot?.baseItem?.displayName && (
+        <div style={styles.itemTooltip}>{slot.baseItem?.displayName}</div>
       )}
     </div>
   )

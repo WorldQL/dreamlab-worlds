@@ -1,16 +1,16 @@
 import type { Game } from '@dreamlab.gg/core'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
-import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import React, { useEffect, useRef, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events'
+import type { InventoryItem } from '../inventory/inventoryManager'
 import { styles } from './styles'
 
 interface ItemScreenProps {
   game: Game<false>
   player: Player
-  item: PlayerItem | undefined
+  item: InventoryItem | undefined
 }
 
 export const ItemScreen: React.FC<ItemScreenProps> = ({
@@ -19,8 +19,10 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
   item,
 }) => {
   const [keyPressed, setKeyPressed] = useState(false)
-  const [currentItem, setCurrentItem] = useState<PlayerItem | undefined>(item)
-  const itemRef = useRef<PlayerItem | undefined>(item)
+  const [currentItem, setCurrentItem] = useState<InventoryItem | undefined>(
+    item,
+  )
+  const itemRef = useRef<InventoryItem | undefined>(item)
 
   game.client?.inputs.registerInput('@survival/pickup', 'KeyF')
 
@@ -32,7 +34,7 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
       }
     }
 
-    const itemListener = (_player: Player, item: PlayerItem | undefined) => {
+    const itemListener = (_player: Player, item: InventoryItem | undefined) => {
       itemRef.current = item
       setCurrentItem(item)
       setKeyPressed(false)
@@ -55,12 +57,12 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
   return (
     <div style={overlayStyle}>
       <img
-        alt={currentItem.displayName}
-        src={currentItem.textureURL}
+        alt={currentItem.baseItem?.displayName}
+        src={currentItem.baseItem?.textureURL}
         style={styles.itemTexture}
       />
       <div style={styles.itemInfo}>
-        <span style={styles.itemName}>{currentItem.displayName}</span>
+        <span style={styles.itemName}>{currentItem.baseItem?.displayName}</span>
         <span style={styles.pickupPrompt}>{promptMessage}</span>
       </div>
     </div>
