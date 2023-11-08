@@ -10,6 +10,7 @@ import React, {
   useEffect,
   useState,
 } from 'https://esm.sh/react@18.2.0'
+import { events } from '../events.js'
 import Inventory from './Inventory.js'
 import InventoryManager from './InventoryManager.js'
 import type { InventoryClickEvent } from './events/InventoryClickEvent.js'
@@ -48,8 +49,9 @@ const useGameEventListener = (
 }
 
 const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
-  const inventoryManager = InventoryManager.getInstance()
-  const inventoryData = inventoryManager.getInventoryData()
+  const [inventoryData] = useState(
+    InventoryManager.getInstance().getInventoryData(),
+  )
 
   const [activeSlot, setActiveSlot] = useState<number>(0)
   const [isInventoryOpen, setIsInventoryOpen] = useState(false)
@@ -78,6 +80,18 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
     },
     [player, inventoryData, setActiveSlot],
   )
+
+  useEffect(() => {
+    // cheap fix: close inventory so the ui updates after inventory contents has been altered
+    const itemListener = () => {
+      setIsInventoryOpen(false)
+    }
+
+    events.addListener('onPlayerPickUp', itemListener)
+    return () => {
+      events.removeListener('onPlayerPickUp', itemListener)
+    }
+  }, [player])
 
   useGameEventListener('inputs', '@inventory/open', onInventoryOpen)
   for (let index = 0; index <= 9; index++) {

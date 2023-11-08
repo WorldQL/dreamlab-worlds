@@ -33,6 +33,7 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
         setKeyPressed(true)
         const inventoryManager = InventoryManager.getInstance()
         inventoryManager.addItemToInventory(itemRef.current)
+        events.emit('onPlayerPickUp')
       }
     }
 
