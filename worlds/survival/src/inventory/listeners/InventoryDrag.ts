@@ -10,17 +10,14 @@ export const handleInventoryDragStart = (event: InventoryDragStartEvent) => {
 }
 
 export const handleInventoryDragEnd = (event: InventoryDragEndEvent) => {
-  const inventoryManager = InventoryManager.getInstance()
+  const invData = InventoryManager.getInstance().getInventoryData()
   console.log(
     `Ended dragging from slot [${event.sourceSlot}] to slot [${event.targetSlot}]`,
   )
 
-  inventoryManager.swapItems(event.sourceSlot, event.targetSlot)
-  const newData = inventoryManager.getInventoryData()
-
   if (event.activeSlot === event.sourceSlot) {
-    event.player.setItemInHand(newData[event.sourceSlot]?.baseItem)
+    event.player.setItemInHand(invData[event.sourceSlot]?.baseItem)
   } else if (event.activeSlot === event.targetSlot) {
-    event.player.setItemInHand(newData[event.targetSlot]?.baseItem)
+    event.player.setItemInHand(invData[event.targetSlot]?.baseItem)
   }
 }

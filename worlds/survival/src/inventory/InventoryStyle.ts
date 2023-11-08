@@ -36,12 +36,20 @@ export const inventoryStyles: Record<string, CSSProperties> = {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     transform: 'scale(1.05)',
   },
-  hotbarSlots: {
+  inventoryHotbarSlots: {
     display: 'flex',
     justifyContent: 'space-between',
     marginTop: '10px',
     borderTop: '2px solid #8c7ae6',
     paddingTop: '10px',
+  },
+  hotbarSlots: {
+    display: 'flex',
+    justifyContent: 'center',
+    background: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: '8px',
+    padding: '5px 0',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
   },
   itemTooltip: {
     position: 'absolute',

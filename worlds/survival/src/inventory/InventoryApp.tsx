@@ -12,6 +12,7 @@ import React, {
 } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events.js'
 import Inventory from './Inventory.js'
+import InventoryHotbar from './InventoryHotbar.js'
 import InventoryManager from './InventoryManager.js'
 import type { InventoryClickEvent } from './events/InventoryClickEvent.js'
 import type {
@@ -49,7 +50,7 @@ const useGameEventListener = (
 }
 
 const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
-  const [inventoryData] = useState(
+  const [inventoryData, setInventoryData] = useState(
     InventoryManager.getInstance().getInventoryData(),
   )
 
@@ -82,16 +83,16 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
   )
 
   useEffect(() => {
-    // cheap fix: close inventory so the ui updates after inventory contents has been altered
-    const itemListener = () => {
-      setIsInventoryOpen(false)
+    const updateInventory = () => {
+      setInventoryData([...InventoryManager.getInstance().getInventoryData()])
     }
 
-    events.addListener('onPlayerPickUp', itemListener)
+    events.addListener('onInventoryUpdate', updateInventory)
+
     return () => {
-      events.removeListener('onPlayerPickUp', itemListener)
+      events.removeListener('onInventoryUpdate', updateInventory)
     }
-  }, [player])
+  }, [])
 
   useGameEventListener('inputs', '@inventory/open', onInventoryOpen)
   for (let index = 0; index <= 9; index++) {
@@ -125,6 +126,9 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
       return
     }
 
+    InventoryManager.getInstance().swapItems(sourceSlot, slotIndex)
+    setInventoryData([...InventoryManager.getInstance().getInventoryData()])
+
     const event: InventoryDragEndEvent = {
       ...commonEventProps,
       cursorSlot: slotIndex,
@@ -132,17 +136,23 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
       targetSlot: slotIndex,
     }
     handleInventoryDragEnd(event)
+
     setSourceSlot(null)
   }
 
-  return isInventoryOpen ? (
-    <Inventory
-      data={inventoryData}
-      onClick={handleClick}
-      onDragEnd={handleDragEndEvent}
-      onDragStart={handleDragStartEvent}
-    />
-  ) : null
+  return (
+    <>
+      <InventoryHotbar activeSlot={activeSlot} inventoryData={inventoryData} />
+      {isInventoryOpen && (
+        <Inventory
+          data={inventoryData}
+          onClick={handleClick}
+          onDragEnd={handleDragEndEvent}
+          onDragStart={handleDragStartEvent}
+        />
+      )}
+    </>
+  )
 }
 
 export const initializeGameUI = (game: Game<false>) => {
