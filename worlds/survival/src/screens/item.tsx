@@ -4,7 +4,8 @@ import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import React, { useEffect, useRef, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events'
-import type { InventoryItem } from '../inventory/inventoryManager'
+import type { InventoryItem } from '../inventory/InventoryManager'
+import InventoryManager from '../inventory/InventoryManager'
 import { styles } from './styles'
 
 interface ItemScreenProps {
@@ -30,7 +31,8 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
     const itemConfirmListener = () => {
       if (!keyPressed && itemRef.current) {
         setKeyPressed(true)
-        events.emit('onInventoryAdd', itemRef.current)
+        const inventoryManager = InventoryManager.getInstance()
+        inventoryManager.addItemToInventory(itemRef.current)
       }
     }
 

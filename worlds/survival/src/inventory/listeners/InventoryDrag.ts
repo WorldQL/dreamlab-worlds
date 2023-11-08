@@ -1,3 +1,4 @@
+import InventoryManager from '../InventoryManager'
 import type {
   InventoryDragEndEvent,
   InventoryDragStartEvent,
@@ -9,24 +10,17 @@ export const handleInventoryDragStart = (event: InventoryDragStartEvent) => {
 }
 
 export const handleInventoryDragEnd = (event: InventoryDragEndEvent) => {
+  const inventoryManager = InventoryManager.getInstance()
   console.log(
     `Ended dragging from slot [${event.sourceSlot}] to slot [${event.targetSlot}]`,
   )
 
-  // swap item to new slot
-  const newData = [...event.data]
-  ;[newData[event.sourceSlot], newData[event.targetSlot]] = [
-    newData[event.targetSlot],
-    newData[event.sourceSlot],
-  ]
+  inventoryManager.swapItems(event.sourceSlot, event.targetSlot)
+  const newData = inventoryManager.getInventoryData()
 
-  // change item in hand if active slot is changed
   if (event.activeSlot === event.sourceSlot) {
     event.player.setItemInHand(newData[event.sourceSlot]?.baseItem)
   } else if (event.activeSlot === event.targetSlot) {
     event.player.setItemInHand(newData[event.targetSlot]?.baseItem)
   }
-
-  // update inventory data
-  event.setData(newData)
 }

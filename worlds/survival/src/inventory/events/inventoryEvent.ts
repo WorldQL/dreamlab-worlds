@@ -1,5 +1,5 @@
 import type { Player } from '@dreamlab.gg/core/dist/entities'
-import type { InventoryData } from '../inventoryManager'
+import type { InventoryData } from '../inventoryHandler'
 
 export interface InventoryEvent {
   data: InventoryData

@@ -12,7 +12,7 @@ import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 import type { Sprite } from 'pixi.js'
 import { events } from '../../events'
-import type { InventoryItem } from '../../inventory/inventoryManager'
+import type { InventoryItem } from '../../inventory/InventoryManager'
 
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({

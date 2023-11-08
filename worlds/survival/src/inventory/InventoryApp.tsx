@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Game } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 import type { InputCode } from '@dreamlab.gg/core/dist/input'
-import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
 import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
 import React, {
   createContext,
@@ -12,8 +10,8 @@ import React, {
   useEffect,
   useState,
 } from 'https://esm.sh/react@18.2.0'
-import { events } from '../events.js'
 import Inventory from './Inventory.js'
+import InventoryManager from './InventoryManager.js'
 import type { InventoryClickEvent } from './events/InventoryClickEvent.js'
 import type {
   InventoryDragEndEvent,
@@ -25,24 +23,11 @@ import {
   handleInventoryDragStart,
 } from './listeners/InventoryDrag.js'
 
-export interface ProjectileOptions {
-  projectiles: number
-  explosive: boolean
-}
-
-export interface InventoryItem {
-  baseItem: PlayerItem
-  damage: number
-  projectileOptions?: ProjectileOptions
-}
-
-export type InventoryData = (InventoryItem | undefined)[]
-const TOTAL_SLOTS = 36
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const GameContext = createContext<any | null>(null)
 
 const useGameEventListener = (
-  source: 'common' | 'custom' | 'inputs',
+  source: 'common' | 'inputs',
   event: unknown,
   handler: unknown,
 ) => {
@@ -56,9 +41,6 @@ const useGameEventListener = (
       case 'common':
         game.events.common.addListener(event, handler)
         return () => game.events.common.removeListener(event, handler)
-      case 'custom':
-        events.addListener(event as any, handler as any)
-        return () => events.removeListener(event as any, handler as any)
       default:
         throw new Error(`Unsupported event source: ${source}`)
     }
@@ -66,15 +48,15 @@ const useGameEventListener = (
 }
 
 const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
-  const [data, setData] = useState<InventoryData>(
-    Array.from({ length: TOTAL_SLOTS }).fill(undefined) as InventoryData,
-  )
+  const inventoryManager = InventoryManager.getInstance()
+  const inventoryData = inventoryManager.getInventoryData()
+
   const [activeSlot, setActiveSlot] = useState<number>(0)
   const [isInventoryOpen, setIsInventoryOpen] = useState(false)
   const [sourceSlot, setSourceSlot] = useState<number | null>(null)
 
   const commonEventProps = {
-    data,
+    inventoryData,
     player,
     activeSlot,
   }
@@ -92,32 +74,12 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
       if (!pressed) return
       const idx = digit - 1
       setActiveSlot(idx)
-      player.setItemInHand(data[idx]?.baseItem)
+      player.setItemInHand(inventoryData[idx]?.baseItem)
     },
-    [player, data, setActiveSlot],
+    [player, inventoryData, setActiveSlot],
   )
 
-  const onItemAdd = useCallback(
-    (item: InventoryItem) => {
-      setData(prev => {
-        const newData = [...prev]
-        const slotIndex = newData.indexOf(undefined)
-        if (slotIndex !== -1) {
-          newData[slotIndex] = item
-          if (slotIndex === activeSlot) {
-            player.setItemInHand(newData[slotIndex]?.baseItem)
-          }
-        }
-
-        return newData
-      })
-    },
-    [activeSlot, player],
-  )
-
-  // listen to the events
   useGameEventListener('inputs', '@inventory/open', onInventoryOpen)
-  useGameEventListener('custom', 'onInventoryAdd', onItemAdd)
   for (let index = 0; index <= 9; index++) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useGameEventListener('inputs', `@inventory/digit${index}`, (va: boolean) =>
@@ -138,7 +100,6 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
       ...commonEventProps,
       cursorSlot: slotIndex,
       setSourceSlot,
-      setData,
     }
     handleInventoryDragStart(event)
   }
@@ -155,7 +116,6 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
       cursorSlot: slotIndex,
       sourceSlot,
       targetSlot: slotIndex,
-      setData,
     }
     handleInventoryDragEnd(event)
     setSourceSlot(null)
@@ -163,7 +123,7 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
 
   return isInventoryOpen ? (
     <Inventory
-      data={data}
+      data={inventoryData}
       onClick={handleClick}
       onDragEnd={handleDragEndEvent}
       onDragStart={handleDragStartEvent}
