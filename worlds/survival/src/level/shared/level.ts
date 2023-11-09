@@ -127,7 +127,7 @@ export const level: LooseSpawnableDefinition[] = [
       width: 200,
       height: 200,
       spriteSource: '/worlds/survival/assets/items/bow.png',
-      itemDisplayName: 'Gold Bow',
+      displayName: 'Gold Bow',
       animationName: 'bow',
     },
     transform: {
@@ -141,7 +141,7 @@ export const level: LooseSpawnableDefinition[] = [
       width: 200,
       height: 200,
       spriteSource: '/worlds/survival/assets/items/katana.png',
-      itemDisplayName: 'Katana',
+      displayName: 'Katana',
       animationName: 'greatsword',
     },
     transform: {
@@ -155,7 +155,7 @@ export const level: LooseSpawnableDefinition[] = [
       width: 200,
       height: 200,
       spriteSource: '/worlds/survival/assets/items/bow.png',
-      itemDisplayName: 'Gold Bow',
+      displayName: 'Gold Bow',
       animationName: 'bow',
     },
     transform: {

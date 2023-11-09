@@ -58,6 +58,14 @@ class InventoryManager {
     this.inventoryData[targetSlotIndex] = temp
     events.emit('onInventoryUpdate')
   }
+
+  public getItemFromItem(baseItem: PlayerItem) {
+    for (const item of this.inventoryData) {
+      if ((item!.baseItem = baseItem)) return item
+    }
+
+    return undefined
+  }
 }
 
 export default InventoryManager

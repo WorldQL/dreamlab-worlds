@@ -18,9 +18,15 @@ type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
-  spriteSource: z.string(),
-  itemDisplayName: z.string(),
+  displayName: z.string(),
   animationName: z.string(),
+  spriteSource: z.string(),
+  damage: z.number().default(1),
+  hand: z.enum(['left', 'right']).default('right'),
+  anchorX: z.number().default(0.5),
+  anchorY: z.number().default(0.5),
+  speedMultiplier: z.number().optional(),
+  projectiles: z.number().default(1).optional(),
 })
 
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
@@ -129,13 +135,13 @@ export const createPickupItem = createSpawnableEntity<
       ) => {
         if (body && bodyCollided === body && game.client) {
           const itemOptions: ItemOptions = {
-            anchorX: 0.5,
-            anchorY: 0.5,
-            hand: 'right',
+            anchorX: args.anchorX,
+            anchorY: args.anchorY,
+            hand: args.hand,
           }
 
           const newItem = createItem(
-            args.itemDisplayName,
+            args.displayName,
             args.spriteSource,
             args.animationName,
             itemOptions,
@@ -143,7 +149,7 @@ export const createPickupItem = createSpawnableEntity<
 
           const inventoryItem: InventoryItem = {
             baseItem: newItem,
-            damage: 1,
+            damage: args.damage,
           }
 
           events.emit('onPlayerNearItem', player, inventoryItem)
