@@ -13,6 +13,12 @@ export interface ScreenProps {
   player: Player
 }
 
+const getButtonHoverStyles = (hover: boolean): CSSProperties => ({
+  transform: hover ? 'scale(1.05)' : 'scale(1)',
+  boxShadow: hover ? '0 0 20px #fff' : 'none',
+  transition: 'all 0.3s ease',
+})
+
 const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
   const [hovered, setHovered] = useState(false)
   const [active, setActive] = useState(false)
@@ -26,16 +32,19 @@ const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
     netClient?.sendCustomMessage(PLAY_CHANNEL, {})
   }
 
-  const getButtonStyles = (): CSSProperties => {
+  const getButtonStyles = (hover: boolean, active: boolean): CSSProperties => {
     const style: CSSProperties = { ...styles.button }
-
     if (active) {
-      style.transform = 'scale(0.95)'
+      style.transform = 'translateY(2px)'
+      style.boxShadow = '1px 1px 0px #7f462c'
     }
 
-    if (hovered) {
-      style.transform = 'scale(1.1)'
-      style.boxShadow = '0 0 15px #9d9d9d'
+    if (hover) {
+      style.backgroundColor = '#a52a2a'
+      style.color = '#ffffff'
+      style.borderColor = '#7f0000'
+      style.boxShadow = '0 0 10px 3px #ff0000'
+      style.textShadow = '0 0 5px #ff0000, 0 0 10px #ff0000'
     }
 
     return style
@@ -47,8 +56,8 @@ const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
 
   return (
     <div style={styles.container}>
+      <div style={styles.backgroundAnimation} />
       <div style={styles.content}>
-        <div style={styles.title}>Zombie Survival</div>
         <button
           onClick={handlePlayClick}
           onMouseDown={() => setActive(true)}
@@ -58,10 +67,13 @@ const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
             setActive(false)
           }}
           onMouseUp={() => setActive(false)}
-          style={getButtonStyles()}
+          style={{
+            ...getButtonStyles(hovered, active),
+            ...getButtonHoverStyles(hovered),
+          }}
           type='button'
         >
-          PLAY
+          Play
         </button>
       </div>
     </div>
