@@ -13,7 +13,7 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
   const combinedStyles = {
     ...styles.inventorySlot,
     ...(isHovered ? styles.inventorySlotHover : {}),
-    border: slot ? '2px solid #8c7ae6' : '2px solid transparent',
+    border: slot ? '2px solid #9e8a7c' : '2px solid transparent',
   }
 
   const renderTooltipContent = () => {

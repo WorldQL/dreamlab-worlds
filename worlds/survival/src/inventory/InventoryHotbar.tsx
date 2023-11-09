@@ -15,14 +15,14 @@ const InventoryHotbar: React.FC<InventoryHotbarProps> = ({
 
   const slotStyle: React.CSSProperties = {
     ...styles.inventorySlot,
-    margin: '0 5px',
+    margin: '0 3px',
     transition: 'transform 0.3s ease',
   }
 
   const activeSlotStyle: React.CSSProperties = {
     ...slotStyle,
+    boxShadow: '0 0 10px #7f0000',
     transform: 'scale(1.1)',
-    boxShadow: '0 0 10px gold',
     zIndex: 10,
   }
 
@@ -52,9 +52,7 @@ const InventoryHotbar: React.FC<InventoryHotbarProps> = ({
                 style={{ width: '100%', height: '100%' }}
               />
             ) : (
-              <div
-                style={{ ...slotStyle, backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
-              />
+              <div style={{ ...slotStyle }} />
             )}
           </div>
         )

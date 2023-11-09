@@ -13,12 +13,6 @@ export interface ScreenProps {
   player: Player
 }
 
-const getButtonHoverStyles = (hover: boolean): CSSProperties => ({
-  transform: hover ? 'scale(1.05)' : 'scale(1)',
-  boxShadow: hover ? '0 0 20px #fff' : 'none',
-  transition: 'all 0.3s ease',
-})
-
 const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
   const [hovered, setHovered] = useState(false)
   const [active, setActive] = useState(false)
@@ -69,7 +63,6 @@ const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
           onMouseUp={() => setActive(false)}
           style={{
             ...getButtonStyles(hovered, active),
-            ...getButtonHoverStyles(hovered),
           }}
           type='button'
         >
