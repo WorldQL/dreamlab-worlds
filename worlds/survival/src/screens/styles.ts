@@ -3,7 +3,7 @@ import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
 export const styles: { [key: string]: CSSProperties } = {
   pickupOverlay: {
     position: 'absolute',
-    bottom: '10%',
+    bottom: '70%',
     left: '50%',
     transform: 'translateX(-50%)',
     display: 'flex',
@@ -56,9 +56,16 @@ export const styles: { [key: string]: CSSProperties } = {
     fontWeight: 'bold',
   },
   healthContainer: {
+    position: 'absolute',
+    bottom: '75px',
+    left: '50%',
+    transform: 'translateX(-50%)',
     display: 'flex',
+    justifyContent: 'center',
+    width: '100%',
+    maxWidth: '600px',
     alignItems: 'center',
-    marginBottom: '10px',
+    zIndex: 10,
   },
   heartIcon: {
     fontSize: '28px',
@@ -116,7 +123,7 @@ export const styles: { [key: string]: CSSProperties } = {
     color: 'white',
     textShadow: '2px 2px 4px black',
   },
-  bloodStain: {
+  dealthOverlay: {
     position: 'absolute',
     top: 0,
     right: 0,

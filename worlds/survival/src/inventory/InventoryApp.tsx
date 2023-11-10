@@ -85,6 +85,7 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
   useEffect(() => {
     const updateInventory = () => {
       setInventoryData([...InventoryManager.getInstance().getInventoryData()])
+      player.setItemInHand(inventoryData[activeSlot]?.baseItem)
     }
 
     events.addListener('onInventoryUpdate', updateInventory)
@@ -92,7 +93,7 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
     return () => {
       events.removeListener('onInventoryUpdate', updateInventory)
     }
-  }, [])
+  }, [activeSlot, inventoryData, player])
 
   useGameEventListener('inputs', '@inventory/open', onInventoryOpen)
   for (let index = 0; index <= 9; index++) {

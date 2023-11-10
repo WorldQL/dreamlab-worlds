@@ -9,6 +9,7 @@ export interface ProjectileOptions {
 export interface InventoryItem {
   baseItem: PlayerItem
   damage: number
+  value: number | undefined // gold value
   projectileOptions?: ProjectileOptions
 }
 

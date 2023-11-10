@@ -150,6 +150,7 @@ export const createPickupItem = createSpawnableEntity<
           const inventoryItem: InventoryItem = {
             baseItem: newItem,
             damage: args.damage,
+            value: 100,
           }
 
           events.emit('onPlayerNearItem', player, inventoryItem)

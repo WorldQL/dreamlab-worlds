@@ -8,6 +8,7 @@ interface Events {
   onPlayerHeal: [number]
   onPlayerNearItem: [Player, InventoryItem | undefined]
   onInventoryUpdate: []
+  onGoldUpdate: []
 }
 
 export const events = new EventEmitter<Events>()

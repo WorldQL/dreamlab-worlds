@@ -343,7 +343,7 @@ export const createZombieMob = createSpawnableEntity<
           }
         }
 
-        if (closestPlayer) {
+        if (closestPlayer && minDistance < 2_000) {
           const dx = closestPlayer.position.x - body.position.x
           const dy = closestPlayer.position.y - body.position.y
 
@@ -357,21 +357,7 @@ export const createZombieMob = createSpawnableEntity<
           })
         }
 
-        if (closestPlayer) {
-          const dx = closestPlayer.position.x - body.position.x
-          const dy = closestPlayer.position.y - body.position.y
-
-          const distance = Math.hypot(dx, dy)
-          const unitX = dx / distance
-          const unitY = dy / distance
-
-          Matter.Body.translate(body, {
-            x: speed * unitX,
-            y: speed * unitY,
-          })
-        }
-
-        if (game.server && (!closestPlayer || minDistance > 4_000)) {
+        if (game.server && (!closestPlayer || minDistance > 6_000)) {
           await game.destroy(this as SpawnableEntity)
         }
       },

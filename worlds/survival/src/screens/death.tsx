@@ -33,7 +33,7 @@ export const DeathScreen: React.FC<DeathScreenProps> = ({
 
   return (
     <div style={styles.container}>
-      <div style={styles.bloodStain} />
+      <div style={styles.dealthOverlay} />
       <div style={styles.content}>
         <div style={styles.title}>You Died</div>
         <div style={{ ...styles.scoreContainer, marginBottom: '20px' }}>
