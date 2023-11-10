@@ -69,7 +69,8 @@ class RegionManager {
 
       clearTimeout(region.spawnIntervalId)
 
-      const newSpawnIntervalId = setTimeout(spawn, 20 * 1_000)
+      const interval = Math.random() * (15 - 5) + 5
+      const newSpawnIntervalId = setTimeout(spawn, interval * 1_000)
       region.spawnIntervalId = newSpawnIntervalId
     }
 
@@ -138,12 +139,17 @@ class RegionManager {
       game.physics.engine.world,
     ).filter(b => b.label === 'zombie')
     if (zombies.length >= 30) return
+
+    const additionalZombies = Math.floor(players.length / 2)
+    const zombieCount = region.difficulty + additionalZombies
+
     const spawnPromises = players.flatMap(player => {
       const playerPosition = { x: player.position.x, y: player.position.y }
-      return Array.from({ length: region.difficulty }, async () => {
-        const randomZombieTypeIndex = Math.floor(
-          Math.random() * region.zombieTypes.length,
-        )
+      return Array.from({ length: zombieCount }, async () => {
+        const randomZombieTypeIndex =
+          Math.random() < 0.7
+            ? Math.floor(Math.random() * region.zombieTypes.length)
+            : region.zombieTypes.length - 1
         const randomZombieType = region.zombieTypes[randomZombieTypeIndex]
         const spawnPosition = this.getSpawnPositionAwayFromPlayer(
           region,
