@@ -142,10 +142,11 @@ export const level: LooseSpawnableDefinition[] = [
     args: {
       width: 200,
       height: 200,
+      hand: 'left',
       spriteSource: '/worlds/survival/assets/items/hand_cannon.png',
       displayName: 'Scatter Shot Shotgun',
       lore: "Forged in a lawless frontier town, this shotgun's scatter shot was the bane of undead hordes, turning any cowboy into a one-person army against the zombie outbreak.",
-      animationName: 'bow',
+      animationName: 'shoot',
       projectileType: 'SCATTER_SHOT',
     },
     transform: {
@@ -158,10 +159,11 @@ export const level: LooseSpawnableDefinition[] = [
     args: {
       width: 200,
       height: 200,
+      hand: 'left',
       spriteSource: '/worlds/survival/assets/items/classic_revolver.png',
       displayName: 'Burst Revolver',
       lore: "Crafted by the legendary gunsmith 'Bullseye' Betty, this revolver's rapid bursts made it a favorite among cowboys holding the line in the great zombie sieges of the Old West.",
-      animationName: 'bow',
+      animationName: 'shoot',
       projectileType: 'BURST_SHOT',
     },
     transform: {
