@@ -12,6 +12,7 @@ export enum ProjectileTypes {
 
 export interface InventoryItem {
   baseItem: PlayerItem
+  lore: string
   damage: number
   value: number | undefined // gold value
   projectileType?: ProjectileTypes

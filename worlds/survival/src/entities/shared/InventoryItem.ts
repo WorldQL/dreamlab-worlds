@@ -27,6 +27,7 @@ const ArgsSchema = z.object({
   animationName: z.string(),
   spriteSource: z.string(),
   damage: z.number().default(1),
+  lore: z.string().default('Default Item Lore'),
   hand: z.enum(['left', 'right']).default('right'),
   anchorX: z.number().default(0.5),
   anchorY: z.number().default(0.5),
@@ -154,6 +155,7 @@ export const createPickupItem = createSpawnableEntity<
 
           const inventoryItem: InventoryItem = {
             baseItem: newItem,
+            lore: args.lore,
             damage: args.damage,
             value: 100,
             projectileType:

@@ -18,7 +18,7 @@ export const sharedInit: InitShared = async game => {
   game.register('@dreamlab/Ladder', createLadder)
   game.register('@dreamlab/Region', createRegion)
   game.register('@dreamlab/BreakableSolid', createBreakableSolid)
-  game.register('@dreamlab/PickupItem', createPickupItem)
+  game.register('@dreamlab/InventoryItem', createPickupItem)
   game.register('@dreamlab/Platform', createPlatform)
   game.register('@dreamlab/Projectile', createProjectile)
 

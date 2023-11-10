@@ -122,12 +122,13 @@ export const level: LooseSpawnableDefinition[] = [
     },
   },
   {
-    entity: '@dreamlab/PickupItem', // weapon 1
+    entity: '@dreamlab/InventoryItem', // weapon 1
     args: {
       width: 200,
       height: 200,
       spriteSource: '/worlds/survival/assets/items/bow.png',
-      displayName: 'Gold Bow',
+      displayName: 'Basic Bow',
+      lore: "Once wielded by 'Sharp-Eye' Sam, the fastest archer in the West, this bow's arrows are said to whistle with the winds of the prairie and never miss a zombie's heart.",
       animationName: 'bow',
       projectileType: 'SINGLE_SHOT',
     },
@@ -137,12 +138,13 @@ export const level: LooseSpawnableDefinition[] = [
     },
   },
   {
-    entity: '@dreamlab/PickupItem', // weapon 2
+    entity: '@dreamlab/InventoryItem', // weapon 2
     args: {
       width: 200,
       height: 200,
-      spriteSource: '/worlds/survival/assets/items/bow.png',
-      displayName: 'DOBULE',
+      spriteSource: '/worlds/survival/assets/items/hand_cannon.png',
+      displayName: 'Scatter Shot Shotgun',
+      lore: "Forged in a lawless frontier town, this shotgun's scatter shot was the bane of undead hordes, turning any cowboy into a one-person army against the zombie outbreak.",
       animationName: 'bow',
       projectileType: 'SCATTER_SHOT',
     },
@@ -152,14 +154,15 @@ export const level: LooseSpawnableDefinition[] = [
     },
   },
   {
-    entity: '@dreamlab/PickupItem', // weapon 3
+    entity: '@dreamlab/InventoryItem', // weapon 3
     args: {
       width: 200,
       height: 200,
-      spriteSource: '/worlds/survival/assets/items/bow.png',
-      displayName: 'BURST',
+      spriteSource: '/worlds/survival/assets/items/classic_revolver.png',
+      displayName: 'Burst Revolver',
+      lore: "Crafted by the legendary gunsmith 'Bullseye' Betty, this revolver's rapid bursts made it a favorite among cowboys holding the line in the great zombie sieges of the Old West.",
       animationName: 'bow',
-      projectileType: 'DOUBLE_SCATTER_SHOT',
+      projectileType: 'BURST_SHOT',
     },
     transform: {
       position: { x: 1_800, y: 300 },

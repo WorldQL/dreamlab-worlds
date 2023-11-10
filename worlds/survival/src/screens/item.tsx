@@ -117,13 +117,14 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
 
   return (
     <div style={overlayStyle}>
-      <img
+      {/* <img
         alt={currentItem.baseItem?.displayName}
         src={currentItem.baseItem?.textureURL}
         style={styles.itemTexture}
-      />
+      /> */}
       <div style={styles.itemInfo}>
         <span style={styles.itemName}>{currentItem.baseItem?.displayName}</span>
+        <span style={styles.loreSection}>{currentItem.lore}</span>
         <span style={styles.pickupPrompt}>{promptMessage}</span>
       </div>
     </div>
