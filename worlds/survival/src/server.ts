@@ -6,10 +6,13 @@ import { sharedInit } from './shared.js'
 export const init: InitServer = async game => {
   await sharedInit(game)
 
-  const checkPlayersInRegions = () => {
+  // using this until we can detect players entering/exiting a region
+  const checkPlayersInRegions = async () => {
     const allPlayers = Matter.Composite.allBodies(
       game.physics.engine.world,
     ).filter(b => b.label === 'player')
+    const startRegionIntervalsPromises = []
+
     for (const region of regionManager.getRegions()) {
       const playersInRegion = allPlayers.filter(player =>
         regionManager.isPlayerInRegion(
@@ -17,14 +20,22 @@ export const init: InitServer = async game => {
           region,
         ),
       )
-      if (playersInRegion.length > 0 && !region.spawnIntervalId) {
-        regionManager.startRegionInterval(game, region)
+      if (
+        playersInRegion.length > 0 &&
+        !region.spawnIntervalId &&
+        !region.isInCooldown
+      ) {
+        startRegionIntervalsPromises.push(
+          regionManager.startRegionInterval(game, region),
+        )
       } else if (playersInRegion.length === 0 && region.spawnIntervalId) {
         regionManager.stopRegionInterval(region)
       }
     }
+
+    await Promise.all(startRegionIntervalsPromises)
   }
 
-  checkPlayersInRegions()
+  await checkPlayersInRegions()
   setInterval(checkPlayersInRegions, 5_000)
 }

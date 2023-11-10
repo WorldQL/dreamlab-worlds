@@ -34,10 +34,14 @@ export const ZombieTypes = [
 
 export interface Region {
   id: string
+  zombieTypes: typeof ZombieTypes
   bounds: { width: number; height: number }
   center: { x: number; y: number }
   difficulty: number
-  zombieTypes: typeof ZombieTypes
+  waves: number
+  waveInterval: number
+  endCooldown: number
+  isInCooldown?: boolean
   spawnIntervalId?: NodeJS.Timeout
 }
 
@@ -64,13 +68,24 @@ class RegionManager {
   public async startRegionInterval(game: Game<false>, region: Region) {
     if (region.spawnIntervalId) return
 
+    let currentWave = 0
+
     const spawn = async () => {
-      await this.spawnZombies(game, region)
+      if (currentWave < region.waves) {
+        await this.spawnZombies(game, region)
+        currentWave++
+      } else {
+        this.stopRegionInterval(region)
+        region.isInCooldown = true
+        setTimeout(async () => {
+          currentWave = 0
+          region.isInCooldown = false
+          await this.startRegionInterval(game, region)
+        }, region.endCooldown * 1_000)
+        return
+      }
 
-      clearTimeout(region.spawnIntervalId)
-
-      const interval = Math.random() * (15 - 5) + 5
-      const newSpawnIntervalId = setTimeout(spawn, interval * 1_000)
+      const newSpawnIntervalId = setTimeout(spawn, region.waveInterval * 1_000)
       region.spawnIntervalId = newSpawnIntervalId
     }
 
@@ -181,23 +196,32 @@ export const regionManager = new RegionManager()
 regionManager.setRegions([
   {
     id: 'center',
+    zombieTypes: [ZombieTypes[0]!, ZombieTypes[1]!],
     bounds: { width: 4_000, height: 1_100 },
     center: { x: 0, y: 4_000 },
     difficulty: 2,
-    zombieTypes: [ZombieTypes[0]!, ZombieTypes[1]!],
+    waves: 2,
+    waveInterval: Math.random() * (15 - 5) + 5,
+    endCooldown: 60,
   },
   {
     id: 'left',
+    zombieTypes: [ZombieTypes[1]!, ZombieTypes[2]!],
     bounds: { width: 4_000, height: 1_100 },
     center: { x: -5_000, y: 4_000 },
     difficulty: 3,
-    zombieTypes: [ZombieTypes[1]!, ZombieTypes[2]!],
+    waves: 2,
+    waveInterval: Math.random() * (15 - 5) + 5,
+    endCooldown: 60,
   },
   {
     id: 'right',
+    zombieTypes: [ZombieTypes[2]!, ZombieTypes[3]!],
     bounds: { width: 4_000, height: 1_100 },
     center: { x: 5_000, y: 4_000 },
     difficulty: 4,
-    zombieTypes: [ZombieTypes[2]!, ZombieTypes[3]!],
+    waves: 1,
+    waveInterval: Math.random() * (15 - 5) + 5,
+    endCooldown: 200,
   },
 ])
