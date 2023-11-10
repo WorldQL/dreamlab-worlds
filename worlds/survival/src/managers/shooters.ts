@@ -44,7 +44,7 @@ export const initProjectileWeapons = (game: Game<false>) => {
     async (player: Player, item: PlayerItem) => {
       if (
         player.currentAnimation === 'bow' ||
-        player.currentAnimation === 'gun'
+        player.currentAnimation === 'shoot'
       ) {
         const currentTime = Date.now()
         if (
