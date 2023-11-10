@@ -150,8 +150,12 @@ export const createArcherMob = createSpawnableEntity<
           patrolDirection: syncedValue(game, uid, 'patrolDirection', 1),
         }
 
-        const onPlayerAttack: OnPlayerAttack = (player, _item) => {
-          if (hitCooldownCounter <= 0) {
+        const onPlayerAttack: OnPlayerAttack = (player, item) => {
+          if (
+            hitCooldownCounter <= 0 &&
+            item?.animationName !== 'bow' &&
+            item?.animationName !== 'shoot'
+          ) {
             const xDiff = player.body.position.x - body.position.x
 
             if (Math.abs(xDiff) <= hitRadius) {
@@ -166,8 +170,19 @@ export const createArcherMob = createSpawnableEntity<
         }
 
         const onCollisionStart: OnCollisionStart = ([a, b]) => {
-          if ((a.uid === uid || b.uid === uid) && game.server) {
-            mobData.direction.value = -mobData.direction.value
+          if (a.uid === uid || b.uid === uid) {
+            const other = a.uid === uid ? b : a
+
+            if (other.tags.includes('Projectile')) {
+              netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              hitCooldownCounter = hitCooldown * 60
+
+              if (mobHealth - 1 <= 0) {
+                events.emit('onPlayerScore', maxHealth * 25)
+              }
+            }
+
+            if (game.server) direction.value = -direction.value
           }
         }
 

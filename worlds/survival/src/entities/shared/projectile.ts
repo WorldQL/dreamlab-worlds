@@ -40,7 +40,7 @@ export const createProjectile = createSpawnableEntity<
   Render
 >(
   ArgsSchema,
-  ({ uid, tags, transform }, { width, height, direction, spriteSource }) => {
+  ({ uid, transform }, { width, height, direction, spriteSource }) => {
     const { position, rotation, zIndex } = transform
 
     const body = Matter.Bodies.rectangle(
