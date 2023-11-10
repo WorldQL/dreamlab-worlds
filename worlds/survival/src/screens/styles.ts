@@ -107,8 +107,7 @@ export const styles: { [key: string]: CSSProperties } = {
     zIndex: 10,
   },
   heartIcon: {
-    fontSize: '28px',
-    marginLeft: '5px',
+    fontSize: '20px',
   },
   scoreContainer: {
     display: 'flex',

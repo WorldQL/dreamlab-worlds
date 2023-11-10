@@ -54,10 +54,8 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
   }, [playerManager])
 
   const handleStartOver = async () => {
-    playerManager.setScore(0)
     playerManager.setHealth(playerManager.getMaxHealth())
 
-    setScore(0)
     setHealth(playerManager.getHealth())
     player.teleport({ x: 0, y: 500 }, true)
   }
@@ -88,12 +86,12 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
           </div>
           <div style={styles.gameScreenContainer}>
             <div style={styles.scoreContainer}>
-              <span style={styles.gameScreenLabel}>🪙</span>
-              <span style={styles.score}>{gold}</span>
-            </div>
-            <div style={styles.scoreContainer}>
               <span style={styles.gameScreenLabel}>Score:</span>
               <span style={styles.score}>{score}</span>
+            </div>
+            <div style={styles.scoreContainer}>
+              <span style={styles.gameScreenLabel}>🪙</span>
+              <span style={styles.score}>{gold}</span>
             </div>
           </div>
         </>
