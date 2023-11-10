@@ -1,16 +1,20 @@
 import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
 import { events } from '../events'
 
-export interface ProjectileOptions {
-  projectiles: number
-  explosive: boolean
+export enum ProjectileTypes {
+  BURST_SHOT = 'BURST_SHOT',
+  DOUBLE_SCATTER_SHOT = 'DOUBLE_SCATTER_SHOT',
+  DOUBLE_SHOT = 'DOUBLE_SHOT',
+  EXPLOSIVE_SHOT = 'EXPLOSIVE_SHOT',
+  SCATTER_SHOT = 'SCATTER_SHOT',
+  SINGLE_SHOT = 'SINGLE_SHOT',
 }
 
 export interface InventoryItem {
   baseItem: PlayerItem
   damage: number
   value: number | undefined // gold value
-  projectileOptions?: ProjectileOptions
+  projectileType?: ProjectileTypes
 }
 
 export type InventoryData = (InventoryItem | undefined)[]
@@ -62,7 +66,7 @@ class InventoryManager {
 
   public getItemFromItem(baseItem: PlayerItem) {
     for (const item of this.inventoryData) {
-      if ((item!.baseItem = baseItem)) return item
+      if (item?.baseItem?.displayName === baseItem?.displayName) return item
     }
 
     return undefined

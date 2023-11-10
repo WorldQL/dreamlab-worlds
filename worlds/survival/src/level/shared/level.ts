@@ -129,6 +129,7 @@ export const level: LooseSpawnableDefinition[] = [
       spriteSource: '/worlds/survival/assets/items/bow.png',
       displayName: 'Gold Bow',
       animationName: 'bow',
+      projectileType: 'SINGLE_SHOT',
     },
     transform: {
       position: { x: 800, y: 300 },
@@ -140,9 +141,10 @@ export const level: LooseSpawnableDefinition[] = [
     args: {
       width: 200,
       height: 200,
-      spriteSource: '/worlds/survival/assets/items/katana.png',
-      displayName: 'Katana',
-      animationName: 'greatsword',
+      spriteSource: '/worlds/survival/assets/items/bow.png',
+      displayName: 'DOBULE',
+      animationName: 'bow',
+      projectileType: 'SCATTER_SHOT',
     },
     transform: {
       position: { x: 1_300, y: 300 },
@@ -155,8 +157,9 @@ export const level: LooseSpawnableDefinition[] = [
       width: 200,
       height: 200,
       spriteSource: '/worlds/survival/assets/items/bow.png',
-      displayName: 'Gold Bow',
+      displayName: 'BURST',
       animationName: 'bow',
+      projectileType: 'DOUBLE_SCATTER_SHOT',
     },
     transform: {
       position: { x: 1_800, y: 300 },

@@ -41,7 +41,7 @@ export const createProjectile = createSpawnableEntity<
 >(
   ArgsSchema,
   ({ uid, tags, transform }, { width, height, direction, spriteSource }) => {
-    const { position, zIndex } = transform
+    const { position, rotation, zIndex } = transform
 
     const body = Matter.Bodies.rectangle(
       position.x,
@@ -59,7 +59,7 @@ export const createProjectile = createSpawnableEntity<
     )
 
     return {
-      tags,
+      tags: ['Projectile'],
 
       transform: cloneTransform(transform),
 
@@ -76,7 +76,11 @@ export const createProjectile = createSpawnableEntity<
 
         const onCollisionStart: OnCollisionStart = async ([a, b]) => {
           if (a.uid === uid || b.uid === uid) {
-            await game.destroy(this as SpawnableEntity)
+            const other = a.uid === uid ? b : a
+
+            if (!other.tags.includes('Projectile')) {
+              await game.destroy(this as SpawnableEntity)
+            }
           }
         }
 
@@ -126,11 +130,13 @@ export const createProjectile = createSpawnableEntity<
       },
 
       onPhysicsStep(_) {
-        Matter.Body.setAngle(body, 0)
-        Matter.Body.setAngularVelocity(body, 0)
+        Matter.Body.setAngle(body, rotation)
 
         const speed = 50
-        const velocity = { x: speed * direction, y: 0 }
+        const velocity = {
+          x: speed * Math.cos(rotation) * direction,
+          y: speed * Math.sin(rotation),
+        }
         Matter.Body.setVelocity(body, velocity)
       },
 

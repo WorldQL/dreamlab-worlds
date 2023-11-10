@@ -12,7 +12,12 @@ import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 import type { Sprite } from 'pixi.js'
 import { events } from '../../events'
+import { ProjectileTypes } from '../../inventory/InventoryManager'
 import type { InventoryItem } from '../../inventory/InventoryManager'
+
+const projectileTypeValues = Object.values(ProjectileTypes).filter(
+  value => typeof value === 'string',
+) as [string, ...string[]]
 
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
@@ -26,7 +31,7 @@ const ArgsSchema = z.object({
   anchorX: z.number().default(0.5),
   anchorY: z.number().default(0.5),
   speedMultiplier: z.number().optional(),
-  projectiles: z.number().default(1).optional(),
+  projectileType: z.enum(projectileTypeValues).optional(),
 })
 
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
@@ -151,6 +156,10 @@ export const createPickupItem = createSpawnableEntity<
             baseItem: newItem,
             damage: args.damage,
             value: 100,
+            projectileType:
+              ProjectileTypes[
+                args.projectileType as keyof typeof ProjectileTypes
+              ],
           }
 
           events.emit('onPlayerNearItem', player, inventoryItem)
