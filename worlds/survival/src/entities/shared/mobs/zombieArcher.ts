@@ -37,6 +37,8 @@ interface MobData {
   health: SyncedValue<number>
   direction: SyncedValue<number>
   projectileCooldownCounter: SyncedValue<number>
+  currentPatrolDistance: SyncedValue<number>
+  patrolDirection: SyncedValue<number>
 }
 
 type OnPlayerAttack = EventHandler<'onPlayerAttack'>
@@ -90,6 +92,7 @@ export const createArcherMob = createSpawnableEntity<
       },
     )
 
+    const patrolDistance = 300
     let mobHealth = maxHealth
     const projectileCooldown = 2 * 60 // 2 seconds
     const hitRadius = width / 2 + 120
@@ -138,6 +141,13 @@ export const createArcherMob = createSpawnableEntity<
           health,
           direction,
           projectileCooldownCounter,
+          currentPatrolDistance: syncedValue(
+            game,
+            uid,
+            'currentPatrolDistance',
+            0,
+          ),
+          patrolDirection: syncedValue(game, uid, 'patrolDirection', 1),
         }
 
         const onPlayerAttack: OnPlayerAttack = (player, _item) => {
@@ -371,6 +381,23 @@ export const createArcherMob = createSpawnableEntity<
             x: speed * unitX,
             y: speed * unitY,
           })
+        } else {
+          // patrol back and fourth when player is far from entity
+          if (
+            mobData.currentPatrolDistance.value >= patrolDistance &&
+            game.server
+          ) {
+            mobData.patrolDirection.value *= -1
+            mobData.currentPatrolDistance.value = 0
+          }
+
+          Matter.Body.translate(body, {
+            x: (speed / 2) * mobData.patrolDirection.value,
+            y: 0,
+          })
+
+          if (game.server)
+            mobData.currentPatrolDistance.value += Math.abs(speed / 2)
         }
 
         if (game.server) {

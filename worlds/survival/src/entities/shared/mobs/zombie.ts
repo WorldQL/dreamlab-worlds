@@ -41,6 +41,11 @@ type OnPlayerAttack = EventHandler<'onPlayerAttack'>
 type OnCollisionStart = EventHandler<'onCollisionStart'>
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
 
+interface MobData {
+  currentPatrolDistance: SyncedValue<number>
+  patrolDirection: SyncedValue<number>
+}
+
 interface Data {
   game: Game<boolean>
   body: Matter.Body
@@ -52,6 +57,7 @@ interface Data {
   onPlayerAttack: OnPlayerAttack
   onCollisionStart: OnCollisionStart
   onPlayerCollisionStart: OnPlayerCollisionStart
+  mobData: MobData
 }
 
 interface Render {
@@ -95,6 +101,7 @@ export const createZombieMob = createSpawnableEntity<
       },
     )
 
+    const patrolDistance = 300
     const hitRadius = width / 2 + 220
     const hitCooldown = 1 // Second(s)
     let hitCooldownCounter = 0
@@ -175,6 +182,16 @@ export const createZombieMob = createSpawnableEntity<
           onPlayerCollisionStart,
         )
 
+        const mobData = {
+          currentPatrolDistance: syncedValue(
+            game,
+            uid,
+            'currentPatrolDistance',
+            0,
+          ),
+          patrolDirection: syncedValue(game, uid, 'patrolDirection', 1),
+        }
+
         const onHitServer: MessageListenerServer = async (
           { peerID },
           _,
@@ -233,6 +250,7 @@ export const createZombieMob = createSpawnableEntity<
           onPlayerAttack,
           onCollisionStart,
           onPlayerCollisionStart,
+          mobData,
         }
       },
 
@@ -318,7 +336,7 @@ export const createZombieMob = createSpawnableEntity<
         ctrHealth.destroy({ children: true })
       },
 
-      async onPhysicsStep(_, { game }) {
+      async onPhysicsStep(_, { game, mobData }) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
@@ -355,6 +373,23 @@ export const createZombieMob = createSpawnableEntity<
             x: speed * unitX,
             y: speed * unitY,
           })
+        } else {
+          // patrol back and fourth when player is far from entity
+          if (
+            mobData.currentPatrolDistance.value >= patrolDistance &&
+            game.server
+          ) {
+            mobData.patrolDirection.value *= -1
+            mobData.currentPatrolDistance.value = 0
+          }
+
+          Matter.Body.translate(body, {
+            x: (speed / 2) * mobData.patrolDirection.value,
+            y: 0,
+          })
+
+          if (game.server)
+            mobData.currentPatrolDistance.value += Math.abs(speed / 2)
         }
 
         if (game.server && (!closestPlayer || minDistance > 6_000)) {
