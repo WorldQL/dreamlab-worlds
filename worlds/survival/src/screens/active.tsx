@@ -1,4 +1,3 @@
-import { onlyNetClient } from '@dreamlab.gg/core/dist/network'
 import { useEffect, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events'
 import PlayerManager from '../managers/playerData'
@@ -12,9 +11,6 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
   const [gold, setGold] = useState(playerManager.getGold())
   const [health, setHealth] = useState(playerManager.getHealth())
   const [showDamage, setShowDamage] = useState(false)
-
-  const PLAY_CHANNEL = 'game/start'
-  const netClient = onlyNetClient(game)
 
   useEffect(() => {
     const scoreListener = (newScore: number) => {
@@ -64,7 +60,6 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
     setScore(0)
     setHealth(playerManager.getHealth())
     player.teleport({ x: 0, y: 500 }, true)
-    netClient?.sendCustomMessage(PLAY_CHANNEL, {})
   }
 
   return (
