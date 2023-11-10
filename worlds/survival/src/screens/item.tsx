@@ -117,13 +117,17 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
 
   return (
     <div style={overlayStyle}>
-      {/* <img
-        alt={currentItem.baseItem?.displayName}
-        src={currentItem.baseItem?.textureURL}
-        style={styles.itemTexture}
-      /> */}
       <div style={styles.itemInfo}>
         <span style={styles.itemName}>{currentItem.baseItem?.displayName}</span>
+        <div style={styles.statsSection}>
+          <span style={styles.statName}>Stats:</span>
+          <span style={styles.statValue}>Damage: {currentItem.damage}</span>
+          {currentItem.projectileType && (
+            <span style={styles.statValue}>
+              Barrel: {currentItem.projectileType}
+            </span>
+          )}
+        </div>
         <span style={styles.loreSection}>{currentItem.lore}</span>
         <span style={styles.pickupPrompt}>{promptMessage}</span>
       </div>
