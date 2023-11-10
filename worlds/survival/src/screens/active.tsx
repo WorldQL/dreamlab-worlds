@@ -58,8 +58,11 @@ export const GameScreen: React.FC<ScreenProps> = ({ game, player }) => {
   }, [playerManager])
 
   const handleStartOver = async () => {
+    playerManager.setScore(0)
+    playerManager.setHealth(playerManager.getMaxHealth())
+
     setScore(0)
-    setHealth(5)
+    setHealth(playerManager.getHealth())
     player.teleport({ x: 0, y: 500 }, true)
     netClient?.sendCustomMessage(PLAY_CHANNEL, {})
   }
