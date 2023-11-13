@@ -19,7 +19,7 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
   const renderTooltipContent = () => {
     if (!slot?.baseItem) return null
 
-    const { baseItem, damage, projectileOptions } = slot
+    const { baseItem, damage, projectileType } = slot
     const { displayName, itemOptions } = baseItem
 
     return (
@@ -27,12 +27,7 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
         <div>{displayName}</div>
         <div>Damage: {damage}</div>
         <div>Attack Speed: {itemOptions?.speedMultiplier ?? 1}</div>
-        {projectileOptions && (
-          <>
-            <div>Projectiles: {projectileOptions.projectiles}</div>
-            <div>Explosive: {projectileOptions.explosive ? 'Yes' : 'No'}</div>
-          </>
-        )}
+        {projectileType && <div>Barrel: {projectileType}</div>}
       </div>
     )
   }
