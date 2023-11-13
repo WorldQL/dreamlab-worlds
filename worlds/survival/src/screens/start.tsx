@@ -1,9 +1,8 @@
 import type { Game } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
-import { isPlayer } from '@dreamlab.gg/core/dist/entities'
-import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
-import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
-import React, { useState } from 'https://esm.sh/react@18.2.0'
+import { renderUI, useGame, usePlayer } from '@dreamlab.gg/ui/react'
+import type { CSSProperties, FC } from 'https://esm.sh/react@18.2.0'
+import { useState } from 'https://esm.sh/react@18.2.0'
 import { GameScreen } from './active'
 import { styles } from './styles'
 
@@ -12,7 +11,10 @@ export interface ScreenProps {
   player: Player
 }
 
-const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
+const StartScreen: FC = () => {
+  const game = useGame()
+  const player = usePlayer()
+
   const [hovered, setHovered] = useState(false)
   const [active, setActive] = useState(false)
   const [gameStarted, setGameStarted] = useState(false)
@@ -39,7 +41,7 @@ const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
     return style
   }
 
-  if (gameStarted) {
+  if (player && gameStarted) {
     return <GameScreen game={game} player={player} />
   }
 
@@ -47,35 +49,29 @@ const StartScreen: React.FC<ScreenProps> = ({ game, player }) => {
     <div style={styles.container}>
       <div style={styles.backgroundAnimation} />
       <div style={styles.content}>
-        <button
-          onClick={handlePlayClick}
-          onMouseDown={() => setActive(true)}
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => {
-            setHovered(false)
-            setActive(false)
-          }}
-          onMouseUp={() => setActive(false)}
-          style={{
-            ...getButtonStyles(hovered, active),
-          }}
-          type='button'
-        >
-          Play
-        </button>
+        {!player ? (
+          <div style={getButtonStyles(hovered, active)}>Loading...</div>
+        ) : (
+          <button
+            onClick={handlePlayClick}
+            onMouseDown={() => setActive(true)}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => {
+              setHovered(false)
+              setActive(false)
+            }}
+            onMouseUp={() => setActive(false)}
+            style={getButtonStyles(hovered, active)}
+            type='button'
+          >
+            Play
+          </button>
+        )}
       </div>
     </div>
   )
 }
 
 export const initializeStartScreen = (game: Game<false>) => {
-  game.events.common.addListener('onInstantiate', (entity: unknown) => {
-    if (isPlayer(entity)) {
-      const uiContainer = document.createElement('div')
-      game.client.ui.add(uiContainer)
-      createRoot(uiContainer).render(
-        <StartScreen game={game} player={entity} />,
-      )
-    }
-  })
+  renderUI(game, <StartScreen />)
 }
