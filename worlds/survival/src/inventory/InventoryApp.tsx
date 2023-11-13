@@ -1,9 +1,6 @@
-import type { Game } from '@dreamlab.gg/core'
-import type { Player } from '@dreamlab.gg/core/dist/entities'
-import { isPlayer } from '@dreamlab.gg/core/dist/entities'
-import type { InputCode } from '@dreamlab.gg/core/dist/input'
-import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
-import React, {
+import { usePlayer } from '@dreamlab.gg/ui/dist/react'
+import type { FC } from 'https://esm.sh/react@18.2.0'
+import {
   createContext,
   useCallback,
   useContext,
@@ -26,7 +23,7 @@ import {
 } from './listeners/InventoryDrag.js'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const GameContext = createContext<any | null>(null)
+export const GameContext = createContext<any | null>(null)
 
 const useGameEventListener = (
   source: 'common' | 'inputs',
@@ -49,7 +46,8 @@ const useGameEventListener = (
   }, [source, event, handler, game])
 }
 
-const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
+export const InventoryApp: FC = () => {
+  const player = usePlayer()
   const [inventoryData, setInventoryData] = useState(
     InventoryManager.getInstance().getInventoryData(),
   )
@@ -60,7 +58,6 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
 
   const commonEventProps = {
     inventoryData,
-    player,
     activeSlot,
   }
 
@@ -74,7 +71,7 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
 
   const onInventoryDigits = useCallback(
     (digit: number, pressed: boolean) => {
-      if (!pressed) return
+      if (!pressed || !player) return
       const idx = digit - 1
       setActiveSlot(idx)
       player.setItemInHand(inventoryData[idx]?.baseItem)
@@ -85,7 +82,7 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
   useEffect(() => {
     const updateInventory = () => {
       setInventoryData([...InventoryManager.getInstance().getInventoryData()])
-      player.setItemInHand(inventoryData[activeSlot]?.baseItem)
+      player?.setItemInHand(inventoryData[activeSlot]?.baseItem)
     }
 
     events.addListener('onInventoryUpdate', updateInventory)
@@ -121,7 +118,7 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
   }
 
   const handleDragEndEvent = (slotIndex: number) => {
-    if (sourceSlot === null) return
+    if (sourceSlot === null || !player) return
     if (sourceSlot === slotIndex) {
       setSourceSlot(null)
       return
@@ -132,6 +129,7 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
 
     const event: InventoryDragEndEvent = {
       ...commonEventProps,
+      player,
       cursorSlot: slotIndex,
       sourceSlot,
       targetSlot: slotIndex,
@@ -143,49 +141,24 @@ const InventoryApp: React.FC<{ player: Player }> = ({ player }) => {
 
   return (
     <>
-      <InventoryHotbar activeSlot={activeSlot} inventoryData={inventoryData} />
-      {isInventoryOpen && (
-        <Inventory
-          data={inventoryData}
-          onClick={handleClick}
-          onDragEnd={handleDragEndEvent}
-          onDragStart={handleDragStartEvent}
-        />
+      {!player ? (
+        <div>Loading...</div>
+      ) : (
+        <>
+          <InventoryHotbar
+            activeSlot={activeSlot}
+            inventoryData={inventoryData}
+          />
+          {isInventoryOpen && (
+            <Inventory
+              data={inventoryData}
+              onClick={handleClick}
+              onDragEnd={handleDragEndEvent}
+              onDragStart={handleDragStartEvent}
+            />
+          )}
+        </>
       )}
     </>
   )
-}
-
-export const initializeGameUI = (game: Game<false>) => {
-  // here we register the inputs
-  const registerInput = (input: string, key: InputCode) =>
-    game.client?.inputs.registerInput(input, key)
-
-  const digits = Array.from({ length: 9 }, (_, index) => 'digit' + (index + 1))
-  const keys: InputCode[] = [
-    'KeyE',
-    ...Array.from(
-      { length: 9 },
-      (_, index) => `Digit${index + 1}` as InputCode,
-    ),
-  ]
-
-  for (const [index, input] of ['open', ...digits].entries()) {
-    const key = keys[index]
-    if (key) {
-      registerInput(`@inventory/${input}`, key)
-    }
-  }
-
-  game.events.common.addListener('onInstantiate', (entity: unknown) => {
-    if (isPlayer(entity)) {
-      const uiContainer = document.createElement('div')
-      game.client.ui.add(uiContainer)
-      createRoot(uiContainer).render(
-        <GameContext.Provider value={game}>
-          <InventoryApp player={entity} />
-        </GameContext.Provider>,
-      )
-    }
-  })
 }

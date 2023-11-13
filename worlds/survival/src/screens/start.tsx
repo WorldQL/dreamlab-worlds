@@ -1,9 +1,12 @@
 import type { Game } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
+import type { InputCode } from '@dreamlab.gg/core/dist/input'
 import { renderUI, useGame, usePlayer } from '@dreamlab.gg/ui/react'
 import type { CSSProperties, FC } from 'https://esm.sh/react@18.2.0'
 import { useState } from 'https://esm.sh/react@18.2.0'
+import { GameContext, InventoryApp } from '../inventory/InventoryApp'
 import { GameScreen } from './active'
+import { ItemScreen } from './item'
 import { styles } from './styles'
 
 export interface ScreenProps {
@@ -72,6 +75,34 @@ const StartScreen: FC = () => {
   )
 }
 
-export const initializeStartScreen = (game: Game<false>) => {
-  renderUI(game, <StartScreen />)
+export const initializeUI = (game: Game<false>) => {
+  const registerInput = (input: string, key: InputCode) =>
+    game.client?.inputs.registerInput(input, key)
+
+  const digits = Array.from({ length: 9 }, (_, index) => 'digit' + (index + 1))
+  const keys: InputCode[] = [
+    'KeyE',
+    ...Array.from(
+      { length: 9 },
+      (_, index) => `Digit${index + 1}` as InputCode,
+    ),
+  ]
+
+  for (const [index, input] of ['open', ...digits].entries()) {
+    const key = keys[index]
+    if (key) {
+      registerInput(`@inventory/${input}`, key)
+    }
+  }
+
+  renderUI(
+    game,
+    <>
+      <StartScreen />
+      <GameContext.Provider value={game}>
+        <InventoryApp />
+      </GameContext.Provider>
+      <ItemScreen game={game} item={undefined} />
+    </>,
+  )
 }

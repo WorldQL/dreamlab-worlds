@@ -1,8 +1,8 @@
 import type { Game } from '@dreamlab.gg/core'
-import { isPlayer } from '@dreamlab.gg/core/dist/entities'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
-import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client'
-import React, { useEffect, useRef, useState } from 'https://esm.sh/react@18.2.0'
+import { usePlayer } from '@dreamlab.gg/ui/dist/react'
+import type { FC } from 'https://esm.sh/react@18.2.0'
+import { useEffect, useRef, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events'
 import type { InventoryItem } from '../inventory/InventoryManager'
 import InventoryManager from '../inventory/InventoryManager'
@@ -11,15 +11,11 @@ import { styles } from './styles'
 
 interface ItemScreenProps {
   game: Game<false>
-  player: Player
   item: InventoryItem | undefined
 }
 
-export const ItemScreen: React.FC<ItemScreenProps> = ({
-  game,
-  player,
-  item,
-}) => {
+export const ItemScreen: FC<ItemScreenProps> = ({ game, item }) => {
+  const player = usePlayer()
   const [purchaseComplete, setPurchaseComplete] = useState(false)
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
   const [prompt, setPrompt] = useState('')
@@ -51,6 +47,7 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
         // ignore if key up, only respond to key down
         return
       }
+
       const itemToPickup = itemRef.current
       if (itemToPickup) {
         if (
@@ -125,15 +122,4 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
       </div>
     </div>
   )
-}
-
-export const initializeItemScreen = (game: Game<false>) => {
-  game.events.common.addListener('onInstantiate', (entity: unknown) => {
-    if (isPlayer(entity)) {
-      const uiContainer = document.createElement('div')
-      game.client.ui.add(uiContainer)
-      const root = createRoot(uiContainer)
-      root.render(<ItemScreen game={game} item={undefined} player={entity} />)
-    }
-  })
 }
