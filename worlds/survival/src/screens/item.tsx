@@ -26,7 +26,6 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
   const [currentItem, setCurrentItem] = useState<InventoryItem | undefined>(
     item,
   )
-  const confirmTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const itemRef = useRef<InventoryItem | undefined>(item)
   const playerManager = PlayerManager.getInstance()
   const inventoryManager = InventoryManager.getInstance()
@@ -47,27 +46,23 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
       )
     }
 
-    const itemConfirmListener = () => {
+    const itemConfirmListener = (keyDown: boolean) => {
+      if (!keyDown) {
+        // ignore if key up, only respond to key down
+        return
+      }
       const itemToPickup = itemRef.current
       if (itemToPickup) {
-        if (confirmTimeoutRef.current) {
-          clearTimeout(confirmTimeoutRef.current)
-          confirmTimeoutRef.current = null
-        }
-
         if (
           itemToPickup.value &&
           itemToPickup.value > 0 &&
           !awaitingConfirmation &&
           !purchaseComplete
         ) {
-          confirmTimeoutRef.current = setTimeout(() => {
-            setPrompt(
-              `Confirm purchase of ${itemToPickup.baseItem?.displayName} for ${itemToPickup.value}🪙? Press F again to confirm.`,
-            )
-            setAwaitingConfirmation(true)
-            confirmTimeoutRef.current = null
-          }, 150)
+          setPrompt(
+            `Confirm purchase of ${itemToPickup.baseItem?.displayName} for ${itemToPickup.value}🪙? Press F again to confirm.`,
+          )
+          setAwaitingConfirmation(true)
         } else if (
           itemToPickup.value &&
           itemToPickup.value > 0 &&
@@ -98,9 +93,6 @@ export const ItemScreen: React.FC<ItemScreenProps> = ({
     return () => {
       events.removeListener('onPlayerNearItem', itemListener)
       game.client.inputs.removeListener('@survival/pickup', itemConfirmListener)
-      if (confirmTimeoutRef.current) {
-        clearTimeout(confirmTimeoutRef.current)
-      }
     }
   }, [
     game.client.inputs,
