@@ -4,7 +4,7 @@ import type { InputCode } from '@dreamlab.gg/core/dist/input'
 import { renderUI, useGame, usePlayer } from '@dreamlab.gg/ui/react'
 import type { CSSProperties, FC } from 'https://esm.sh/react@18.2.0'
 import { useState } from 'https://esm.sh/react@18.2.0'
-import { GameContext, InventoryApp } from '../inventory/InventoryApp'
+import { InventoryApp } from '../inventory/InventoryApp'
 import { GameScreen } from './active'
 import { ItemScreen } from './item'
 import { styles } from './styles'
@@ -99,9 +99,7 @@ export const initializeUI = (game: Game<false>) => {
     game,
     <>
       <StartScreen />
-      <GameContext.Provider value={game}>
-        <InventoryApp />
-      </GameContext.Provider>
+      <InventoryApp />
       <ItemScreen game={game} item={undefined} />
     </>,
   )

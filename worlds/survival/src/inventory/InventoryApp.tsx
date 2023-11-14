@@ -1,12 +1,6 @@
-import { usePlayer } from '@dreamlab.gg/ui/dist/react'
+import { useInput, usePlayer } from '@dreamlab.gg/ui/react'
 import type { FC } from 'https://esm.sh/react@18.2.0'
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'https://esm.sh/react@18.2.0'
+import { useCallback, useEffect, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events.js'
 import Inventory from './Inventory.js'
 import InventoryHotbar from './InventoryHotbar.js'
@@ -21,30 +15,6 @@ import {
   handleInventoryDragEnd,
   handleInventoryDragStart,
 } from './listeners/InventoryDrag.js'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const GameContext = createContext<any | null>(null)
-
-const useGameEventListener = (
-  source: 'common' | 'inputs',
-  event: unknown,
-  handler: unknown,
-) => {
-  const game = useContext(GameContext)
-
-  useEffect(() => {
-    switch (source) {
-      case 'inputs':
-        game.client.inputs.addListener(event, handler)
-        return () => game.client.inputs.removeListener(event, handler)
-      case 'common':
-        game.events.common.addListener(event, handler)
-        return () => game.events.common.removeListener(event, handler)
-      default:
-        throw new Error(`Unsupported event source: ${source}`)
-    }
-  }, [source, event, handler, game])
-}
 
 export const InventoryApp: FC = () => {
   const player = usePlayer()
@@ -92,10 +62,10 @@ export const InventoryApp: FC = () => {
     }
   }, [activeSlot, inventoryData, player])
 
-  useGameEventListener('inputs', '@inventory/open', onInventoryOpen)
+  useInput('@inventory/open', onInventoryOpen)
   for (let index = 0; index <= 9; index++) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    useGameEventListener('inputs', `@inventory/digit${index}`, (va: boolean) =>
+    useInput(`@inventory/digit${index}`, (va: boolean) =>
       onInventoryDigits(index, va),
     )
   }
