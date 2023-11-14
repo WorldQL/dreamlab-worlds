@@ -107,7 +107,8 @@ export const styles: { [key: string]: CSSProperties } = {
     zIndex: 10,
   },
   heartIcon: {
-    fontSize: '20px',
+    fontSize: '24px',
+    color: 'red',
   },
   scoreContainer: {
     display: 'flex',
@@ -147,7 +148,7 @@ export const styles: { [key: string]: CSSProperties } = {
   },
   gameScreenContainer: {
     position: 'absolute',
-    top: '5%',
+    top: '10%',
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
