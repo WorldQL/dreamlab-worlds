@@ -27,8 +27,6 @@ export const ItemScreen: FC<ItemScreenProps> = ({ game, item }) => {
   const inventoryManager = InventoryManager.getInstance()
 
   useEffect(() => {
-    game.client?.inputs.registerInput('@survival/pickup', 'KeyF')
-
     const itemListener = (
       _player: Player,
       newItem: InventoryItem | undefined,

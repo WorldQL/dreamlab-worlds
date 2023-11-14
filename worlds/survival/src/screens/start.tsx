@@ -76,8 +76,8 @@ const StartScreen: FC = () => {
 }
 
 export const initializeUI = (game: Game<false>) => {
-  const registerInput = (input: string, key: InputCode) =>
-    game.client?.inputs.registerInput(input, key)
+  const registerInput = (input: string, name: string, defaultKey: InputCode) =>
+    game.client?.inputs.registerInput(input, name, defaultKey)
 
   const digits = Array.from({ length: 9 }, (_, index) => 'digit' + (index + 1))
   const keys: InputCode[] = [
@@ -87,13 +87,20 @@ export const initializeUI = (game: Game<false>) => {
       (_, index) => `Digit${index + 1}` as InputCode,
     ),
   ]
+  const inputNames = [
+    'Open Inventory',
+    ...digits.map(digit => `Select ${digit}`),
+  ]
 
   for (const [index, input] of ['open', ...digits].entries()) {
     const key = keys[index]
-    if (key) {
-      registerInput(`@inventory/${input}`, key)
+    const name = inputNames[index]
+    if (key && name) {
+      registerInput(`@inventory/${input}`, name, key)
     }
   }
+
+  registerInput('@survival/pickup', 'Item Pickup', 'KeyF')
 
   renderUI(
     game,

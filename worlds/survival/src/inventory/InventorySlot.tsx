@@ -20,13 +20,13 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
     if (!slot?.baseItem) return null
 
     const { baseItem, damage, projectileType } = slot
-    const { displayName, itemOptions } = baseItem
+    const { displayName, speedMultiplier } = baseItem
 
     return (
       <div>
         <div>{displayName}</div>
         <div>Damage: {damage}</div>
-        <div>Attack Speed: {itemOptions?.speedMultiplier ?? 1}</div>
+        <div>Attack Speed: {speedMultiplier ?? 1}</div>
         {projectileType && <div>Barrel: {projectileType}</div>}
       </div>
     )

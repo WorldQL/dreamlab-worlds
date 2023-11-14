@@ -3,7 +3,6 @@ import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import type { Camera } from '@dreamlab.gg/core/entities'
 import { createItem } from '@dreamlab.gg/core/managers'
-import type { ItemOptions } from '@dreamlab.gg/core/managers'
 import { cloneTransform, toRadians, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite } from '@dreamlab.gg/core/textures'
@@ -28,9 +27,10 @@ const ArgsSchema = z.object({
   spriteSource: z.string(),
   damage: z.number().default(1),
   lore: z.string().default('Default Item Lore'),
-  hand: z.enum(['left', 'right']).default('right'),
+  bone: z.enum(['handLeft', 'handRight']).default('handRight'),
   anchorX: z.number().default(0.5),
   anchorY: z.number().default(0.5),
+  rotation: z.number().default(0),
   speedMultiplier: z.number().optional(),
   projectileType: z.enum(projectileTypeValues).optional(),
 })
@@ -140,17 +140,15 @@ export const createPickupItem = createSpawnableEntity<
         _raw,
       ) => {
         if (body && bodyCollided === body && game.client) {
-          const itemOptions: ItemOptions = {
-            anchorX: args.anchorX,
-            anchorY: args.anchorY,
-            hand: args.hand,
-          }
-
           const newItem = createItem(
             args.displayName,
             args.spriteSource,
             args.animationName,
-            itemOptions,
+            args.speedMultiplier,
+            args.anchorX,
+            args.anchorY,
+            args.rotation,
+            args.bone,
           )
 
           const inventoryItem: InventoryItem = {
