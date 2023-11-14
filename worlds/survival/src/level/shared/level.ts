@@ -142,7 +142,7 @@ export const level: LooseSpawnableDefinition[] = [
     args: {
       width: 200,
       height: 200,
-      hand: 'left',
+      bone: 'handLeft',
       anchorX: 0.29,
       anchorY: 0.58,
       spriteSource: '/worlds/survival/assets/items/hand_cannon.png',
@@ -161,7 +161,7 @@ export const level: LooseSpawnableDefinition[] = [
     args: {
       width: 200,
       height: 200,
-      hand: 'left',
+      bone: 'handLeft',
       anchorX: 0.24,
       anchorY: 0.6,
       spriteSource: '/worlds/survival/assets/items/classic_revolver.png',
