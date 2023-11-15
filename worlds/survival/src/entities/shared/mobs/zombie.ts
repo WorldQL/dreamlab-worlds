@@ -13,6 +13,7 @@ import {
   onlyNetClient,
   onlyNetServer,
   syncedValue,
+  updateSyncedValue,
 } from '@dreamlab.gg/core/network'
 import type {
   MessageListenerClient,
@@ -46,8 +47,8 @@ type OnCollisionStart = EventHandler<'onCollisionStart'>
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
 
 interface MobData {
-  currentPatrolDistance: SyncedValue<number>
-  direction: SyncedValue<number>
+  currentPatrolDistance: number
+  direction: number
 }
 
 interface Data {
@@ -60,7 +61,8 @@ interface Data {
   onPlayerAttack: OnPlayerAttack
   onCollisionStart: OnCollisionStart
   onPlayerCollisionStart: OnPlayerCollisionStart
-  mobData: MobData
+  currentPatrolDistance: SyncedValue<number>
+  direction: SyncedValue<number>
 }
 
 interface Render {
@@ -146,15 +148,13 @@ export const createZombieMob = createSpawnableEntity<
 
         const netServer = onlyNetServer(game)
         const netClient = onlyNetClient(game)
-        const mobData = {
-          currentPatrolDistance: syncedValue(
-            game,
-            uid,
-            'currentPatrolDistance',
-            0,
-          ),
-          direction: syncedValue(game, uid, 'direction', 1),
-        }
+        const currentPatrolDistance = syncedValue(
+          game,
+          uid,
+          'currentPatrolDistance',
+          0,
+        )
+        const direction = syncedValue(game, uid, 'direction', 1)
 
         const onPlayerAttack: OnPlayerAttack = (player, item) => {
           if (
@@ -187,8 +187,6 @@ export const createZombieMob = createSpawnableEntity<
                 events.emit('onPlayerScore', maxHealth * 20)
               }
             }
-
-            if (game.server) mobData.direction.value = -mobData.direction.value
           }
         }
 
@@ -233,8 +231,7 @@ export const createZombieMob = createSpawnableEntity<
 
           if (!player) throw new Error('missing netplayer')
 
-          mobData.direction.value = body.position.x > player.position.x ? 1 : -1
-          const force = knockback * mobData.direction.value
+          const force = knockback * direction.value
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
           health -= 1
@@ -273,7 +270,8 @@ export const createZombieMob = createSpawnableEntity<
           onPlayerAttack,
           onCollisionStart,
           onPlayerCollisionStart,
-          mobData,
+          direction,
+          currentPatrolDistance,
         }
       },
 
@@ -375,11 +373,14 @@ export const createZombieMob = createSpawnableEntity<
         sprite.destroy()
       },
 
-      async onPhysicsStep(_, { game, mobData }) {
-        if (mobData.direction.value !== 1) {
+      async onPhysicsStep(_, { game, direction, currentPatrolDistance }) {
+        /*
+        console.log('running -- !!')
+        if (direction.value !== 1) {
           // This never runs!
-          console.log('direction: ' + mobData.direction.value)
+          console.log('direction: ' + direction.value)
         }
+        */
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
@@ -417,26 +418,22 @@ export const createZombieMob = createSpawnableEntity<
             y: speed * unitY,
           })
           if (game.server) {
-            mobData.direction.value =
+            direction.value =
               closestPlayer.position.x > body.position.x ? -1 : 1
           }
         } else {
           // patrol back and fourth when player is far from entity
-          if (
-            game.server &&
-            mobData.currentPatrolDistance.value >= patrolDistance
-          ) {
-            mobData.currentPatrolDistance.value = 0
-            mobData.direction.value *= -1
+          if (game.server && currentPatrolDistance.value >= patrolDistance) {
+            currentPatrolDistance.value = 0
+            direction.value *= -1
           }
 
           Matter.Body.translate(body, {
-            x: (speed / 2) * mobData.direction.value,
+            x: (speed / 2) * direction.value,
             y: 0,
           })
 
-          if (game.server)
-            mobData.currentPatrolDistance.value += Math.abs(speed / 2)
+          if (game.server) currentPatrolDistance.value += Math.abs(speed / 2)
         }
 
         if (game.server && (!closestPlayer || minDistance > 6_000)) {
@@ -446,14 +443,14 @@ export const createZombieMob = createSpawnableEntity<
 
       onRenderFrame(
         { smooth },
-        { game, body, mobData },
+        { game, body, direction },
         { camera, sprite, container, gfxHittest, gfxBounds, gfxHealthAmount },
       ) {
         const debug = game.debug
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
         const pos = Vec.add(smoothed, camera.offset)
 
-        sprite.scale.x = mobData.direction.value === 1 ? -0.9 : 0.9
+        sprite.scale.x = direction.value === 1 ? 1 : -1
 
         sprite.position = pos
         if (currentAnimation !== newAnimation) {
