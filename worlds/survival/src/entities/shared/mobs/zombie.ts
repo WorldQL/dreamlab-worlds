@@ -47,7 +47,7 @@ type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
 
 interface MobData {
   currentPatrolDistance: SyncedValue<number>
-  patrolDirection: SyncedValue<number>
+  direction: SyncedValue<number>
 }
 
 interface Data {
@@ -57,7 +57,6 @@ interface Data {
   onHitClient: MessageListenerClient
   netServer: NetServer | undefined
   netClient: NetClient | undefined
-  direction: SyncedValue<number>
   onPlayerAttack: OnPlayerAttack
   onCollisionStart: OnCollisionStart
   onPlayerCollisionStart: OnPlayerCollisionStart
@@ -147,7 +146,15 @@ export const createZombieMob = createSpawnableEntity<
 
         const netServer = onlyNetServer(game)
         const netClient = onlyNetClient(game)
-        const direction = syncedValue(game, uid, 'direction', 1)
+        const mobData = {
+          currentPatrolDistance: syncedValue(
+            game,
+            uid,
+            'currentPatrolDistance',
+            0,
+          ),
+          direction: syncedValue(game, uid, 'direction', 1),
+        }
 
         const onPlayerAttack: OnPlayerAttack = (player, item) => {
           if (
@@ -181,7 +188,7 @@ export const createZombieMob = createSpawnableEntity<
               }
             }
 
-            if (game.server) direction.value = -direction.value
+            if (game.server) mobData.direction.value = -mobData.direction.value
           }
         }
 
@@ -208,16 +215,6 @@ export const createZombieMob = createSpawnableEntity<
           onPlayerCollisionStart,
         )
 
-        const mobData = {
-          currentPatrolDistance: syncedValue(
-            game,
-            uid,
-            'currentPatrolDistance',
-            0,
-          ),
-          patrolDirection: syncedValue(game, uid, 'patrolDirection', 1),
-        }
-
         const onHitServer: MessageListenerServer = async (
           { peerID },
           _,
@@ -236,8 +233,8 @@ export const createZombieMob = createSpawnableEntity<
 
           if (!player) throw new Error('missing netplayer')
 
-          direction.value = body.position.x > player.position.x ? 1 : -1
-          const force = knockback * direction.value
+          mobData.direction.value = body.position.x > player.position.x ? 1 : -1
+          const force = knockback * mobData.direction.value
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
           health -= 1
@@ -273,7 +270,6 @@ export const createZombieMob = createSpawnableEntity<
           onHitClient,
           netServer,
           netClient,
-          direction,
           onPlayerAttack,
           onCollisionStart,
           onPlayerCollisionStart,
@@ -292,6 +288,7 @@ export const createZombieMob = createSpawnableEntity<
         zombieAnimations.recoil = spritesheetRecoil.textures
 
         const sprite = new AnimatedSprite(zombieAnimations[currentAnimation]!)
+        sprite.scale.set(0.9)
         sprite.gotoAndPlay(0)
         sprite.anchor.set(0.45, 0.535)
         const container = new Container()
@@ -415,18 +412,22 @@ export const createZombieMob = createSpawnableEntity<
             x: speed * unitX,
             y: speed * unitY,
           })
+          if (game.server) {
+            mobData.direction.value =
+              closestPlayer.position.x > body.position.x ? -1 : 1
+          }
         } else {
           // patrol back and fourth when player is far from entity
           if (
-            mobData.currentPatrolDistance.value >= patrolDistance &&
-            game.server
+            game.server &&
+            mobData.currentPatrolDistance.value >= patrolDistance
           ) {
-            mobData.patrolDirection.value *= -1
             mobData.currentPatrolDistance.value = 0
+            mobData.direction.value *= -1
           }
 
           Matter.Body.translate(body, {
-            x: (speed / 2) * mobData.patrolDirection.value,
+            x: (speed / 2) * mobData.direction.value,
             y: 0,
           })
 
@@ -441,12 +442,14 @@ export const createZombieMob = createSpawnableEntity<
 
       onRenderFrame(
         { smooth },
-        { game, body },
+        { game, body, mobData },
         { camera, sprite, container, gfxHittest, gfxBounds, gfxHealthAmount },
       ) {
         const debug = game.debug
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
         const pos = Vec.add(smoothed, camera.offset)
+
+        sprite.scale.x = mobData.direction.value === 1 ? -0.9 : 0.9
 
         sprite.position = pos
         if (currentAnimation !== newAnimation) {
