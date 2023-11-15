@@ -2,8 +2,8 @@ import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import { createSpawnableEntity, isEntity } from '@dreamlab.gg/core'
 import { z } from '@dreamlab.gg/core/dist/sdk'
 import {
-  SpriteSourceSchema,
   loadPlayerSpritesheet,
+  SpriteSourceSchema,
 } from '@dreamlab.gg/core/dist/textures'
 import type { Camera } from '@dreamlab.gg/core/entities'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
@@ -27,14 +27,8 @@ import {
   drawCircle,
 } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
-import {
-  AnimatedSprite,
-  Container,
-  Graphics,
-  Resource,
-  Sprite,
-  Texture,
-} from 'pixi.js'
+import type { Resource, Texture } from 'pixi.js'
+import { AnimatedSprite, Container, Graphics } from 'pixi.js'
 import { events } from '../../../events'
 
 type Args = typeof ArgsSchema
@@ -80,7 +74,7 @@ interface Render {
   sprite: AnimatedSprite
 }
 
-type zombieAnimations = 'walk' | 'recoil' | 'hitting';
+type zombieAnimations = 'hitting' | 'recoil' | 'walk'
 
 const zombieSymbol = Symbol.for('@dreamlab/core/entities/zombie')
 export const isZombie = (
@@ -125,8 +119,8 @@ export const createZombieMob = createSpawnableEntity<
     let health = maxHealth
 
     const zombieAnimations: Record<string, Texture<Resource>[]> = {}
-    let currentAnimation: zombieAnimations = 'walk';
-    let newAnimation: zombieAnimations = 'walk';
+    let currentAnimation: zombieAnimations = 'walk'
+    let newAnimation: zombieAnimations = 'walk'
 
     return {
       [zombieSymbol]: true,
@@ -255,7 +249,7 @@ export const createZombieMob = createSpawnableEntity<
         }
 
         const onHitClient: MessageListenerClient = (_, data) => {
-          newAnimation = 'recoil';
+          newAnimation = 'recoil'
           const network = netClient
           if (!network) throw new Error('missing network')
 
@@ -291,11 +285,11 @@ export const createZombieMob = createSpawnableEntity<
         const spritesheetwalk = await loadPlayerSpritesheet(
           '/animations/z1walk.json',
         )
-        zombieAnimations['walk'] = spritesheetwalk.textures
+        zombieAnimations.walk = spritesheetwalk.textures
         const spritesheetRecoil = await loadPlayerSpritesheet(
           '/animations/z1hitreact.json',
         )
-        zombieAnimations['recoil'] = spritesheetRecoil.textures
+        zombieAnimations.recoil = spritesheetRecoil.textures
 
         const sprite = new AnimatedSprite(zombieAnimations[currentAnimation]!)
         sprite.gotoAndPlay(0)
@@ -458,11 +452,14 @@ export const createZombieMob = createSpawnableEntity<
         if (currentAnimation !== newAnimation) {
           console.log('switching animation for zombie')
           currentAnimation = newAnimation
-          sprite.textures = zombieAnimations[currentAnimation]!;
+          sprite.textures = zombieAnimations[currentAnimation]!
           sprite.gotoAndPlay(0)
         }
-        
-        if (currentAnimation == 'recoil' && sprite.currentFrame == sprite.totalFrames - 1) {
+
+        if (
+          currentAnimation === 'recoil' &&
+          sprite.currentFrame === sprite.totalFrames - 1
+        ) {
           newAnimation = 'walk'
         }
 
