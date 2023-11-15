@@ -376,6 +376,10 @@ export const createZombieMob = createSpawnableEntity<
       },
 
       async onPhysicsStep(_, { game, mobData }) {
+        if (mobData.direction.value !== 1) {
+          // This never runs!
+          console.log('direction: ' + mobData.direction.value)
+        }
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
