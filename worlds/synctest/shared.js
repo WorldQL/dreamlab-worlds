@@ -28,6 +28,10 @@ const createServerTime = createSpawnableEntity(
         return tags
       },
 
+      isPointInside() {
+        return false;
+      },
+
       isInBounds() {
         return false
       },
