@@ -1,7 +1,10 @@
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import { createSpawnableEntity, isEntity } from '@dreamlab.gg/core'
 import { z } from '@dreamlab.gg/core/dist/sdk'
-import { SpriteSourceSchema } from '@dreamlab.gg/core/dist/textures'
+import {
+  SpriteSourceSchema,
+  loadPlayerSpritesheet,
+} from '@dreamlab.gg/core/dist/textures'
 import type { Camera } from '@dreamlab.gg/core/entities'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import type { EventHandler } from '@dreamlab.gg/core/events'
@@ -24,7 +27,14 @@ import {
   drawCircle,
 } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
-import { Container, Graphics } from 'pixi.js'
+import {
+  AnimatedSprite,
+  Container,
+  Graphics,
+  Resource,
+  Sprite,
+  Texture,
+} from 'pixi.js'
 import { events } from '../../../events'
 
 type Args = typeof ArgsSchema
@@ -67,7 +77,10 @@ interface Render {
   gfxHittest: Graphics
   ctrHealth: Container
   gfxHealthAmount: Graphics
+  sprite: AnimatedSprite
 }
+
+type zombieAnimations = 'walk' | 'recoil' | 'hitting';
 
 const zombieSymbol = Symbol.for('@dreamlab/core/entities/zombie')
 export const isZombie = (
@@ -110,6 +123,10 @@ export const createZombieMob = createSpawnableEntity<
     const healthIndicatorHeight = 20
 
     let health = maxHealth
+
+    const zombieAnimations: Record<string, Texture<Resource>[]> = {}
+    let currentAnimation: zombieAnimations = 'walk';
+    let newAnimation: zombieAnimations = 'walk';
 
     return {
       [zombieSymbol]: true,
@@ -238,6 +255,7 @@ export const createZombieMob = createSpawnableEntity<
         }
 
         const onHitClient: MessageListenerClient = (_, data) => {
+          newAnimation = 'recoil';
           const network = netClient
           if (!network) throw new Error('missing network')
 
@@ -269,7 +287,19 @@ export const createZombieMob = createSpawnableEntity<
         }
       },
 
-      initRenderContext(_, { camera, stage }) {
+      initRenderContext: async (_, { camera, stage }) => {
+        const spritesheetwalk = await loadPlayerSpritesheet(
+          '/animations/z1walk.json',
+        )
+        zombieAnimations['walk'] = spritesheetwalk.textures
+        const spritesheetRecoil = await loadPlayerSpritesheet(
+          '/animations/z1hitreact.json',
+        )
+        zombieAnimations['recoil'] = spritesheetRecoil.textures
+
+        const sprite = new AnimatedSprite(zombieAnimations[currentAnimation]!)
+        sprite.gotoAndPlay(0)
+        sprite.anchor.set(0.45, 0.535)
         const container = new Container()
         container.sortableChildren = true
         container.zIndex = zIndex
@@ -313,6 +343,7 @@ export const createZombieMob = createSpawnableEntity<
         container.addChild(gfxHittest)
         container.addChild(ctrHealth)
         stage.addChild(container)
+        stage.addChild(sprite)
 
         return {
           camera,
@@ -321,6 +352,7 @@ export const createZombieMob = createSpawnableEntity<
           gfxHittest,
           ctrHealth,
           gfxHealthAmount,
+          sprite,
         }
       },
 
@@ -346,9 +378,10 @@ export const createZombieMob = createSpawnableEntity<
         netClient?.removeCustomMessageListener(HIT_CHANNEL, onHitClient)
       },
 
-      teardownRenderContext({ container, ctrHealth }) {
+      teardownRenderContext({ container, ctrHealth, sprite }) {
         container.destroy({ children: true })
         ctrHealth.destroy({ children: true })
+        sprite.destroy()
       },
 
       async onPhysicsStep(_, { game, mobData }) {
@@ -414,12 +447,24 @@ export const createZombieMob = createSpawnableEntity<
 
       onRenderFrame(
         { smooth },
-        { game },
-        { camera, container, gfxHittest, gfxBounds, gfxHealthAmount },
+        { game, body },
+        { camera, sprite, container, gfxHittest, gfxBounds, gfxHealthAmount },
       ) {
         const debug = game.debug
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
         const pos = Vec.add(smoothed, camera.offset)
+
+        sprite.position = pos
+        if (currentAnimation !== newAnimation) {
+          console.log('switching animation for zombie')
+          currentAnimation = newAnimation
+          sprite.textures = zombieAnimations[currentAnimation]!;
+          sprite.gotoAndPlay(0)
+        }
+        
+        if (currentAnimation == 'recoil' && sprite.currentFrame == sprite.totalFrames - 1) {
+          newAnimation = 'walk'
+        }
 
         container.position = pos
         container.rotation = body.angle
