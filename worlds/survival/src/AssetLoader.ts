@@ -6,22 +6,33 @@ interface PreloadedAssets {
   recoilTextures: Texture[]
 }
 
+let preloadPromise: Promise<PreloadedAssets> | null = null
 let preloadedAssets: PreloadedAssets | null = null
 
 export async function preloadAssets(): Promise<PreloadedAssets> {
-  if (preloadedAssets) return preloadedAssets
-
-  const spritesheetWalk = await loadPlayerSpritesheet('/animations/z1walk.json')
-  const spritesheetRecoil = await loadPlayerSpritesheet(
-    '/animations/z1hitreact.json',
-  )
-
-  preloadedAssets = {
-    walkTextures: spritesheetWalk.textures,
-    recoilTextures: spritesheetRecoil.textures,
+  if (preloadedAssets) {
+    return preloadedAssets
   }
 
-  return preloadedAssets
+  if (!preloadPromise) {
+    preloadPromise = (async () => {
+      const spritesheetWalk = await loadPlayerSpritesheet(
+        '/animations/z1walk.json',
+      )
+      const spritesheetRecoil = await loadPlayerSpritesheet(
+        '/animations/z1hitreact.json',
+      )
+
+      preloadedAssets = {
+        walkTextures: spritesheetWalk.textures,
+        recoilTextures: spritesheetRecoil.textures,
+      }
+
+      return preloadedAssets
+    })()
+  }
+
+  return preloadPromise
 }
 
 export function getPreloadedAssets(): PreloadedAssets {
