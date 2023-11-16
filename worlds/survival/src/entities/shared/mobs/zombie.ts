@@ -354,59 +354,66 @@ export const createZombieMob = createSpawnableEntity<
         _,
         { game, hitCooldownCounter, currentPatrolDistance, direction },
       ) {
-        Matter.Body.setAngle(body, 0)
-        Matter.Body.setAngularVelocity(body, 0)
+        if (game.server) {
+          Matter.Body.setAngle(body, 0)
+          Matter.Body.setAngularVelocity(body, 0)
 
-        if (hitCooldownCounter.value > 0 && game.server) {
-          hitCooldownCounter.value -= 1
-        }
+          if (hitCooldownCounter.value > 0) {
+            hitCooldownCounter.value -= 1
+          }
 
-        const allBodies = Matter.Composite.allBodies(game.physics.engine.world)
-        let closestPlayer: Matter.Body | null = null
-        let minDistance = Number.POSITIVE_INFINITY
+          const allBodies = Matter.Composite.allBodies(
+            game.physics.engine.world,
+          )
+          let closestPlayer: Matter.Body | null = null
+          let minDistance = Number.POSITIVE_INFINITY
 
-        for (const player of allBodies) {
-          if (player.label === 'player') {
-            const dx = player.position.x - body.position.x
-            const dy = player.position.y - body.position.y
-            const distance = Math.hypot(dx, dy)
+          for (const player of allBodies) {
+            if (player.label === 'player') {
+              const dx = player.position.x - body.position.x
+              const dy = player.position.y - body.position.y
+              const distance = Math.hypot(dx, dy)
 
-            if (distance < minDistance) {
-              minDistance = distance
-              closestPlayer = player
+              if (distance < minDistance) {
+                minDistance = distance
+                closestPlayer = player
+              }
             }
           }
-        }
 
-        if (closestPlayer && minDistance < 2_000) {
-          const dx = closestPlayer.position.x - body.position.x
-          const dy = closestPlayer.position.y - body.position.y
+          if (closestPlayer && minDistance < 2_000) {
+            const dx = closestPlayer.position.x - body.position.x
+            const dy = closestPlayer.position.y - body.position.y
 
-          const distance = Math.hypot(dx, dy)
-          const unitX = dx / distance
-          const unitY = dy / distance
+            const distance = Math.hypot(dx, dy)
+            const unitX = dx / distance
+            const unitY = dy / distance
 
-          Matter.Body.translate(body, {
-            x: speed * unitX,
-            y: speed * unitY,
-          })
-        } else {
-          // patrol back and fourth when player is far from entity
-          if (game.server && currentPatrolDistance.value >= patrolDistance) {
-            currentPatrolDistance.value = 0
-            direction.value *= -1
+            Matter.Body.translate(body, {
+              x: speed * unitX,
+              y: speed * unitY,
+            })
+
+            direction.value =
+              closestPlayer.position.x > body.position.x ? -1 : 1
+          } else {
+            // patrol back and fourth when player is far from entity
+            if (currentPatrolDistance.value >= patrolDistance) {
+              currentPatrolDistance.value = 0
+              direction.value *= -1
+            }
+
+            Matter.Body.translate(body, {
+              x: (speed / 2) * direction.value,
+              y: 0,
+            })
+
+            currentPatrolDistance.value += Math.abs(speed / 2)
           }
 
-          Matter.Body.translate(body, {
-            x: (speed / 2) * direction.value,
-            y: 0,
-          })
-
-          if (game.server) currentPatrolDistance.value += Math.abs(speed / 2)
-        }
-
-        if (game.server && (!closestPlayer || minDistance > 6_000)) {
-          await game.destroy(this as SpawnableEntity)
+          if (!closestPlayer || minDistance > 6_000) {
+            await game.destroy(this as SpawnableEntity)
+          }
         }
       },
 
@@ -419,7 +426,7 @@ export const createZombieMob = createSpawnableEntity<
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
         const pos = Vec.add(smoothed, camera.offset)
 
-        sprite.scale.x = direction.value === 1 ? 1 : -1
+        sprite.scale.x = direction.value
 
         sprite.position = pos
         if (currentAnimation !== newAnimation) {
