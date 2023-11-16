@@ -1,10 +1,7 @@
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import { createSpawnableEntity, isEntity } from '@dreamlab.gg/core'
 import { z } from '@dreamlab.gg/core/dist/sdk'
-import {
-  loadPlayerSpritesheet,
-  SpriteSourceSchema,
-} from '@dreamlab.gg/core/dist/textures'
+import { SpriteSourceSchema } from '@dreamlab.gg/core/dist/textures'
 import type { Camera } from '@dreamlab.gg/core/entities'
 import { isNetPlayer } from '@dreamlab.gg/core/entities'
 import type { EventHandler } from '@dreamlab.gg/core/events'
@@ -29,6 +26,7 @@ import {
 import Matter from 'matter-js'
 import type { Resource, Texture } from 'pixi.js'
 import { AnimatedSprite, Container, Graphics } from 'pixi.js'
+import { getPreloadedAssets } from '../../../AssetLoader'
 import { events } from '../../../events'
 
 type Args = typeof ArgsSchema
@@ -45,13 +43,6 @@ type OnPlayerAttack = EventHandler<'onPlayerAttack'>
 type OnCollisionStart = EventHandler<'onCollisionStart'>
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
 
-interface MobData {
-  health: number
-  direction: number
-  currentPatrolDistance: number
-  hitCooldownCounter: number
-}
-
 interface Data {
   game: Game<boolean>
   body: Matter.Body
@@ -65,8 +56,8 @@ interface Data {
 
   health: SyncedValue<number>
   direction: SyncedValue<number>
-  currentPatrolDistance: SyncedValue<number>
   hitCooldownCounter: SyncedValue<number>
+  currentPatrolDistance: SyncedValue<number>
 }
 
 interface Render {
@@ -114,13 +105,13 @@ export const createZombieMob = createSpawnableEntity<
     )
 
     const patrolDistance = 300
-    const hitRadius = width / 2 + 220
+    const hitRadius = width / 2 + 120
     const hitCooldown = 1 // Second(s)
-
     const healthIndicatorWidth = width + 50
     const healthIndicatorHeight = 20
 
     const zombieAnimations: Record<string, Texture<Resource>[]> = {}
+
     let currentAnimation: zombieAnimations = 'walk'
     let newAnimation: zombieAnimations = 'walk'
 
@@ -152,16 +143,16 @@ export const createZombieMob = createSpawnableEntity<
 
         const direction = syncedValue(game, uid, 'direction', 1)
         const health = syncedValue(game, uid, 'health', maxHealth)
-        const hitCooldownCounter = syncedValue(
-          game,
-          uid,
-          'hitCooldownCounter',
-          0,
-        )
         const currentPatrolDistance = syncedValue(
           game,
           uid,
           'currentPatrolDistance',
+          0,
+        )
+        const hitCooldownCounter = syncedValue(
+          game,
+          uid,
+          'hitCooldownCounter',
           0,
         )
 
@@ -177,7 +168,7 @@ export const createZombieMob = createSpawnableEntity<
               netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
 
               if (health.value - 1 <= 0) {
-                events.emit('onPlayerScore', maxHealth * 20)
+                events.emit('onPlayerScore', maxHealth * 25)
               }
             }
           }
@@ -191,7 +182,7 @@ export const createZombieMob = createSpawnableEntity<
               netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
 
               if (health.value - 1 <= 0) {
-                events.emit('onPlayerScore', maxHealth * 20)
+                events.emit('onPlayerScore', maxHealth * 25)
               }
             }
           }
@@ -265,8 +256,8 @@ export const createZombieMob = createSpawnableEntity<
           if (typeof data.health !== 'number') return
         }
 
-        netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
         netClient?.addCustomMessageListener(HIT_CHANNEL, onHitClient)
+        netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
 
         return {
           game,
@@ -278,28 +269,22 @@ export const createZombieMob = createSpawnableEntity<
           onPlayerAttack,
           onCollisionStart,
           onPlayerCollisionStart,
-          // mob data
+
           health,
           direction,
-          currentPatrolDistance,
           hitCooldownCounter,
+          currentPatrolDistance,
         }
       },
 
       initRenderContext: async (_, { camera, stage }) => {
-        const spritesheetwalk = await loadPlayerSpritesheet(
-          '/animations/z1walk.json',
-        )
-        zombieAnimations.walk = spritesheetwalk.textures
-        const spritesheetRecoil = await loadPlayerSpritesheet(
-          '/animations/z1hitreact.json',
-        )
-        zombieAnimations.recoil = spritesheetRecoil.textures
-
+        const assets = getPreloadedAssets()
+        zombieAnimations.walk = assets.walkTextures
+        zombieAnimations.recoil = assets.recoilTextures
         const sprite = new AnimatedSprite(zombieAnimations[currentAnimation]!)
-        sprite.scale.set(0.9)
         sprite.gotoAndPlay(0)
         sprite.anchor.set(0.45, 0.535)
+
         const container = new Container()
         container.sortableChildren = true
         container.zIndex = zIndex
@@ -386,7 +371,7 @@ export const createZombieMob = createSpawnableEntity<
 
       async onPhysicsStep(
         _,
-        { game, direction, currentPatrolDistance, hitCooldownCounter },
+        { game, hitCooldownCounter, currentPatrolDistance, direction },
       ) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
@@ -424,10 +409,6 @@ export const createZombieMob = createSpawnableEntity<
             x: speed * unitX,
             y: speed * unitY,
           })
-          if (game.server) {
-            direction.value =
-              closestPlayer.position.x > body.position.x ? -1 : 1
-          }
         } else {
           // patrol back and fourth when player is far from entity
           if (game.server && currentPatrolDistance.value >= patrolDistance) {
@@ -450,8 +431,8 @@ export const createZombieMob = createSpawnableEntity<
 
       onRenderFrame(
         { smooth },
-        { game, body, direction, hitCooldownCounter, health },
-        { camera, sprite, container, gfxHittest, gfxBounds, gfxHealthAmount },
+        { game, hitCooldownCounter, health, direction },
+        { camera, container, gfxHittest, gfxBounds, gfxHealthAmount, sprite },
       ) {
         const debug = game.debug
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
