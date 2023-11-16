@@ -12,7 +12,6 @@ import {
   syncedValue,
 } from '@dreamlab.gg/core/network'
 import type {
-  MessageListenerClient,
   MessageListenerServer,
   NetClient,
   NetServer,
@@ -47,7 +46,6 @@ interface Data {
   game: Game<boolean>
   body: Matter.Body
   onHitServer: MessageListenerServer
-  onHitClient: MessageListenerClient
   netServer: NetServer | undefined
   netClient: NetClient | undefined
   onPlayerAttack: OnPlayerAttack
@@ -244,26 +242,12 @@ export const createZombieMob = createSpawnableEntity<
           }
         }
 
-        const onHitClient: MessageListenerClient = (_, data) => {
-          const network = netClient
-          if (!network) throw new Error('missing network')
-
-          if (!('uid' in data)) return
-          if (typeof data.uid !== 'string') return
-          if (data.uid !== uid) return
-
-          if (!('health' in data)) return
-          if (typeof data.health !== 'number') return
-        }
-
-        netClient?.addCustomMessageListener(HIT_CHANNEL, onHitClient)
         netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
 
         return {
           game,
           body,
           onHitServer,
-          onHitClient,
           netServer,
           netClient,
           onPlayerAttack,
@@ -344,9 +328,7 @@ export const createZombieMob = createSpawnableEntity<
       teardown({
         game,
         onHitServer,
-        onHitClient,
         netServer,
-        netClient,
         onPlayerAttack,
         onCollisionStart,
         onPlayerCollisionStart,
@@ -360,7 +342,6 @@ export const createZombieMob = createSpawnableEntity<
         )
 
         netServer?.removeCustomMessageListener(HIT_CHANNEL, onHitServer)
-        netClient?.removeCustomMessageListener(HIT_CHANNEL, onHitClient)
       },
 
       teardownRenderContext({ container, ctrHealth, sprite }) {
