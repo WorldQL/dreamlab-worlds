@@ -13,7 +13,6 @@ import {
   onlyNetClient,
   onlyNetServer,
   syncedValue,
-  updateSyncedValue,
 } from '@dreamlab.gg/core/network'
 import type {
   MessageListenerClient,
@@ -47,8 +46,10 @@ type OnCollisionStart = EventHandler<'onCollisionStart'>
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
 
 interface MobData {
-  currentPatrolDistance: number
+  health: number
   direction: number
+  currentPatrolDistance: number
+  hitCooldownCounter: number
 }
 
 interface Data {
@@ -61,8 +62,11 @@ interface Data {
   onPlayerAttack: OnPlayerAttack
   onCollisionStart: OnCollisionStart
   onPlayerCollisionStart: OnPlayerCollisionStart
-  currentPatrolDistance: SyncedValue<number>
+
+  health: SyncedValue<number>
   direction: SyncedValue<number>
+  currentPatrolDistance: SyncedValue<number>
+  hitCooldownCounter: SyncedValue<number>
 }
 
 interface Render {
@@ -112,12 +116,9 @@ export const createZombieMob = createSpawnableEntity<
     const patrolDistance = 300
     const hitRadius = width / 2 + 220
     const hitCooldown = 1 // Second(s)
-    let hitCooldownCounter = 0
 
     const healthIndicatorWidth = width + 50
     const healthIndicatorHeight = 20
-
-    let health = maxHealth
 
     const zombieAnimations: Record<string, Texture<Resource>[]> = {}
     let currentAnimation: zombieAnimations = 'walk'
@@ -148,17 +149,25 @@ export const createZombieMob = createSpawnableEntity<
 
         const netServer = onlyNetServer(game)
         const netClient = onlyNetClient(game)
+
+        const direction = syncedValue(game, uid, 'direction', 1)
+        const health = syncedValue(game, uid, 'health', maxHealth)
+        const hitCooldownCounter = syncedValue(
+          game,
+          uid,
+          'hitCooldownCounter',
+          0,
+        )
         const currentPatrolDistance = syncedValue(
           game,
           uid,
           'currentPatrolDistance',
           0,
         )
-        const direction = syncedValue(game, uid, 'direction', 1)
 
         const onPlayerAttack: OnPlayerAttack = (player, item) => {
           if (
-            hitCooldownCounter <= 0 &&
+            hitCooldownCounter.value <= 0 &&
             item?.animationName !== 'bow' &&
             item?.animationName !== 'shoot'
           ) {
@@ -166,9 +175,8 @@ export const createZombieMob = createSpawnableEntity<
 
             if (Math.abs(xDiff) <= hitRadius) {
               netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
-              hitCooldownCounter = hitCooldown * 60
 
-              if (health - 1 <= 0) {
+              if (health.value - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 20)
               }
             }
@@ -181,9 +189,8 @@ export const createZombieMob = createSpawnableEntity<
 
             if (other.tags.includes('Projectile')) {
               netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
-              hitCooldownCounter = hitCooldown * 60
 
-              if (health - 1 <= 0) {
+              if (health.value - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 20)
               }
             }
@@ -231,19 +238,22 @@ export const createZombieMob = createSpawnableEntity<
 
           if (!player) throw new Error('missing netplayer')
 
+          hitCooldownCounter.value = hitCooldown * 60
           const force = knockback * direction.value
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
-          health -= 1
-          if (health <= 0) {
+          health.value -= 1
+          if (health.value <= 0) {
             await game.destroy(this as SpawnableEntity)
           } else {
-            network.broadcastCustomMessage(HIT_CHANNEL, { uid, health })
+            network.broadcastCustomMessage(HIT_CHANNEL, {
+              uid,
+              health: health.value,
+            })
           }
         }
 
         const onHitClient: MessageListenerClient = (_, data) => {
-          newAnimation = 'recoil'
           const network = netClient
           if (!network) throw new Error('missing network')
 
@@ -253,8 +263,6 @@ export const createZombieMob = createSpawnableEntity<
 
           if (!('health' in data)) return
           if (typeof data.health !== 'number') return
-
-          health = data.health
         }
 
         netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
@@ -270,8 +278,11 @@ export const createZombieMob = createSpawnableEntity<
           onPlayerAttack,
           onCollisionStart,
           onPlayerCollisionStart,
+          // mob data
+          health,
           direction,
           currentPatrolDistance,
+          hitCooldownCounter,
         }
       },
 
@@ -373,19 +384,15 @@ export const createZombieMob = createSpawnableEntity<
         sprite.destroy()
       },
 
-      async onPhysicsStep(_, { game, direction, currentPatrolDistance }) {
-        /*
-        console.log('running -- !!')
-        if (direction.value !== 1) {
-          // This never runs!
-          console.log('direction: ' + direction.value)
-        }
-        */
+      async onPhysicsStep(
+        _,
+        { game, direction, currentPatrolDistance, hitCooldownCounter },
+      ) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
-        if (hitCooldownCounter > 0) {
-          hitCooldownCounter -= 1
+        if (hitCooldownCounter.value > 0 && game.server) {
+          hitCooldownCounter.value -= 1
         }
 
         const allBodies = Matter.Composite.allBodies(game.physics.engine.world)
@@ -443,7 +450,7 @@ export const createZombieMob = createSpawnableEntity<
 
       onRenderFrame(
         { smooth },
-        { game, body, direction },
+        { game, body, direction, hitCooldownCounter, health },
         { camera, sprite, container, gfxHittest, gfxBounds, gfxHealthAmount },
       ) {
         const debug = game.debug
@@ -472,11 +479,14 @@ export const createZombieMob = createSpawnableEntity<
 
         const alpha = debug.value ? 0.5 : 0
         gfxBounds.alpha = alpha
-        gfxHittest.alpha = hitCooldownCounter === 0 ? alpha / 3 : 0
+        gfxHittest.alpha = hitCooldownCounter.value === 0 ? alpha / 3 : 0
 
         drawBox(
           gfxHealthAmount,
-          { width: (health / maxHealth) * healthIndicatorWidth, height: 20 },
+          {
+            width: (health.value / maxHealth) * healthIndicatorWidth,
+            height: 20,
+          },
           { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
         )
       },
