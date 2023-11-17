@@ -1,9 +1,6 @@
-import { sharedInit } from './shared.js'
+import type { InitServer } from '@dreamlab.gg/core/sdk'
 
-/** @type {import('@dreamlab.gg/core/sdk').InitServer} */
-export const init = async game => {
-  await sharedInit(game)
-
+export const init: InitServer = async game => {
   // since this is replicated it will get auto-spawned on clients as they join
   await game.spawn({
     entity: '@dreamlab/BouncyBall',

@@ -1,5 +1,6 @@
-/** @type {import('@dreamlab.gg/core').LooseSpawnableDefinition[]} */
-export const level = [
+import { Level } from '@dreamlab.gg/core/sdk'
+
+export const level: Level = [
   {
     entity: '@dreamlab/Solid',
     args: { width: 1_290, height: 50 },

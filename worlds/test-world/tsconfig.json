@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    // Type Checking
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+    "useUnknownInCatchVariables": true,
+    "noUncheckedIndexedAccess": true,
+
+    // Modules
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+
+    // Emit
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "importHelpers": false,
+    "inlineSources": true,
+    "newLine": "lf",
+    "noEmitHelpers": false,
+    "outDir": "dist",
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Language and Environment
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": false,
+    "lib": ["ESNext", "DOM"],
+    "target": "ES2021",
+    "useDefineForClassFields": true,
+
+    // React
+    // "jsx": "react-jsx",
+    // "jsxImportSource": "https://esm.sh/react@18.2.0"
+  }
+}
