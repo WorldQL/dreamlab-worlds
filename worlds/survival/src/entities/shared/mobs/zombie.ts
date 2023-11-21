@@ -223,9 +223,6 @@ export const createZombieMob = createSpawnableEntity<
 
           mobData.value.hitCooldownCounter = hitCooldown * 60
           mobData.value.currentAnimation = 'recoil'
-          setTimeout(() => {
-            mobData.value.currentAnimation = 'walk'
-          }, 200)
           const force = knockback * mobData.value.direction
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
@@ -233,6 +230,9 @@ export const createZombieMob = createSpawnableEntity<
           if (mobData.value.health <= 0) {
             await game.destroy(this as SpawnableEntity)
           } else {
+            setTimeout(() => {
+              mobData.value.currentAnimation = 'walk'
+            }, 200)
             network.broadcastCustomMessage(HIT_CHANNEL, {
               uid,
               health: mobData.value.health,
