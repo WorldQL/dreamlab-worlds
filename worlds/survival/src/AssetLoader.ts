@@ -4,6 +4,7 @@ import type { Texture } from 'pixi.js'
 interface PreloadedAssets {
   walkTextures: Texture[]
   recoilTextures: Texture[]
+  punchTextures: Texture[]
 }
 
 let preloadPromise: Promise<PreloadedAssets> | null = null
@@ -22,10 +23,14 @@ export async function preloadAssets(): Promise<PreloadedAssets> {
       const spritesheetRecoil = await loadPlayerSpritesheet(
         '/animations/z1hitreact.json',
       )
+      const spritesheetPunch = await loadPlayerSpritesheet(
+        '/animations/z1punch.json',
+      )
 
       preloadedAssets = {
         walkTextures: spritesheetWalk.textures,
         recoilTextures: spritesheetRecoil.textures,
+        punchTextures: spritesheetPunch.textures,
       }
 
       return preloadedAssets

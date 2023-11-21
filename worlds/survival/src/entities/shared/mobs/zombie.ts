@@ -41,7 +41,7 @@ const ArgsSchema = z.object({
 type OnPlayerAttack = EventHandler<'onPlayerAttack'>
 type OnCollisionStart = EventHandler<'onCollisionStart'>
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
-type zombieAnimations = 'hitting' | 'recoil' | 'walk'
+type zombieAnimations = 'punch' | 'recoil' | 'walk'
 
 interface MobData {
   health: number
@@ -259,6 +259,7 @@ export const createZombieMob = createSpawnableEntity<
         const assets = getPreloadedAssets()
         zombieAnimations.walk = assets.walkTextures
         zombieAnimations.recoil = assets.recoilTextures
+        zombieAnimations.punch = assets.punchTextures
         const sprite = new AnimatedSprite(zombieAnimations.walk!)
         sprite.gotoAndPlay(0)
         sprite.anchor.set(0.45, 0.535)
@@ -380,6 +381,8 @@ export const createZombieMob = createSpawnableEntity<
               x: speed * -mobData.value.direction,
               y: 0,
             })
+            mobData.value.currentAnimation =
+              minDistance < 150 ? 'punch' : 'walk'
           } else {
             // patrol back and fourth when player is far from entity
             if (mobData.value.currentPatrolDistance > patrolDistance) {
