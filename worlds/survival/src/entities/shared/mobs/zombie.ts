@@ -370,29 +370,22 @@ export const createZombieMob = createSpawnableEntity<
           }
 
           if (closestPlayer && minDistance < 2_000) {
-            const dx = closestPlayer.position.x - body.position.x
-            const dy = closestPlayer.position.y - body.position.y
-
-            const distance = Math.hypot(dx, dy)
-            const unitX = dx / distance
-            const unitY = dy / distance
-
-            Matter.Body.translate(body, {
-              x: speed * unitX,
-              y: speed * unitY,
-            })
-
             mobData.value.direction =
               closestPlayer.position.x > body.position.x ? -1 : 1
+
+            Matter.Body.translate(body, {
+              x: speed * -mobData.value.direction,
+              y: 0,
+            })
           } else {
             // patrol back and fourth when player is far from entity
-            if (mobData.value.currentPatrolDistance >= patrolDistance) {
+            if (mobData.value.currentPatrolDistance > patrolDistance) {
               mobData.value.currentPatrolDistance = 0
               mobData.value.direction *= -1
             }
 
             Matter.Body.translate(body, {
-              x: (speed / 2) * mobData.value.direction,
+              x: (speed / 2) * -mobData.value.direction,
               y: 0,
             })
 
