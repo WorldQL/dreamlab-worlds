@@ -57,7 +57,7 @@ export const createPickupItem = createSpawnableEntity<
   SpawnableEntity<Data, Render, Args>,
   Data,
   Render
->(ArgsSchema, ({ tags, transform, preview }, args) => {
+>(ArgsSchema, ({ tags, transform }, args) => {
   const body = Matter.Bodies.rectangle(
     transform.position.x,
     transform.position.y,
@@ -67,7 +67,7 @@ export const createPickupItem = createSpawnableEntity<
       label: 'inventoryItem',
       isStatic: true,
       render: { visible: false },
-      isSensor: preview,
+      isSensor: true,
     },
   )
 
