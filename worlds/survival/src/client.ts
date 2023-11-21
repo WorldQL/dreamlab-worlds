@@ -2,8 +2,6 @@ import type { InitClient } from '@dreamlab.gg/core/sdk'
 import { preloadAssets } from './AssetLoader.js'
 import { createBackground } from './entities/client/background.js'
 import { createGrappleHook } from './entities/client/grappleHook.js'
-// import { images } from './level/client/graphics.js'
-import { map1 } from './level/client/map1.js'
 import { initializeUI } from './screens/start.js'
 import { sharedInit } from './shared.js'
 
@@ -16,6 +14,4 @@ export const init: InitClient = async game => {
   game.register('@dreamlab/Hook', createGrappleHook)
 
   await sharedInit(game)
-  await game.spawnMany(...map1)
-  // await game.spawn(...images)
 }

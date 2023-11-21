@@ -41,6 +41,15 @@ const ArgsSchema = z.object({
 type OnPlayerAttack = EventHandler<'onPlayerAttack'>
 type OnCollisionStart = EventHandler<'onCollisionStart'>
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
+type zombieAnimations = 'hitting' | 'recoil' | 'walk'
+
+interface MobData {
+  health: number
+  direction: number
+  hitCooldownCounter: number
+  currentPatrolDistance: number
+  currentAnimation: zombieAnimations
+}
 
 interface Data {
   game: Game<boolean>
@@ -52,10 +61,7 @@ interface Data {
   onCollisionStart: OnCollisionStart
   onPlayerCollisionStart: OnPlayerCollisionStart
 
-  health: SyncedValue<number>
-  direction: SyncedValue<number>
-  hitCooldownCounter: SyncedValue<number>
-  currentPatrolDistance: SyncedValue<number>
+  mobData: SyncedValue<MobData>
 }
 
 interface Render {
@@ -67,8 +73,6 @@ interface Render {
   gfxHealthAmount: Graphics
   sprite: AnimatedSprite
 }
-
-type zombieAnimations = 'hitting' | 'recoil' | 'walk'
 
 const zombieSymbol = Symbol.for('@dreamlab/core/entities/zombie')
 export const isZombie = (
@@ -110,9 +114,6 @@ export const createZombieMob = createSpawnableEntity<
 
     const zombieAnimations: Record<string, Texture<Resource>[]> = {}
 
-    let currentAnimation: zombieAnimations = 'walk'
-    let newAnimation: zombieAnimations = 'walk'
-
     return {
       [zombieSymbol]: true,
 
@@ -139,24 +140,17 @@ export const createZombieMob = createSpawnableEntity<
         const netServer = onlyNetServer(game)
         const netClient = onlyNetClient(game)
 
-        const direction = syncedValue(game, uid, 'direction', 1)
-        const health = syncedValue(game, uid, 'health', maxHealth)
-        const currentPatrolDistance = syncedValue(
-          game,
-          uid,
-          'currentPatrolDistance',
-          0,
-        )
-        const hitCooldownCounter = syncedValue(
-          game,
-          uid,
-          'hitCooldownCounter',
-          0,
-        )
+        const mobData = syncedValue(game, uid, 'mobData', {
+          health: maxHealth,
+          direction: 1,
+          hitCooldownCounter: 0,
+          currentPatrolDistance: 0,
+          currentAnimation: 'walk' as zombieAnimations,
+        })
 
         const onPlayerAttack: OnPlayerAttack = (player, item) => {
           if (
-            hitCooldownCounter.value <= 0 &&
+            mobData.value.hitCooldownCounter <= 0 &&
             item?.animationName !== 'bow' &&
             item?.animationName !== 'shoot'
           ) {
@@ -165,7 +159,7 @@ export const createZombieMob = createSpawnableEntity<
             if (Math.abs(xDiff) <= hitRadius) {
               netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
 
-              if (health.value - 1 <= 0) {
+              if (mobData.value.health - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
               }
             }
@@ -179,7 +173,7 @@ export const createZombieMob = createSpawnableEntity<
             if (other.tags.includes('Projectile')) {
               netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
 
-              if (health.value - 1 <= 0) {
+              if (mobData.value.health - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
               }
             }
@@ -204,7 +198,7 @@ export const createZombieMob = createSpawnableEntity<
 
         game.events.common.addListener('onPlayerAttack', onPlayerAttack)
         game.events.common.addListener('onCollisionStart', onCollisionStart)
-        game.events.common.addListener(
+        game.events.client?.addListener(
           'onPlayerCollisionStart',
           onPlayerCollisionStart,
         )
@@ -227,17 +221,18 @@ export const createZombieMob = createSpawnableEntity<
 
           if (!player) throw new Error('missing netplayer')
 
-          hitCooldownCounter.value = hitCooldown * 60
-          const force = knockback * direction.value
+          mobData.value.hitCooldownCounter = hitCooldown * 60
+          mobData.value.currentAnimation = 'recoil'
+          const force = knockback * mobData.value.direction
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
-          health.value -= 1
-          if (health.value <= 0) {
+          mobData.value.health -= 1
+          if (mobData.value.health <= 0) {
             await game.destroy(this as SpawnableEntity)
           } else {
             network.broadcastCustomMessage(HIT_CHANNEL, {
               uid,
-              health: health.value,
+              health: mobData.value.health,
             })
           }
         }
@@ -253,11 +248,7 @@ export const createZombieMob = createSpawnableEntity<
           onPlayerAttack,
           onCollisionStart,
           onPlayerCollisionStart,
-
-          health,
-          direction,
-          hitCooldownCounter,
-          currentPatrolDistance,
+          mobData,
         }
       },
 
@@ -265,7 +256,7 @@ export const createZombieMob = createSpawnableEntity<
         const assets = getPreloadedAssets()
         zombieAnimations.walk = assets.walkTextures
         zombieAnimations.recoil = assets.recoilTextures
-        const sprite = new AnimatedSprite(zombieAnimations[currentAnimation]!)
+        const sprite = new AnimatedSprite(zombieAnimations.walk!)
         sprite.gotoAndPlay(0)
         sprite.anchor.set(0.45, 0.535)
 
@@ -336,7 +327,7 @@ export const createZombieMob = createSpawnableEntity<
         game.physics.unregister(this, body)
         game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
         game.events.common.removeListener('onCollisionStart', onCollisionStart)
-        game.events.common.removeListener(
+        game.events.client?.removeListener(
           'onPlayerCollisionStart',
           onPlayerCollisionStart,
         )
@@ -350,16 +341,13 @@ export const createZombieMob = createSpawnableEntity<
         sprite.destroy()
       },
 
-      async onPhysicsStep(
-        _,
-        { game, hitCooldownCounter, currentPatrolDistance, direction },
-      ) {
+      async onPhysicsStep(_, { game, mobData }) {
         if (game.server) {
           Matter.Body.setAngle(body, 0)
           Matter.Body.setAngularVelocity(body, 0)
 
-          if (hitCooldownCounter.value > 0) {
-            hitCooldownCounter.value -= 1
+          if (mobData.value.hitCooldownCounter > 0) {
+            mobData.value.hitCooldownCounter -= 1
           }
 
           const allBodies = Matter.Composite.allBodies(
@@ -394,21 +382,21 @@ export const createZombieMob = createSpawnableEntity<
               y: speed * unitY,
             })
 
-            direction.value =
+            mobData.value.direction =
               closestPlayer.position.x > body.position.x ? -1 : 1
           } else {
             // patrol back and fourth when player is far from entity
-            if (currentPatrolDistance.value >= patrolDistance) {
-              currentPatrolDistance.value = 0
-              direction.value *= -1
+            if (mobData.value.currentPatrolDistance >= patrolDistance) {
+              mobData.value.currentPatrolDistance = 0
+              mobData.value.direction *= -1
             }
 
             Matter.Body.translate(body, {
-              x: (speed / 2) * direction.value,
+              x: (speed / 2) * mobData.value.direction,
               y: 0,
             })
 
-            currentPatrolDistance.value += Math.abs(speed / 2)
+            mobData.value.currentPatrolDistance += Math.abs(speed / 2)
           }
 
           if (!closestPlayer || minDistance > 6_000) {
@@ -419,28 +407,28 @@ export const createZombieMob = createSpawnableEntity<
 
       onRenderFrame(
         { smooth },
-        { game, hitCooldownCounter, health, direction },
+        { game, mobData },
         { camera, container, gfxHittest, gfxBounds, gfxHealthAmount, sprite },
       ) {
         const debug = game.debug
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
         const pos = Vec.add(smoothed, camera.offset)
 
-        sprite.scale.x = direction.value
+        sprite.scale.x = mobData.value.direction
 
         sprite.position = pos
-        if (currentAnimation !== newAnimation) {
-          console.log('switching animation for zombie')
-          currentAnimation = newAnimation
-          sprite.textures = zombieAnimations[currentAnimation]!
+        if (
+          sprite.textures !== zombieAnimations[mobData.value.currentAnimation]
+        ) {
+          sprite.textures = zombieAnimations[mobData.value.currentAnimation]!
           sprite.gotoAndPlay(0)
         }
 
         if (
-          currentAnimation === 'recoil' &&
+          mobData.value.currentAnimation === 'recoil' &&
           sprite.currentFrame === sprite.totalFrames - 1
         ) {
-          newAnimation = 'walk'
+          mobData.value.currentAnimation = 'walk'
         }
 
         container.position = pos
@@ -448,12 +436,13 @@ export const createZombieMob = createSpawnableEntity<
 
         const alpha = debug.value ? 0.5 : 0
         gfxBounds.alpha = alpha
-        gfxHittest.alpha = hitCooldownCounter.value === 0 ? alpha / 3 : 0
+        gfxHittest.alpha =
+          mobData.value.hitCooldownCounter === 0 ? alpha / 3 : 0
 
         drawBox(
           gfxHealthAmount,
           {
-            width: (health.value / maxHealth) * healthIndicatorWidth,
+            width: (mobData.value.health / maxHealth) * healthIndicatorWidth,
             height: 20,
           },
           { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },

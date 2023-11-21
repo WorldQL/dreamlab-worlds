@@ -23,7 +23,9 @@ import {
   drawCircle,
 } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
-import { Container, Graphics } from 'pixi.js'
+import type { Resource, Texture } from 'pixi.js'
+import { AnimatedSprite, Container, Graphics } from 'pixi.js'
+import { getPreloadedAssets } from '../../../AssetLoader'
 import { events } from '../../../events'
 
 type Args = typeof ArgsSchema
@@ -39,6 +41,16 @@ const ArgsSchema = z.object({
 type OnPlayerAttack = EventHandler<'onPlayerAttack'>
 type OnCollisionStart = EventHandler<'onCollisionStart'>
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
+type zombieAnimations = 'hitting' | 'recoil' | 'walk'
+
+interface MobData {
+  health: number
+  direction: number
+  hitCooldownCounter: number
+  currentPatrolDistance: number
+  currentAnimation: zombieAnimations
+  projectileCooldownCounter: number
+}
 
 interface Data {
   game: Game<boolean>
@@ -50,11 +62,7 @@ interface Data {
   onCollisionStart: OnCollisionStart
   onPlayerCollisionStart: OnPlayerCollisionStart
 
-  health: SyncedValue<number>
-  direction: SyncedValue<number>
-  projectileCooldownCounter: SyncedValue<number>
-  hitCooldownCounter: SyncedValue<number>
-  currentPatrolDistance: SyncedValue<number>
+  mobData: SyncedValue<MobData>
 }
 
 interface Render {
@@ -64,6 +72,7 @@ interface Render {
   gfxHittest: Graphics
   ctrHealth: Container
   gfxHealthAmount: Graphics
+  sprite: AnimatedSprite
 }
 
 export const createArcherMob = createSpawnableEntity<
@@ -97,6 +106,7 @@ export const createArcherMob = createSpawnableEntity<
     const healthIndicatorWidth = width + 50
     const healthIndicatorHeight = 20
 
+    const zombieAnimations: Record<string, Texture<Resource>[]> = {}
     let applyKnockback: [Matter.Body, number] | undefined
 
     return {
@@ -123,30 +133,18 @@ export const createArcherMob = createSpawnableEntity<
         const netServer = onlyNetServer(game)
         const netClient = onlyNetClient(game)
 
-        const direction = syncedValue(game, uid, 'direction', 1)
-        const health = syncedValue(game, uid, 'health', maxHealth)
-        const projectileCooldownCounter = syncedValue(
-          game,
-          uid,
-          'projectileCooldownCounter',
-          0,
-        )
-        const currentPatrolDistance = syncedValue(
-          game,
-          uid,
-          'currentPatrolDistance',
-          0,
-        )
-        const hitCooldownCounter = syncedValue(
-          game,
-          uid,
-          'hitCooldownCounter',
-          0,
-        )
+        const mobData = syncedValue(game, uid, 'mobData', {
+          health: maxHealth,
+          direction: 1,
+          hitCooldownCounter: 0,
+          currentPatrolDistance: 0,
+          currentAnimation: 'walk' as zombieAnimations,
+          projectileCooldownCounter: 0,
+        })
 
         const onPlayerAttack: OnPlayerAttack = (player, item) => {
           if (
-            hitCooldownCounter.value <= 0 &&
+            mobData.value.hitCooldownCounter <= 0 &&
             item?.animationName !== 'bow' &&
             item?.animationName !== 'shoot'
           ) {
@@ -155,7 +153,7 @@ export const createArcherMob = createSpawnableEntity<
             if (Math.abs(xDiff) <= hitRadius) {
               netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
 
-              if (health.value - 1 <= 0) {
+              if (mobData.value.health - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
               }
             }
@@ -169,7 +167,7 @@ export const createArcherMob = createSpawnableEntity<
             if (other.tags.includes('Projectile')) {
               netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
 
-              if (health.value - 1 <= 0) {
+              if (mobData.value.health - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
               }
             }
@@ -194,7 +192,7 @@ export const createArcherMob = createSpawnableEntity<
 
         game.events.common.addListener('onPlayerAttack', onPlayerAttack)
         game.events.common.addListener('onCollisionStart', onCollisionStart)
-        game.events.common.addListener(
+        game.events.client?.addListener(
           'onPlayerCollisionStart',
           onPlayerCollisionStart,
         )
@@ -217,17 +215,18 @@ export const createArcherMob = createSpawnableEntity<
 
           if (!player) throw new Error('missing netplayer')
 
-          hitCooldownCounter.value = hitCooldown * 60
-          const force = knockback * direction.value
+          mobData.value.hitCooldownCounter = hitCooldown * 60
+          mobData.value.currentAnimation = 'recoil'
+          const force = knockback * mobData.value.direction
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
-          health.value -= 1
-          if (health.value <= 0) {
+          mobData.value.health -= 1
+          if (mobData.value.health <= 0) {
             await game.destroy(this as SpawnableEntity)
           } else {
             network.broadcastCustomMessage(HIT_CHANNEL, {
               uid,
-              health: health.value,
+              health: mobData.value.health,
             })
           }
         }
@@ -244,15 +243,18 @@ export const createArcherMob = createSpawnableEntity<
           onCollisionStart,
           onPlayerCollisionStart,
 
-          health,
-          direction,
-          projectileCooldownCounter,
-          hitCooldownCounter,
-          currentPatrolDistance,
+          mobData,
         }
       },
 
-      initRenderContext(_, { camera, stage }) {
+      initRenderContext: async (_, { camera, stage }) => {
+        const assets = getPreloadedAssets()
+        zombieAnimations.walk = assets.walkTextures
+        zombieAnimations.recoil = assets.recoilTextures
+        const sprite = new AnimatedSprite(zombieAnimations.walk!)
+        sprite.gotoAndPlay(0)
+        sprite.anchor.set(0.45, 0.535)
+
         const container = new Container()
         container.sortableChildren = true
         container.zIndex = zIndex
@@ -296,6 +298,7 @@ export const createArcherMob = createSpawnableEntity<
         container.addChild(gfxHittest)
         container.addChild(ctrHealth)
         stage.addChild(container)
+        stage.addChild(sprite)
 
         return {
           camera,
@@ -304,6 +307,7 @@ export const createArcherMob = createSpawnableEntity<
           gfxHittest,
           ctrHealth,
           gfxHealthAmount,
+          sprite,
         }
       },
 
@@ -318,7 +322,7 @@ export const createArcherMob = createSpawnableEntity<
         game.physics.unregister(this, body)
         game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
         game.events.common.removeListener('onCollisionStart', onCollisionStart)
-        game.events.common.removeListener(
+        game.events.client?.removeListener(
           'onPlayerCollisionStart',
           onPlayerCollisionStart,
         )
@@ -331,21 +335,12 @@ export const createArcherMob = createSpawnableEntity<
         ctrHealth.destroy({ children: true })
       },
 
-      async onPhysicsStep(
-        _,
-        {
-          game,
-          hitCooldownCounter,
-          currentPatrolDistance,
-          direction,
-          projectileCooldownCounter,
-        },
-      ) {
+      async onPhysicsStep(_, { game, mobData }) {
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
-        if (hitCooldownCounter.value > 0 && game.server) {
-          hitCooldownCounter.value -= 1
+        if (mobData.value.hitCooldownCounter > 0) {
+          mobData.value.hitCooldownCounter -= 1
         }
 
         if (applyKnockback) {
@@ -388,22 +383,22 @@ export const createArcherMob = createSpawnableEntity<
           })
         } else {
           // patrol back and fourth when player is far from entity
-          if (game.server && currentPatrolDistance.value >= patrolDistance) {
-            currentPatrolDistance.value = 0
-            direction.value *= -1
+          if (mobData.value.currentPatrolDistance >= patrolDistance) {
+            mobData.value.currentPatrolDistance = 0
+            mobData.value.direction *= -1
           }
 
           Matter.Body.translate(body, {
-            x: (speed / 2) * direction.value,
+            x: (speed / 2) * mobData.value.direction,
             y: 0,
           })
 
-          if (game.server) currentPatrolDistance.value += Math.abs(speed / 2)
+          mobData.value.currentPatrolDistance += Math.abs(speed / 2)
         }
 
         if (game.server) {
-          if (projectileCooldownCounter.value === 0) {
-            const xOffset = direction.value === 1 ? 150 : -150
+          if (mobData.value.projectileCooldownCounter === 0) {
+            const xOffset = mobData.value.direction === 1 ? 150 : -150
             const yOffset = 75
 
             await game.spawn({
@@ -411,7 +406,7 @@ export const createArcherMob = createSpawnableEntity<
               args: {
                 width: 50,
                 height: 10,
-                direction: direction.value,
+                direction: mobData.value.direction,
               },
               transform: {
                 position: {
@@ -423,11 +418,11 @@ export const createArcherMob = createSpawnableEntity<
               tags: ['net/replicated'],
             })
 
-            if (projectileCooldownCounter.value === 0) {
-              projectileCooldownCounter.value = projectileCooldown
+            if (mobData.value.projectileCooldownCounter === 0) {
+              mobData.value.projectileCooldownCounter = projectileCooldown
             }
           } else {
-            projectileCooldownCounter.value -= 1
+            mobData.value.projectileCooldownCounter -= 1
           }
         }
 
@@ -438,24 +433,42 @@ export const createArcherMob = createSpawnableEntity<
 
       onRenderFrame(
         { smooth },
-        { game, hitCooldownCounter, health },
-        { camera, container, gfxHittest, gfxBounds, gfxHealthAmount },
+        { game, mobData },
+        { camera, container, gfxHittest, gfxBounds, gfxHealthAmount, sprite },
       ) {
         const debug = game.debug
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
         const pos = Vec.add(smoothed, camera.offset)
+
+        sprite.scale.x = mobData.value.direction
+
+        sprite.position = pos
+        if (
+          sprite.textures !== zombieAnimations[mobData.value.currentAnimation]
+        ) {
+          sprite.textures = zombieAnimations[mobData.value.currentAnimation]!
+          sprite.gotoAndPlay(0)
+        }
+
+        if (
+          mobData.value.currentAnimation === 'recoil' &&
+          sprite.currentFrame === sprite.totalFrames - 1
+        ) {
+          mobData.value.currentAnimation = 'walk'
+        }
 
         container.position = pos
         container.rotation = body.angle
 
         const alpha = debug.value ? 0.5 : 0
         gfxBounds.alpha = alpha
-        gfxHittest.alpha = hitCooldownCounter.value === 0 ? alpha / 3 : 0
+        gfxHittest.alpha =
+          mobData.value.hitCooldownCounter === 0 ? alpha / 3 : 0
 
         drawBox(
           gfxHealthAmount,
           {
-            width: (health.value / maxHealth) * healthIndicatorWidth,
+            width: (mobData.value.health / maxHealth) * healthIndicatorWidth,
             height: 20,
           },
           { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },

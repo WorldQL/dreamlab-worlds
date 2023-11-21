@@ -104,54 +104,6 @@ export const createBreakableSolid = createSpawnableEntity<
       )
     },
 
-    onArgsUpdate(path, _data, render) {
-      if (render && path === 'spriteSource') {
-        const { width, height, spriteSource } = args
-        if (spriteSource) {
-          render.gfxBoundsRight?.destroy()
-          render.gfxBoundsLeft?.destroy()
-          render.gfxBoundsRight = createSprite(spriteSource, {
-            width,
-            height,
-            zIndex: transform.zIndex,
-          })
-
-          if (render.gfxBoundsRight)
-            render.stage.addChild(render.gfxBoundsRight)
-          if (render.gfxBoundsLeft) render.stage.addChild(render.gfxBoundsLeft)
-        }
-      }
-    },
-
-    onResize({ width, height }, data, render) {
-      const originalWidth = args.width
-      const originalHeight = args.height
-
-      args.width = width
-      args.height = height
-
-      const scaleX = width / originalWidth
-      const scaleY = height / originalHeight
-
-      Matter.Body.setAngle(data.bodyRight, 0)
-      Matter.Body.scale(data.bodyRight, scaleX, scaleY)
-      Matter.Body.setAngle(bodyRight, toRadians(transform.rotation))
-
-      Matter.Body.setAngle(data.bodyLeft, 0)
-      Matter.Body.scale(data.bodyLeft, scaleX, scaleY)
-      Matter.Body.setAngle(bodyLeft, toRadians(transform.rotation))
-
-      if (!render) return
-      drawBox(render.gfxBoundsRight as Graphics, { width, height })
-      drawBox(render.gfxBoundsLeft as Graphics, { width, height })
-      if (args.spriteSource) {
-        render.gfxBoundsRight.width = width
-        render.gfxBoundsRight.height = height
-        render.gfxBoundsLeft.width = width
-        render.gfxBoundsLeft.height = height
-      }
-    },
-
     init({ game }) {
       game.physics.register(this, bodyLeft)
       game.physics.register(this, bodyRight)
@@ -204,6 +156,30 @@ export const createBreakableSolid = createSpawnableEntity<
         gfxBoundsLeft,
         gfxBoundsRight,
       }
+    },
+
+    onArgsUpdate(path, _previous, _data, render) {
+      if (render && path === 'spriteSource') {
+        const { width, height, spriteSource } = args
+        if (spriteSource) {
+          render.gfxBoundsRight?.destroy()
+          render.gfxBoundsLeft?.destroy()
+          render.gfxBoundsRight = createSprite(spriteSource, {
+            width,
+            height,
+            zIndex: transform.zIndex,
+          })
+
+          if (render.gfxBoundsRight)
+            render.stage.addChild(render.gfxBoundsRight)
+          if (render.gfxBoundsLeft) render.stage.addChild(render.gfxBoundsLeft)
+        }
+      }
+    },
+
+    onResize({ width, height }) {
+      args.width = width
+      args.height = height
     },
 
     teardown({ game }) {

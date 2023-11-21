@@ -7,7 +7,6 @@ import { createArcherMob } from './entities/shared/mobs/zombieArcher.js'
 import { createPlatform } from './entities/shared/platform.js'
 import { createProjectile } from './entities/shared/projectile.js'
 import { createRegion } from './entities/shared/region.js'
-import { level } from './level/shared/level.js'
 import { regionManager } from './managers/regions.js'
 import { initProjectileWeapons } from './managers/shooters.js'
 
@@ -21,8 +20,6 @@ export const sharedInit: InitShared = async game => {
   game.register('@dreamlab/InventoryItem', createPickupItem)
   game.register('@dreamlab/Platform', createPlatform)
   game.register('@dreamlab/Projectile', createProjectile)
-
-  await game.spawnMany(...level)
 
   // Draw hard-coded regions for debugging (see regions.ts for hard-coded region locations)
   const regionSpawns = regionManager.getRegions().map(async region =>

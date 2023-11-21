@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig(options => ({
-  entry: ['./src/client.ts', './src/server.ts'],
+  entry: ['./src/client.ts', './src/server.ts', './src/level.ts'],
 
   target: 'es2021',
   format: 'esm',

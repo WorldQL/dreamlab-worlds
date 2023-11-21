@@ -54,7 +54,7 @@ export const createRegion = createSpawnableEntity<
       )
     },
 
-    onArgsUpdate(path, _data, render) {
+    onArgsUpdate(path, _previous, _data, render) {
       if (render && path === 'spriteSource') {
         const { width, height, spriteSource } = args
 
@@ -71,16 +71,9 @@ export const createRegion = createSpawnableEntity<
       }
     },
 
-    onResize({ width, height }, _, render) {
+    onResize({ width, height }) {
       args.width = width
       args.height = height
-
-      if (!render) return
-      drawBox(render.gfx, { width, height }, { stroke: 'blue' })
-      if (render.sprite) {
-        render.sprite.width = width
-        render.sprite.height = height
-      }
     },
 
     init({ game }) {

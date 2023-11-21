@@ -75,7 +75,7 @@ export const createPlatform = createSpawnableEntity<
       return Matter.Query.point([body], position).length > 0
     },
 
-    onArgsUpdate(path, _data, render) {
+    onArgsUpdate(path, _previous, _data, render) {
       if (render && path === 'spriteSource') {
         const { width, height, spriteSource } = args
 
@@ -92,26 +92,9 @@ export const createPlatform = createSpawnableEntity<
       }
     },
 
-    onResize({ width, height }, data, render) {
-      const originalWidth = args.width
-      const originalHeight = args.height
-
+    onResize({ width, height }) {
       args.width = width
       args.height = height
-
-      const scaleX = width / originalWidth
-      const scaleY = height / originalHeight
-
-      Matter.Body.setAngle(data.body, 0)
-      Matter.Body.scale(data.body, scaleX, scaleY)
-      Matter.Body.setAngle(body, toRadians(transform.rotation))
-
-      if (!render) return
-      drawBox(render.gfx, { width, height })
-      if (render.sprite) {
-        render.sprite.width = width
-        render.sprite.height = height
-      }
     },
 
     init({ game }) {

@@ -3,7 +3,7 @@ import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import type { Camera } from '@dreamlab.gg/core/entities'
 import { createItem } from '@dreamlab.gg/core/managers'
-import { toRadians, Vec } from '@dreamlab.gg/core/math'
+import { Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
@@ -132,11 +132,11 @@ export const createPickupItem = createSpawnableEntity<
         }
       }
 
-      game.events.common.addListener(
+      game.events.client?.addListener(
         'onPlayerCollisionStart',
         onPlayerCollisionStart,
       )
-      game.events.common.addListener(
+      game.events.client?.addListener(
         'onPlayerCollisionEnd',
         onPlayerCollisionEnd,
       )
@@ -179,7 +179,7 @@ export const createPickupItem = createSpawnableEntity<
       }
     },
 
-    onArgsUpdate(path, _data, render) {
+    onArgsUpdate(path, _previous, _data, render) {
       if (render && path === 'spriteSource') {
         const { width, height, spriteSource } = args
 
@@ -196,35 +196,18 @@ export const createPickupItem = createSpawnableEntity<
       }
     },
 
-    onResize({ width, height }, data, render) {
-      const originalWidth = args.width
-      const originalHeight = args.height
-
+    onResize({ width, height }) {
       args.width = width
       args.height = height
-
-      const scaleX = width / originalWidth
-      const scaleY = height / originalHeight
-
-      Matter.Body.setAngle(data.body, 0)
-      Matter.Body.scale(data.body, scaleX, scaleY)
-      Matter.Body.setAngle(body, toRadians(transform.rotation))
-
-      if (!render) return
-      drawBox(render.gfx, { width, height })
-      if (render.sprite) {
-        render.sprite.width = width
-        render.sprite.height = height
-      }
     },
 
     teardown({ game, onPlayerCollisionStart, onPlayerCollisionEnd }) {
       game.physics.unregister(this, body)
-      game.events.common.removeListener(
+      game.events.client?.removeListener(
         'onPlayerCollisionStart',
         onPlayerCollisionStart,
       )
-      game.events.common.removeListener(
+      game.events.client?.removeListener(
         'onPlayerCollisionEnd',
         onPlayerCollisionEnd,
       )

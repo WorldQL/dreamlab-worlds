@@ -2,7 +2,7 @@ import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import { isPlayer } from '@dreamlab.gg/core/entities'
 import type { Camera, Player } from '@dreamlab.gg/core/entities'
-import { cloneTransform, toRadians, Vec } from '@dreamlab.gg/core/math'
+import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
@@ -76,7 +76,7 @@ export const createLadder = createSpawnableEntity<
       return Matter.Query.point([body], position).length > 0
     },
 
-    onArgsUpdate(path, _data, render) {
+    onArgsUpdate(path, _previous, _data, render) {
       if (render && path === 'spriteSource') {
         const { width, height, spriteSource } = args
 
@@ -93,34 +93,17 @@ export const createLadder = createSpawnableEntity<
       }
     },
 
-    onResize({ width, height }, data, render) {
-      const originalWidth = args.width
-      const originalHeight = args.height
-
+    onResize({ width, height }) {
       args.width = width
       args.height = height
-
-      const scaleX = width / originalWidth
-      const scaleY = height / originalHeight
-
-      Matter.Body.setAngle(data.body, 0)
-      Matter.Body.scale(data.body, scaleX, scaleY)
-      Matter.Body.setAngle(body, toRadians(transform.rotation))
-
-      if (!render) return
-      drawBox(render.gfx, { width, height })
-      if (render.sprite) {
-        render.sprite.width = width
-        render.sprite.height = height
-      }
     },
 
     init({ game }) {
       game.physics.register(this, body)
-      game.events.common.addListener('onPlayerCollisionStart', pair =>
+      game.events.client?.addListener('onPlayerCollisionStart', pair =>
         onPlayerCollision(pair, 'start'),
       )
-      game.events.common.addListener('onPlayerCollisionEnd', pair =>
+      game.events.client?.addListener('onPlayerCollisionEnd', pair =>
         onPlayerCollision(pair, 'end'),
       )
 
@@ -164,10 +147,10 @@ export const createLadder = createSpawnableEntity<
 
     teardown({ game }) {
       game.physics.unregister(this, body)
-      game.events.common.removeListener('onPlayerCollisionStart', pair =>
+      game.events.client?.removeListener('onPlayerCollisionStart', pair =>
         onPlayerCollision(pair, 'start'),
       )
-      game.events.common.removeListener('onPlayerCollisionEnd', pair =>
+      game.events.client?.removeListener('onPlayerCollisionEnd', pair =>
         onPlayerCollision(pair, 'end'),
       )
     },
