@@ -223,6 +223,9 @@ export const createZombieMob = createSpawnableEntity<
 
           mobData.value.hitCooldownCounter = hitCooldown * 60
           mobData.value.currentAnimation = 'recoil'
+          setTimeout(() => {
+            mobData.value.currentAnimation = 'walk'
+          }, 200)
           const force = knockback * mobData.value.direction
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
@@ -415,13 +418,6 @@ export const createZombieMob = createSpawnableEntity<
         ) {
           sprite.textures = zombieAnimations[mobData.value.currentAnimation]!
           sprite.gotoAndPlay(0)
-        }
-
-        if (
-          mobData.value.currentAnimation === 'recoil' &&
-          sprite.currentFrame === sprite.totalFrames - 1
-        ) {
-          mobData.value.currentAnimation = 'walk'
         }
 
         container.position = pos
