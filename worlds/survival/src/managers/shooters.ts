@@ -19,11 +19,11 @@ export const initProjectileWeapons = (game: Game<false>) => {
 
   const spawnProjectile = async (
     player: Player,
-    item: PlayerItem,
+    gear: PlayerItem,
     angleOffset: number,
     yOffset = Y_OFFSET_DEFAULT,
   ) => {
-    const xOffsetFactor = item?.texture ? item.texture.width / 1.5 : 165
+    const xOffsetFactor = gear?.texture ? gear.texture.width / 1.5 : 165
     const xOffset =
       player.facingDirection === 1 ? xOffsetFactor : -xOffsetFactor
 
@@ -45,7 +45,7 @@ export const initProjectileWeapons = (game: Game<false>) => {
 
   game.events.common.addListener(
     'onPlayerAttack',
-    async (player: Player, item: PlayerItem) => {
+    async (player: Player, gear: PlayerItem) => {
       if (
         player.currentAnimation === 'bow' ||
         player.currentAnimation === 'shoot'
@@ -60,46 +60,46 @@ export const initProjectileWeapons = (game: Game<false>) => {
           return
         }
 
-        const invItem = InventoryManager.getInstance().getItemFromItem(item)
+        const invItem = InventoryManager.getInstance().getItemFromItem(gear)
 
         switch (invItem?.projectileType) {
           case ProjectileTypes.SINGLE_SHOT:
-            await spawnProjectile(player, item, 0)
+            await spawnProjectile(player, gear, 0)
             break
 
           case ProjectileTypes.DOUBLE_SHOT:
-            await spawnProjectile(player, item, 0)
+            await spawnProjectile(player, gear, 0)
             await delay(SHOT_DELAY)
-            await spawnProjectile(player, item, 0)
+            await spawnProjectile(player, gear, 0)
             break
 
           case ProjectileTypes.BURST_SHOT:
-            await spawnProjectile(player, item, 0)
+            await spawnProjectile(player, gear, 0)
             await delay(SHOT_DELAY)
-            await spawnProjectile(player, item, 0)
+            await spawnProjectile(player, gear, 0)
             await delay(SHOT_DELAY)
-            await spawnProjectile(player, item, 0)
+            await spawnProjectile(player, gear, 0)
             break
 
           case ProjectileTypes.SCATTER_SHOT:
-            await spawnProjectile(player, item, 0.1, 70)
-            await spawnProjectile(player, item, 0)
-            await spawnProjectile(player, item, -0.1, 80)
+            await spawnProjectile(player, gear, 0.1, 70)
+            await spawnProjectile(player, gear, 0)
+            await spawnProjectile(player, gear, -0.1, 80)
             break
 
           case ProjectileTypes.DOUBLE_SCATTER_SHOT:
-            await spawnProjectile(player, item, 0.1, 70)
-            await spawnProjectile(player, item, 0)
-            await spawnProjectile(player, item, -0.1, 80)
+            await spawnProjectile(player, gear, 0.1, 70)
+            await spawnProjectile(player, gear, 0)
+            await spawnProjectile(player, gear, -0.1, 80)
             await delay(SHOT_DELAY)
 
-            await spawnProjectile(player, item, 0.1, 70)
-            await spawnProjectile(player, item, 0)
-            await spawnProjectile(player, item, -0.1, 80)
+            await spawnProjectile(player, gear, 0.1, 70)
+            await spawnProjectile(player, gear, 0)
+            await spawnProjectile(player, gear, -0.1, 80)
             break
 
           default:
-            await spawnProjectile(player, item, 0)
+            await spawnProjectile(player, gear, 0)
         }
       }
     },
