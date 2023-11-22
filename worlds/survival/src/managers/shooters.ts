@@ -27,8 +27,6 @@ export const initProjectileWeapons = (game: Game<false>) => {
     const xOffset =
       player.facingDirection === 1 ? xOffsetFactor : -xOffsetFactor
 
-    console.log(xOffset)
-
     return game.spawn({
       entity: '@dreamlab/Projectile',
       args: { width: 50, height: 10, direction: player.facingDirection },
