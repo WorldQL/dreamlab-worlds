@@ -276,6 +276,14 @@ export const createZombieMob = createSpawnableEntity<
         sprite.gotoAndPlay(0)
         sprite.anchor.set(0.45, 0.535)
 
+        const originalWidth = sprite.texture.width
+        const originalHeight = sprite.texture.height
+        const scaleX = (width * 1.5) / originalWidth
+        const scaleY = (height * 1.5) / originalHeight
+        const uniformScale = Math.max(scaleX, scaleY)
+
+        sprite.scale.set(uniformScale, uniformScale)
+
         const container = new Container()
         container.sortableChildren = true
         container.zIndex = zIndex

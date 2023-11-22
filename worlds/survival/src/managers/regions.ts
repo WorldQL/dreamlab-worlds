@@ -4,11 +4,11 @@ import Matter from 'matter-js'
 export const ZombieTypes = [
   {
     width: 80,
-    height: 100,
+    height: 185,
     maxHealth: 5,
     speed: 5,
     knockback: 2,
-  }, // babyZombie
+  }, // smallZombie
   {
     width: 80,
     height: 260,
