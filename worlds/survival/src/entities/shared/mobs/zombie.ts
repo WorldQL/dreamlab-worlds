@@ -188,8 +188,8 @@ export const createZombieMob = createSpawnableEntity<
             const heightDifference = player.body.position.y - body.position.y
 
             const mobHeight = body.bounds.max.y - body.bounds.min.y
-            const someThreshold = mobHeight / 2
-            if (heightDifference < -someThreshold) {
+            const threshold = mobHeight / 2
+            if (heightDifference < -threshold) {
               netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
               const bounceForce = { x: 0, y: -5 }
               deferUntilPhysicsStep(game, () => {
