@@ -142,7 +142,7 @@ export const createZombieMob = createSpawnableEntity<
 
         const mobData = syncedValue(game, uid, 'mobData', {
           health: maxHealth,
-          direction: 1,
+          direction: 0,
           hitCooldownCounter: 0,
           currentPatrolDistance: 0,
           currentAnimation: 'walk' as zombieAnimations,
@@ -403,13 +403,14 @@ export const createZombieMob = createSpawnableEntity<
 
           if (closestPlayer && minDistance < 2_000) {
             mobData.value.direction =
-              closestPlayer.position.x > body.position.x ? -1 : 1
+              closestPlayer.position.x > body.position.x ? 1 : -1
 
             Matter.Body.translate(body, {
-              x: speed * -mobData.value.direction,
+              x: speed * mobData.value.direction,
               y: 0,
             })
           } else {
+            if (mobData.value.direction === 0) mobData.value.direction = 1
             // patrol back and fourth when player is far from entity
             if (mobData.value.currentPatrolDistance > patrolDistance) {
               mobData.value.currentPatrolDistance = 0
@@ -417,7 +418,7 @@ export const createZombieMob = createSpawnableEntity<
             }
 
             Matter.Body.translate(body, {
-              x: (speed / 2) * -mobData.value.direction,
+              x: (speed / 2) * mobData.value.direction,
               y: 0,
             })
 
@@ -439,7 +440,7 @@ export const createZombieMob = createSpawnableEntity<
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
         const pos = Vec.add(smoothed, camera.offset)
 
-        sprite.scale.x = mobData.value.direction
+        sprite.scale.x = -mobData.value.direction
 
         sprite.position = pos
         if (
