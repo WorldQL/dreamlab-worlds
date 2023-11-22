@@ -185,14 +185,30 @@ export const createZombieMob = createSpawnableEntity<
           _raw,
         ) => {
           if (body && bodyCollided === body) {
-            events.emit('onPlayerDamage', 1)
-            const force = 4 * -player.facingDirection
-            deferUntilPhysicsStep(game, () => {
-              Matter.Body.applyForce(player.body, player.body.position, {
-                x: force,
-                y: -1,
+            const heightDifference = player.body.position.y - body.position.y
+
+            const mobHeight = body.bounds.max.y - body.bounds.min.y
+            const someThreshold = mobHeight / 2
+            if (heightDifference < -someThreshold) {
+              netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              const bounceForce = { x: 0, y: -5 }
+              deferUntilPhysicsStep(game, () => {
+                Matter.Body.applyForce(
+                  player.body,
+                  player.body.position,
+                  bounceForce,
+                )
               })
-            })
+            } else {
+              events.emit('onPlayerDamage', 1)
+              const force = 4 * -player.facingDirection
+              deferUntilPhysicsStep(game, () => {
+                Matter.Body.applyForce(player.body, player.body.position, {
+                  x: force,
+                  y: -1,
+                })
+              })
+            }
           }
         }
 
