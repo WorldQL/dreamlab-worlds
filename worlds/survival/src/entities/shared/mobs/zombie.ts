@@ -381,8 +381,12 @@ export const createZombieMob = createSpawnableEntity<
               x: speed * -mobData.value.direction,
               y: 0,
             })
-            mobData.value.currentAnimation =
-              minDistance < 150 ? 'punch' : 'walk'
+            if (minDistance < 150) mobData.value.currentAnimation = 'punch'
+            else if (
+              mobData.value.currentAnimation !== ('recoil' as zombieAnimations)
+            ) {
+              mobData.value.currentAnimation = 'walk'
+            }
           } else {
             // patrol back and fourth when player is far from entity
             if (mobData.value.currentPatrolDistance > patrolDistance) {
