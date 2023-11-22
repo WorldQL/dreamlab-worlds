@@ -108,7 +108,7 @@ export const createZombieMob = createSpawnableEntity<
 
     const patrolDistance = 300
     const hitRadius = width / 2 + 120
-    const hitCooldown = 1 // Second(s)
+    const hitCooldown = 0.5 // Second(s)
     const healthIndicatorWidth = width + 50
     const healthIndicatorHeight = 20
 
@@ -222,7 +222,6 @@ export const createZombieMob = createSpawnableEntity<
           if (!player) throw new Error('missing netplayer')
 
           mobData.value.hitCooldownCounter = hitCooldown * 60
-          mobData.value.currentAnimation = 'recoil'
           const force = knockback * mobData.value.direction
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
@@ -230,9 +229,6 @@ export const createZombieMob = createSpawnableEntity<
           if (mobData.value.health <= 0) {
             await game.destroy(this as SpawnableEntity)
           } else {
-            setTimeout(() => {
-              mobData.value.currentAnimation = 'walk'
-            }, 200)
             network.broadcastCustomMessage(HIT_CHANNEL, {
               uid,
               health: mobData.value.health,
@@ -373,6 +369,14 @@ export const createZombieMob = createSpawnableEntity<
             }
           }
 
+          if (mobData.value.hitCooldownCounter > 0) {
+            mobData.value.currentAnimation = 'recoil'
+          } else if (closestPlayer && minDistance < 150) {
+            mobData.value.currentAnimation = 'punch'
+          } else if (mobData.value.currentAnimation !== 'walk') {
+            mobData.value.currentAnimation = 'walk'
+          }
+
           if (closestPlayer && minDistance < 2_000) {
             mobData.value.direction =
               closestPlayer.position.x > body.position.x ? -1 : 1
@@ -381,12 +385,6 @@ export const createZombieMob = createSpawnableEntity<
               x: speed * -mobData.value.direction,
               y: 0,
             })
-            if (minDistance < 150) mobData.value.currentAnimation = 'punch'
-            else if (
-              mobData.value.currentAnimation !== ('recoil' as zombieAnimations)
-            ) {
-              mobData.value.currentAnimation = 'walk'
-            }
           } else {
             // patrol back and fourth when player is far from entity
             if (mobData.value.currentPatrolDistance > patrolDistance) {
