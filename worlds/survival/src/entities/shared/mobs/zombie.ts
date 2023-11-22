@@ -113,6 +113,7 @@ export const createZombieMob = createSpawnableEntity<
     const healthIndicatorHeight = 20
 
     const zombieAnimations: Record<string, Texture<Resource>[]> = {}
+    let gameEntities: Matter.Body[]
 
     return {
       [zombieSymbol]: true,
@@ -147,6 +148,8 @@ export const createZombieMob = createSpawnableEntity<
           currentPatrolDistance: 0,
           currentAnimation: 'walk' as zombieAnimations,
         })
+
+        gameEntities = Matter.Composite.allBodies(game.physics.engine.world)
 
         const onPlayerAttack: OnPlayerAttack = (player, item) => {
           if (
@@ -238,7 +241,7 @@ export const createZombieMob = createSpawnableEntity<
           if (!player) throw new Error('missing netplayer')
 
           mobData.value.hitCooldownCounter = hitCooldown * 60
-          const force = knockback * mobData.value.direction
+          const force = knockback * -mobData.value.direction
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
           mobData.value.health -= 1
@@ -374,24 +377,30 @@ export const createZombieMob = createSpawnableEntity<
             mobData.value.hitCooldownCounter -= 1
           }
 
-          const allBodies = Matter.Composite.allBodies(
-            game.physics.engine.world,
-          )
           let closestPlayer: Matter.Body | null = null
           let minDistance = Number.POSITIVE_INFINITY
 
-          for (const player of allBodies) {
+          const searchArea = {
+            min: { x: body.position.x - 5_000, y: body.position.y - 5_000 },
+            max: { x: body.position.x + 5_000, y: body.position.y + 5_000 },
+          }
+
+          const bodiesInRegion = Matter.Query.region(gameEntities, searchArea)
+
+          for (const player of bodiesInRegion) {
             if (player.label === 'player') {
               const dx = player.position.x - body.position.x
               const dy = player.position.y - body.position.y
-              const distance = Math.hypot(dx, dy)
+              const distanceSquared = dx * dx + dy * dy
 
-              if (distance < minDistance) {
-                minDistance = distance
+              if (distanceSquared < minDistance) {
+                minDistance = distanceSquared
                 closestPlayer = player
               }
             }
           }
+
+          minDistance = Math.sqrt(minDistance)
 
           if (mobData.value.hitCooldownCounter > 0) {
             mobData.value.currentAnimation = 'recoil'
@@ -425,7 +434,7 @@ export const createZombieMob = createSpawnableEntity<
             mobData.value.currentPatrolDistance += Math.abs(speed / 2)
           }
 
-          if (!closestPlayer || minDistance > 6_000) {
+          if (!closestPlayer || minDistance > 5_000) {
             await game.destroy(this as SpawnableEntity)
           }
         }
