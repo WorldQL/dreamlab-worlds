@@ -27,13 +27,21 @@ export const initProjectileWeapons = (game: Game<false>) => {
     const xOffset =
       player.facingDirection === 1 ? xOffsetFactor : -xOffsetFactor
 
+    let additionalOffsetX = 0
+    let additionalOffsetY = 0
+
+    if (player.currentAnimation === 'shoot') {
+      additionalOffsetX = 0
+      additionalOffsetY = -50
+    }
+
     return game.spawn({
       entity: '@dreamlab/Projectile',
       args: { width: 50, height: 10, direction: player.facingDirection },
       transform: {
         position: {
           x: player.body.position.x + xOffset,
-          y: player.body.position.y - yOffset,
+          y: player.body.position.y - yOffset + additionalOffsetY,
         },
         rotation: angleOffset,
       },
