@@ -119,8 +119,7 @@ export const createArcherMob = createSpawnableEntity<
       },
 
       rectangleBounds() {
-        // TODO
-        return undefined
+        return { width, height }
       },
 
       isPointInside(position) {

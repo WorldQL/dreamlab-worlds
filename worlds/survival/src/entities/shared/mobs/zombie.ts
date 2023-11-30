@@ -126,8 +126,7 @@ export const createZombieMob = createSpawnableEntity<
       },
 
       rectangleBounds() {
-        // TODO
-        return undefined
+        return { width, height }
       },
 
       isPointInside(position) {
