@@ -113,7 +113,6 @@ export const createZombieMob = createSpawnableEntity<
     const healthIndicatorHeight = 20
 
     const zombieAnimations: Record<string, Texture<Resource>[]> = {}
-    let gameEntities: Matter.Body[]
 
     return {
       [zombieSymbol]: true,
@@ -148,8 +147,6 @@ export const createZombieMob = createSpawnableEntity<
           currentPatrolDistance: 0,
           currentAnimation: 'walk' as zombieAnimations,
         })
-
-        gameEntities = Matter.Composite.allBodies(game.physics.engine.world)
 
         const onPlayerAttack: OnPlayerAttack = (player, item) => {
           if (
@@ -385,7 +382,10 @@ export const createZombieMob = createSpawnableEntity<
             max: { x: body.position.x + 5_000, y: body.position.y + 5_000 },
           }
 
-          const bodiesInRegion = Matter.Query.region(gameEntities, searchArea)
+          const bodiesInRegion = Matter.Query.region(
+            Matter.Composite.allBodies(game.physics.engine.world),
+            searchArea,
+          )
 
           for (const player of bodiesInRegion) {
             if (player.label === 'player') {
@@ -435,6 +435,7 @@ export const createZombieMob = createSpawnableEntity<
           }
 
           if (!closestPlayer || minDistance > 5_000) {
+            console.log('DESTROYED')
             await game.destroy(this as SpawnableEntity)
           }
         }
