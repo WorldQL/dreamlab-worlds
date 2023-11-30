@@ -1,10 +1,9 @@
 import type { Game } from '@dreamlab.gg/core'
 import { isNetPlayer } from '@dreamlab.gg/core/dist/entities'
-import type { NetPlayer, Player } from '@dreamlab.gg/core/dist/entities'
+import type { Player } from '@dreamlab.gg/core/dist/entities'
 import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
 import type { MessageListenerServer } from '@dreamlab.gg/core/dist/network'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/dist/network'
-import type { Texture } from 'pixi.js'
 import InventoryManager, {
   ProjectileTypes,
 } from '../inventory/InventoryManager'
@@ -26,31 +25,30 @@ export const initProjectileWeapons = (game: Game<false>) => {
   const netServer = onlyNetServer(game)
 
   const spawnProjectile = async (
-    player: NetPlayer,
+    direction: number,
+    animation: string,
+    position: [number, number],
     angleOffset: number,
     yOffset = Y_OFFSET_DEFAULT,
   ) => {
     const xOffsetFactor = 165
-    const xOffset =
-      player.facingDirection === 1 ? xOffsetFactor : -xOffsetFactor
+    const xOffset = direction === 1 ? xOffsetFactor : -xOffsetFactor
 
     let additionalOffsetX = 0
     let additionalOffsetY = 0
 
-    if (player.currentAnimation === 'shoot') {
+    if (animation === 'shoot') {
       additionalOffsetX = 0
       additionalOffsetY = -50
     }
 
-    console.log('spawned?')
-
     return game.spawn({
       entity: '@dreamlab/Projectile',
-      args: { width: 50, height: 10, direction: player.facingDirection },
+      args: { width: 50, height: 10, direction },
       transform: {
         position: {
-          x: player.body.position.x + xOffset,
-          y: player.body.position.y - yOffset + additionalOffsetY,
+          x: position[0] + xOffset,
+          y: position[1] - yOffset + additionalOffsetY,
         },
         rotation: angleOffset,
       },
@@ -68,47 +66,13 @@ export const initProjectileWeapons = (game: Game<false>) => {
 
     if (!player) throw new Error('missing netplayer')
 
-    console.log('spawning!')
-    // await spawnProjectile(player, data.angle as number)
-    const xOffsetFactor = 165
-    const xOffset =
-      player.facingDirection === 1 ? xOffsetFactor : -xOffsetFactor
+    const direction = data.direction as number
+    const animation = data.animation as string
+    const position = data.position as [number, number]
+    const angle = data.angle as number
+    const yOffset = data.yOffset ? (data.yOffset as number) : undefined
 
-    let additionalOffsetX = 0
-    let additionalOffsetY = 0
-
-    if (player.currentAnimation === 'shoot') {
-      additionalOffsetX = 0
-      additionalOffsetY = -50
-    }
-
-    // const spawn = await game.spawn({
-    //   entity: '@dreamlab/ZombieMob',
-    //   args: { width: 80, height: 260, maxHealth: 4, speed: 2, knockback: 0.5 },
-    //   transform: {
-    //     position: {
-    //       x: player.body.position.x + xOffset,
-    //       y: player.body.position.y - Y_OFFSET_DEFAULT + additionalOffsetY,
-    //     },
-    //     rotation: data.angle as number,
-    //   },
-    //   tags: ['net/replicated', 'net/server-authoritative', 'editor/doNotSave'],
-    // })
-
-    const spawn = await game.spawn({
-      entity: '@dreamlab/Projectile',
-      args: { width: 50, height: 10, direction: player.facingDirection },
-      transform: {
-        position: {
-          x: player.body.position.x + xOffset,
-          y: player.body.position.y - Y_OFFSET_DEFAULT + additionalOffsetY,
-        },
-        rotation: data.angle as number,
-      },
-      tags: ['net/replicated', 'net/server-authoritative', 'editor/doNotSave'],
-    })
-
-    console.log(spawn)
+    await spawnProjectile(direction, animation, position, angle, yOffset)
   }
 
   netServer?.addCustomMessageListener(SHOOT_CHANNEL, onHitServer)
@@ -134,32 +98,123 @@ export const initProjectileWeapons = (game: Game<false>) => {
 
         switch (invItem?.projectileType) {
           case ProjectileTypes.SINGLE_SHOT:
-            // Inside the 'onPlayerAttack' listener
             netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
               angle: 0,
             })
 
             break
+
+          case ProjectileTypes.DOUBLE_SHOT:
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0,
+            })
+            await delay(SHOT_DELAY)
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0,
+            })
+            break
+
+          case ProjectileTypes.BURST_SHOT:
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0,
+            })
+            await delay(SHOT_DELAY)
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0,
+            })
+            await delay(SHOT_DELAY)
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0,
+            })
+            break
+
+          case ProjectileTypes.SCATTER_SHOT:
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0.1,
+              yOffset: 70,
+            })
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0,
+            })
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: -1,
+              yOffset: 80,
+            })
+            break
+
+          case ProjectileTypes.DOUBLE_SCATTER_SHOT:
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0.1,
+              yOffset: 70,
+            })
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0,
+            })
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: -0.1,
+              yOffset: 80,
+            })
+            await delay(SHOT_DELAY)
+
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0.1,
+              yOffset: 70,
+            })
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: 0,
+            })
+            netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle: -0.1,
+              yOffset: 80,
+            })
+            break
           case undefined: {
             throw new Error('Not implemented yet: undefined case')
-          }
-
-          case ProjectileTypes.BURST_SHOT: {
-            throw new Error(
-              'Not implemented yet: ProjectileTypes.BURST_SHOT case',
-            )
-          }
-
-          case ProjectileTypes.DOUBLE_SCATTER_SHOT: {
-            throw new Error(
-              'Not implemented yet: ProjectileTypes.DOUBLE_SCATTER_SHOT case',
-            )
-          }
-
-          case ProjectileTypes.DOUBLE_SHOT: {
-            throw new Error(
-              'Not implemented yet: ProjectileTypes.DOUBLE_SHOT case',
-            )
           }
 
           case ProjectileTypes.EXPLOSIVE_SHOT: {
@@ -167,46 +222,6 @@ export const initProjectileWeapons = (game: Game<false>) => {
               'Not implemented yet: ProjectileTypes.EXPLOSIVE_SHOT case',
             )
           }
-
-          case ProjectileTypes.SCATTER_SHOT: {
-            throw new Error(
-              'Not implemented yet: ProjectileTypes.SCATTER_SHOT case',
-            )
-          }
-
-          // case ProjectileTypes.DOUBLE_SHOT:
-          //   await spawnProjectile(player, gear, 0)
-          //   await delay(SHOT_DELAY)
-          //   await spawnProjectile(player, gear, 0)
-          //   break
-
-          // case ProjectileTypes.BURST_SHOT:
-          //   await spawnProjectile(player, gear, 0)
-          //   await delay(SHOT_DELAY)
-          //   await spawnProjectile(player, gear, 0)
-          //   await delay(SHOT_DELAY)
-          //   await spawnProjectile(player, gear, 0)
-          //   break
-
-          // case ProjectileTypes.SCATTER_SHOT:
-          //   await spawnProjectile(player, gear, 0.1, 70)
-          //   await spawnProjectile(player, gear, 0)
-          //   await spawnProjectile(player, gear, -0.1, 80)
-          //   break
-
-          // case ProjectileTypes.DOUBLE_SCATTER_SHOT:
-          //   await spawnProjectile(player, gear, 0.1, 70)
-          //   await spawnProjectile(player, gear, 0)
-          //   await spawnProjectile(player, gear, -0.1, 80)
-          //   await delay(SHOT_DELAY)
-
-          //   await spawnProjectile(player, gear, 0.1, 70)
-          //   await spawnProjectile(player, gear, 0)
-          //   await spawnProjectile(player, gear, -0.1, 80)
-          //   break
-
-          // default:
-          //   await spawnProjectile(player, gear, 0)
         }
       }
     },
