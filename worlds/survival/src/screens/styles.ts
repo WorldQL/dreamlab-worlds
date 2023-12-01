@@ -220,4 +220,16 @@ export const styles: { [key: string]: CSSProperties } = {
     backgroundSize: 'cover',
     backgroundPosition: 'center center',
   },
+  versionLabel: {
+    position: 'absolute',
+    bottom: '10px',
+    right: '10px',
+    color: 'white',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: '5px 10px',
+    borderRadius: '5px',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    zIndex: 1_000,
+  },
 }

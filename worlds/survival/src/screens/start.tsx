@@ -71,6 +71,7 @@ const StartScreen: FC = () => {
           </button>
         )}
       </div>
+      <div style={styles.versionLabel}>Alpha Version</div>
     </div>
   )
 }
