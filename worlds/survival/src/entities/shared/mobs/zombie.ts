@@ -142,7 +142,7 @@ export const createZombieMob = createSpawnableEntity<
 
         const mobData = syncedValue(game, uid, 'mobData', {
           health: maxHealth,
-          direction: 0,
+          direction: 1,
           hitCooldownCounter: 0,
           currentPatrolDistance: 0,
           currentAnimation: 'walk' as zombieAnimations,
@@ -437,7 +437,6 @@ export const createZombieMob = createSpawnableEntity<
               y: 0,
             })
           } else {
-            if (mobData.value.direction === 0) mobData.value.direction = 1
             // patrol back and fourth when player is far from entity
             if (mobData.value.currentPatrolDistance > patrolDistance) {
               mobData.value.currentPatrolDistance = 0
