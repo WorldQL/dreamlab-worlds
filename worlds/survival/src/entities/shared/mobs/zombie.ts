@@ -49,6 +49,7 @@ interface MobData {
   hitCooldownCounter: number
   currentPatrolDistance: number
   currentAnimation: zombieAnimations
+  directionChangeCooldown: number
 }
 
 interface Data {
@@ -145,6 +146,7 @@ export const createZombieMob = createSpawnableEntity<
           hitCooldownCounter: 0,
           currentPatrolDistance: 0,
           currentAnimation: 'walk' as zombieAnimations,
+          directionChangeCooldown: 0,
         })
 
         const onPlayerAttack: OnPlayerAttack = (player, item) => {
@@ -373,6 +375,10 @@ export const createZombieMob = createSpawnableEntity<
             mobData.value.hitCooldownCounter -= 1
           }
 
+          if (mobData.value.directionChangeCooldown > 0) {
+            mobData.value.directionChangeCooldown -= 1
+          }
+
           let closestPlayer: Matter.Body | null = null
           let minDistance = Number.POSITIVE_INFINITY
 
@@ -410,8 +416,21 @@ export const createZombieMob = createSpawnableEntity<
           }
 
           if (closestPlayer && minDistance < 2_000) {
-            mobData.value.direction =
-              closestPlayer.position.x > body.position.x ? 1 : -1
+            const verticalDistance = Math.abs(
+              closestPlayer.position.y - body.position.y,
+            )
+            const horizontalDistance = Math.abs(
+              closestPlayer.position.x - body.position.x,
+            )
+
+            if (
+              verticalDistance < horizontalDistance &&
+              mobData.value.directionChangeCooldown === 0
+            ) {
+              mobData.value.direction =
+                closestPlayer.position.x > body.position.x ? 1 : -1
+              mobData.value.directionChangeCooldown = 1
+            }
 
             Matter.Body.translate(body, {
               x: speed * mobData.value.direction,
