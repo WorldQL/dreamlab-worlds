@@ -1,7 +1,7 @@
 import type { Game } from '@dreamlab.gg/core'
 import { isNetPlayer } from '@dreamlab.gg/core/dist/entities'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
-import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
+import type { Gear } from '@dreamlab.gg/core/dist/managers'
 import type { MessageListenerServer } from '@dreamlab.gg/core/dist/network'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/dist/network'
 import InventoryManager, {
@@ -66,7 +66,7 @@ export const initProjectileWeapons = (game: Game<false>) => {
 
   game.events.common.addListener(
     'onPlayerAttack',
-    async (player: Player, gear: PlayerItem) => {
+    async (player: Player, gear: Gear | undefined) => {
       if (
         player.currentAnimation === 'bow' ||
         player.currentAnimation === 'shoot'
@@ -78,7 +78,7 @@ export const initProjectileWeapons = (game: Game<false>) => {
 
         const invItem = InventoryManager.getInstance().getItemFromItem(gear)
 
-        const sendProjectileMessage = (angle: number, yOffset?: number) =>
+        const sendProjectileMessage = async (angle: number, yOffset?: number) =>
           netClient?.sendCustomMessage(SHOOT_CHANNEL, {
             direction: player.facingDirection,
             animation: player.currentAnimation,
@@ -101,7 +101,7 @@ export const initProjectileWeapons = (game: Game<false>) => {
                 : 3);
               idx++
             ) {
-              sendProjectileMessage(0)
+              void sendProjectileMessage(0)
               // eslint-disable-next-line no-await-in-loop
               if (idx < 2) await delay(SHOT_DELAY)
             }
@@ -112,9 +112,9 @@ export const initProjectileWeapons = (game: Game<false>) => {
             const scatterShots =
               invItem.projectileType === ProjectileTypes.SCATTER_SHOT ? 1 : 2
             for (let idx = 0; idx < scatterShots; idx++) {
-              sendProjectileMessage(0.1, 70)
-              sendProjectileMessage(0)
-              sendProjectileMessage(-0.1, 80)
+              void sendProjectileMessage(0.1, 70)
+              void sendProjectileMessage(0)
+              void sendProjectileMessage(-0.1, 80)
               // eslint-disable-next-line no-await-in-loop
               if (idx < 1) await delay(SHOT_DELAY)
             }

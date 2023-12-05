@@ -2,10 +2,10 @@ import { createSpawnableEntity } from '@dreamlab.gg/core'
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import type { Camera } from '@dreamlab.gg/core/entities'
-import { createItem } from '@dreamlab.gg/core/managers'
+import { createGear } from '@dreamlab.gg/core/managers'
 import { Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
-import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
+import { createSprite } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
@@ -24,7 +24,7 @@ const ArgsSchema = z.object({
   height: z.number().positive().min(1),
   displayName: z.string(),
   animationName: z.string(),
-  spriteSource: SpriteSourceSchema.optional(),
+  spriteSource: z.string(),
   damage: z.number().default(1),
   lore: z.string().default('Default Item Lore'),
   bone: z.enum(['handLeft', 'handRight']).default('handRight'),
@@ -97,16 +97,17 @@ export const createPickupItem = createSpawnableEntity<
         _raw,
       ) => {
         if (body && bodyCollided === body && game.client) {
-          const newItem = createItem(
-            args.displayName,
-            args.spriteSource as string,
-            args.animationName,
-            args.speedMultiplier,
-            args.anchorX,
-            args.anchorY,
-            args.rotation,
-            args.bone,
-          )
+          const baseGear = {
+            displayName: args.displayName,
+            textureURL: args.spriteSource,
+            animationName: args.animationName,
+            anchor: { x: args.anchorX, y: args.anchorY },
+            rotation: args.rotation,
+            bone: args.bone,
+            speedMultiplier: args.speedMultiplier,
+          }
+
+          const newItem = createGear(baseGear)
 
           const inventoryItem: InventoryItem = {
             baseItem: newItem,

@@ -150,7 +150,7 @@ export const createArcherMob = createSpawnableEntity<
             const xDiff = player.body.position.x - body.position.x
 
             if (Math.abs(xDiff) <= hitRadius) {
-              netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
 
               if (mobData.value.health - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
@@ -164,7 +164,7 @@ export const createArcherMob = createSpawnableEntity<
             const other = a.uid === uid ? b : a
 
             if (other.tags.includes('Projectile')) {
-              netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
 
               if (mobData.value.health - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
@@ -223,7 +223,7 @@ export const createArcherMob = createSpawnableEntity<
           if (mobData.value.health <= 0) {
             await game.destroy(this as SpawnableEntity)
           } else {
-            network.broadcastCustomMessage(HIT_CHANNEL, {
+            void network.broadcastCustomMessage(HIT_CHANNEL, {
               uid,
               health: mobData.value.health,
             })
