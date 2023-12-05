@@ -8,6 +8,7 @@ export const level: Level = [
       position: { x: 800, y: 600 },
       rotation: 0,
     },
+    tags: ['editorLocked'],
   },
   {
     entity: '@dreamlab/Solid', // large right wall
@@ -16,6 +17,7 @@ export const level: Level = [
       position: { x: 2_550, y: -825 },
       rotation: 90,
     },
+    tags: ['editorLocked'],
   },
   {
     entity: '@dreamlab/Solid', // right well stand

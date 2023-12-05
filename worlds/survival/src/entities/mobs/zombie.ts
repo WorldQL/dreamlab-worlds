@@ -25,8 +25,8 @@ import {
 import Matter from 'matter-js'
 import type { Resource, Texture } from 'pixi.js'
 import { AnimatedSprite, Container, Graphics } from 'pixi.js'
-import { getPreloadedAssets } from '../../../AssetLoader'
-import { events } from '../../../events'
+import { getPreloadedAssets } from '../../AssetLoader'
+import { events } from '../../events'
 
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
