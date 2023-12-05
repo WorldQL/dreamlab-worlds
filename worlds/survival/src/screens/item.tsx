@@ -36,7 +36,7 @@ export const ItemScreen: FC<ItemScreenProps> = ({ game, item }) => {
       setPurchaseComplete(false)
       setAwaitingConfirmation(false)
       setPrompt(
-        `Press F to buy ${newItem?.baseItem?.displayName} for ${newItem?.value}🪙`,
+        `Press F to buy ${newItem?.baseGear?.displayName} for ${newItem?.value}🪙`,
       )
     }
 
@@ -55,7 +55,7 @@ export const ItemScreen: FC<ItemScreenProps> = ({ game, item }) => {
           !purchaseComplete
         ) {
           setPrompt(
-            `Confirm purchase of ${itemToPickup.baseItem?.displayName} for ${itemToPickup.value}🪙? Press F again to confirm.`,
+            `Confirm purchase of ${itemToPickup.baseGear?.displayName} for ${itemToPickup.value}🪙? Press F again to confirm.`,
           )
           setAwaitingConfirmation(true)
         } else if (
@@ -105,7 +105,7 @@ export const ItemScreen: FC<ItemScreenProps> = ({ game, item }) => {
   return (
     <div style={overlayStyle}>
       <div style={styles.itemInfo}>
-        <span style={styles.itemName}>{currentItem.baseItem?.displayName}</span>
+        <span style={styles.itemName}>{currentItem.baseGear?.displayName}</span>
         <div style={styles.statsSection}>
           <span style={styles.statName}>Stats:</span>
           <span style={styles.statValue}>Damage: {currentItem.damage}</span>

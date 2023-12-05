@@ -44,7 +44,7 @@ export const InventoryApp: FC = () => {
       if (!pressed || !player) return
       const idx = digit - 1
       setActiveSlot(idx)
-      player.setGear(inventoryData[idx]?.baseItem)
+      player.setGear(inventoryData[idx]?.baseGear)
     },
     [player, inventoryData, setActiveSlot],
   )
@@ -52,7 +52,7 @@ export const InventoryApp: FC = () => {
   useEffect(() => {
     const updateInventory = () => {
       setInventoryData([...InventoryManager.getInstance().getInventoryData()])
-      player?.setGear(inventoryData[activeSlot]?.baseItem)
+      player?.setGear(inventoryData[activeSlot]?.baseGear)
     }
 
     events.addListener('onInventoryUpdate', updateInventory)

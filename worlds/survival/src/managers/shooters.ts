@@ -71,12 +71,14 @@ export const initProjectileWeapons = (game: Game<false>) => {
         player.currentAnimation === 'bow' ||
         player.currentAnimation === 'shoot'
       ) {
+        if (!gear) return
         const currentTime = Date.now()
         if (!lastSpawnedTime || currentTime - lastSpawnedTime > ATTACK_COOLDOWN)
           lastSpawnedTime = currentTime
         else return
 
-        const invItem = InventoryManager.getInstance().getItemFromItem(gear)
+        const invItem =
+          InventoryManager.getInstance().getInventoryItemFromBaseGear(gear)
 
         const sendProjectileMessage = async (angle: number, yOffset?: number) =>
           netClient?.sendCustomMessage(SHOOT_CHANNEL, {

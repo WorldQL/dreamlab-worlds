@@ -16,8 +16,8 @@ export const handleInventoryDragEnd = (event: InventoryDragEndEvent) => {
   )
 
   if (event.activeSlot === event.sourceSlot) {
-    event.player?.setGear(invData[event.sourceSlot]?.baseItem)
+    event.player?.setGear(invData[event.sourceSlot]?.baseGear)
   } else if (event.activeSlot === event.targetSlot) {
-    event.player?.setGear(invData[event.targetSlot]?.baseItem)
+    event.player?.setGear(invData[event.targetSlot]?.baseGear)
   }
 }

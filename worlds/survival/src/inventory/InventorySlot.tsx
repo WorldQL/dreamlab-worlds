@@ -17,9 +17,9 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
   }
 
   const renderTooltipContent = () => {
-    if (!slot?.baseItem) return null
+    if (!slot?.baseGear) return null
 
-    const { baseItem, damage, projectileType } = slot
+    const { baseGear: baseItem, damage, projectileType } = slot
     const { displayName, speedMultiplier } = baseItem
 
     return (
@@ -40,13 +40,13 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
       onMouseLeave={() => setIsHovered(false)}
       style={combinedStyles}
     >
-      {slot?.baseItem?.textureURL && (
+      {slot?.baseGear?.textureURL && (
         <img
-          alt={slot.baseItem?.displayName}
+          alt={slot.baseGear?.displayName}
           className='inventorySprite'
           draggable
           height='50'
-          src={slot.baseItem?.textureURL}
+          src={slot.baseGear?.textureURL}
           width='50'
         />
       )}

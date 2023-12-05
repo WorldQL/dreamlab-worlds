@@ -1,4 +1,4 @@
-import type { PlayerItem } from '@dreamlab.gg/core/dist/managers'
+import type { BaseGear, Gear } from '@dreamlab.gg/core/dist/managers'
 import { events } from '../events'
 
 export enum ProjectileTypes {
@@ -11,7 +11,7 @@ export enum ProjectileTypes {
 }
 
 export interface InventoryItem {
-  baseItem: PlayerItem
+  baseGear: Gear
   lore: string
   damage: number
   value: number | undefined // gold value
@@ -65,9 +65,9 @@ class InventoryManager {
     events.emit('onInventoryUpdate')
   }
 
-  public getItemFromItem(baseItem: PlayerItem) {
+  public getInventoryItemFromBaseGear(baseGear: BaseGear) {
     for (const item of this.inventoryData) {
-      if (item?.baseItem?.displayName === baseItem?.displayName) return item
+      if (item?.baseGear?.displayName === baseGear?.displayName) return item
     }
 
     return undefined

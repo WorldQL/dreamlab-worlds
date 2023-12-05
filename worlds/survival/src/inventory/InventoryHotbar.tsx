@@ -45,10 +45,10 @@ const InventoryHotbar: React.FC<InventoryHotbarProps> = ({
             key={index}
             style={index === activeSlot ? activeSlotStyle : slotStyle}
           >
-            {item?.baseItem ? (
+            {item?.baseGear ? (
               <img
-                alt={item.baseItem.displayName}
-                src={item.baseItem.textureURL}
+                alt={item.baseGear.displayName}
+                src={item.baseGear.textureURL}
                 style={{ width: '100%', height: '100%' }}
               />
             ) : (

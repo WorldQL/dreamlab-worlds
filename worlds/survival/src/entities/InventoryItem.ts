@@ -10,9 +10,9 @@ import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 import type { Sprite } from 'pixi.js'
-import { events } from '../../events'
-import { ProjectileTypes } from '../../inventory/InventoryManager'
-import type { InventoryItem } from '../../inventory/InventoryManager'
+import { events } from '../events'
+import { ProjectileTypes } from '../inventory/InventoryManager'
+import type { InventoryItem } from '../inventory/InventoryManager'
 
 const projectileTypeValues = Object.values(ProjectileTypes).filter(
   value => typeof value === 'string',
@@ -52,7 +52,7 @@ interface Render {
   sprite: Sprite | undefined
 }
 
-export const createPickupItem = createSpawnableEntity<
+export const createInventoryItem = createSpawnableEntity<
   Args,
   SpawnableEntity<Data, Render, Args>,
   Data,
@@ -110,7 +110,7 @@ export const createPickupItem = createSpawnableEntity<
           const newItem = createGear(baseGear)
 
           const inventoryItem: InventoryItem = {
-            baseItem: newItem,
+            baseGear: newItem,
             lore: args.lore,
             damage: args.damage,
             value: 100,

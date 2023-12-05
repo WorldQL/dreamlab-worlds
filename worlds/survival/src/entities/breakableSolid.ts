@@ -79,9 +79,7 @@ export const createBreakableSolid = createSpawnableEntity<
   let isBroken = false
 
   const hasAttacker = (entities: Matter.Body[]) => {
-    return entities.some(
-      (ev: { label: string }) => ev.label === 'player' || ev.label === 'item',
-    )
+    return entities.some((ev: { label: string }) => ev.label === 'player')
   }
 
   return {
