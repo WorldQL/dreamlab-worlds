@@ -104,6 +104,7 @@ export const createZombieMob = createSpawnableEntity<
       height,
       {
         label: 'zombie',
+        inertia: Number.POSITIVE_INFINITY,
       },
     )
 
