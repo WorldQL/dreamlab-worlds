@@ -86,7 +86,7 @@ export const createArcherMob = createSpawnableEntity<
     { uid, tags, transform },
     { width, height, maxHealth, speed, knockback },
   ) => {
-    const HIT_CHANNEL = '@dreamlab/Hittable/hit'
+    const ZOMBIE_DAMAGE_FROM_PLAYER = '@dreamlab/ZombieMob/damageFromPlayer'
     const { position, zIndex } = transform
 
     const body = Matter.Bodies.rectangle(
@@ -150,7 +150,9 @@ export const createArcherMob = createSpawnableEntity<
             const xDiff = player.body.position.x - body.position.x
 
             if (Math.abs(xDiff) <= hitRadius) {
-              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              netClient?.sendCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
+                uid,
+              })
 
               if (mobData.value.health - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
@@ -164,7 +166,9 @@ export const createArcherMob = createSpawnableEntity<
             const other = a.uid === uid ? b : a
 
             if (other.tags.includes('Projectile')) {
-              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              netClient?.sendCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
+                uid,
+              })
 
               if (mobData.value.health - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
@@ -223,14 +227,17 @@ export const createArcherMob = createSpawnableEntity<
           if (mobData.value.health <= 0) {
             await game.destroy(this as SpawnableEntity)
           } else {
-            void network.broadcastCustomMessage(HIT_CHANNEL, {
+            network.broadcastCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
               uid,
               health: mobData.value.health,
             })
           }
         }
 
-        netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
+        netServer?.addCustomMessageListener(
+          ZOMBIE_DAMAGE_FROM_PLAYER,
+          onHitServer,
+        )
 
         return {
           game,
@@ -326,7 +333,10 @@ export const createArcherMob = createSpawnableEntity<
           onPlayerCollisionStart,
         )
 
-        netServer?.removeCustomMessageListener(HIT_CHANNEL, onHitServer)
+        netServer?.removeCustomMessageListener(
+          ZOMBIE_DAMAGE_FROM_PLAYER,
+          onHitServer,
+        )
       },
 
       teardownRenderContext({ container, ctrHealth }) {
