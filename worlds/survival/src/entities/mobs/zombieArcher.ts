@@ -41,7 +41,7 @@ const ArgsSchema = z.object({
 type OnPlayerAttack = EventHandler<'onPlayerAttack'>
 type OnCollisionStart = EventHandler<'onCollisionStart'>
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
-type zombieAnimations = 'hitting' | 'recoil' | 'walk'
+type zombieAnimations = 'punch' | 'recoil' | 'walk'
 
 interface MobData {
   health: number
@@ -50,6 +50,7 @@ interface MobData {
   currentPatrolDistance: number
   currentAnimation: zombieAnimations
   projectileCooldownCounter: number
+  directionChangeCooldown: number
 }
 
 interface Data {
@@ -96,6 +97,7 @@ export const createArcherMob = createSpawnableEntity<
       height,
       {
         label: 'zombie',
+        inertia: Number.POSITIVE_INFINITY,
       },
     )
 
@@ -107,7 +109,6 @@ export const createArcherMob = createSpawnableEntity<
     const healthIndicatorHeight = 20
 
     const zombieAnimations: Record<string, Texture<Resource>[]> = {}
-    let applyKnockback: [Matter.Body, number] | undefined
 
     return {
       get tags() {
@@ -139,6 +140,7 @@ export const createArcherMob = createSpawnableEntity<
           currentPatrolDistance: 0,
           currentAnimation: 'walk' as zombieAnimations,
           projectileCooldownCounter: 0,
+          directionChangeCooldown: 0,
         })
 
         const onPlayerAttack: OnPlayerAttack = (player, item) => {
@@ -257,6 +259,7 @@ export const createArcherMob = createSpawnableEntity<
         const assets = getPreloadedAssets()
         zombieAnimations.walk = assets.walkTextures
         zombieAnimations.recoil = assets.recoilTextures
+        zombieAnimations.punch = assets.punchTextures
         const sprite = new AnimatedSprite(zombieAnimations.walk!)
         sprite.gotoAndPlay(0)
         sprite.anchor.set(0.45, 0.535)
@@ -352,47 +355,70 @@ export const createArcherMob = createSpawnableEntity<
           mobData.value.hitCooldownCounter -= 1
         }
 
-        if (applyKnockback) {
-          const [knockbackBody, force] = applyKnockback
-          Matter.Body.applyForce(knockbackBody, knockbackBody.position, {
-            x: force,
-            y: -1,
-          })
-          applyKnockback = undefined
+        if (mobData.value.directionChangeCooldown > 0) {
+          mobData.value.directionChangeCooldown -= 1
         }
 
-        const allBodies = Matter.Composite.allBodies(game.physics.engine.world)
         let closestPlayer: Matter.Body | null = null
         let minDistance = Number.POSITIVE_INFINITY
 
-        for (const player of allBodies) {
+        const searchArea = {
+          min: { x: body.position.x - 5_000, y: body.position.y - 5_000 },
+          max: { x: body.position.x + 5_000, y: body.position.y + 5_000 },
+        }
+
+        const bodiesInRegion = Matter.Query.region(
+          Matter.Composite.allBodies(game.physics.engine.world),
+          searchArea,
+        )
+
+        for (const player of bodiesInRegion) {
           if (player.label === 'player') {
             const dx = player.position.x - body.position.x
             const dy = player.position.y - body.position.y
-            const distance = Math.hypot(dx, dy)
+            const distanceSquared = dx * dx + dy * dy
 
-            if (distance < minDistance) {
-              minDistance = distance
+            if (distanceSquared < minDistance) {
+              minDistance = distanceSquared
               closestPlayer = player
             }
           }
         }
 
-        if (closestPlayer && minDistance < 2_000) {
-          const dx = closestPlayer.position.x - body.position.x
-          const dy = closestPlayer.position.y - body.position.y
+        minDistance = Math.sqrt(minDistance)
 
-          const distance = Math.hypot(dx, dy)
-          const unitX = dx / distance
-          const unitY = dy / distance
+        if (mobData.value.hitCooldownCounter > 0) {
+          mobData.value.currentAnimation = 'recoil'
+        } else if (closestPlayer && minDistance < 150) {
+          mobData.value.currentAnimation = 'punch'
+        } else if (mobData.value.currentAnimation !== 'walk') {
+          mobData.value.currentAnimation = 'walk'
+        }
+
+        if (closestPlayer && minDistance < 2_000) {
+          const verticalDistance = Math.abs(
+            closestPlayer.position.y - body.position.y,
+          )
+          const horizontalDistance = Math.abs(
+            closestPlayer.position.x - body.position.x,
+          )
+
+          if (
+            verticalDistance < horizontalDistance &&
+            mobData.value.directionChangeCooldown === 0
+          ) {
+            mobData.value.direction =
+              closestPlayer.position.x > body.position.x ? 1 : -1
+            mobData.value.directionChangeCooldown = 1
+          }
 
           Matter.Body.translate(body, {
-            x: speed * unitX,
-            y: speed * unitY,
+            x: speed * mobData.value.direction,
+            y: 0,
           })
         } else {
           // patrol back and fourth when player is far from entity
-          if (mobData.value.currentPatrolDistance >= patrolDistance) {
+          if (mobData.value.currentPatrolDistance > patrolDistance) {
             mobData.value.currentPatrolDistance = 0
             mobData.value.direction *= -1
           }
@@ -403,6 +429,10 @@ export const createArcherMob = createSpawnableEntity<
           })
 
           mobData.value.currentPatrolDistance += Math.abs(speed / 2)
+        }
+
+        if (!closestPlayer || minDistance > 5_000) {
+          await game.destroy(this as SpawnableEntity)
         }
 
         if (game.server) {
@@ -424,7 +454,11 @@ export const createArcherMob = createSpawnableEntity<
                 },
                 rotation: 0,
               },
-              tags: ['net/replicated'],
+              tags: [
+                'net/replicated',
+                'net/server-authoritative',
+                'editor/doNotSave',
+              ],
             })
 
             if (mobData.value.projectileCooldownCounter === 0) {
@@ -449,7 +483,7 @@ export const createArcherMob = createSpawnableEntity<
         const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
         const pos = Vec.add(smoothed, camera.offset)
 
-        sprite.scale.x = mobData.value.direction
+        sprite.scale.x = -mobData.value.direction
 
         sprite.position = pos
         if (
@@ -457,13 +491,6 @@ export const createArcherMob = createSpawnableEntity<
         ) {
           sprite.textures = zombieAnimations[mobData.value.currentAnimation]!
           sprite.gotoAndPlay(0)
-        }
-
-        if (
-          mobData.value.currentAnimation === 'recoil' &&
-          sprite.currentFrame === sprite.totalFrames - 1
-        ) {
-          mobData.value.currentAnimation = 'walk'
         }
 
         container.position = pos
