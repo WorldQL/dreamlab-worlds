@@ -80,8 +80,8 @@ export const initProjectileWeapons = (game: Game<false>) => {
         const invItem =
           InventoryManager.getInstance().getInventoryItemFromBaseGear(gear)
 
-        const sendProjectileMessage = async (angle: number, yOffset?: number) =>
-          netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+        const sendProjectileMessage = (angle: number, yOffset?: number) =>
+          void netClient?.sendCustomMessage(SHOOT_CHANNEL, {
             direction: player.facingDirection,
             animation: player.currentAnimation,
             position: [player.body.position.x, player.body.position.y],
@@ -103,7 +103,7 @@ export const initProjectileWeapons = (game: Game<false>) => {
                 : 3);
               idx++
             ) {
-              void sendProjectileMessage(0)
+              sendProjectileMessage(0)
               // eslint-disable-next-line no-await-in-loop
               if (idx < 2) await delay(SHOT_DELAY)
             }
@@ -114,9 +114,9 @@ export const initProjectileWeapons = (game: Game<false>) => {
             const scatterShots =
               invItem.projectileType === ProjectileTypes.SCATTER_SHOT ? 1 : 2
             for (let idx = 0; idx < scatterShots; idx++) {
-              void sendProjectileMessage(0.1, 70)
-              void sendProjectileMessage(0)
-              void sendProjectileMessage(-0.1, 80)
+              sendProjectileMessage(0.1, 70)
+              sendProjectileMessage(0)
+              sendProjectileMessage(-0.1, 80)
               // eslint-disable-next-line no-await-in-loop
               if (idx < 1) await delay(SHOT_DELAY)
             }

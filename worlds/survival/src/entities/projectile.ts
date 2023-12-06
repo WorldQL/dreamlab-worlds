@@ -19,11 +19,13 @@ const ArgsSchema = z.object({
 })
 
 type OnCollisionStart = EventHandler<'onCollisionStart'>
+type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
 
 interface Data {
   game: Game<boolean>
   body: Matter.Body
   onCollisionStart: OnCollisionStart
+  onPlayerCollisionStart: OnPlayerCollisionStart
 }
 
 interface Render {
@@ -86,9 +88,22 @@ export const createProjectile = createSpawnableEntity<
           }
         }
 
-        game.events.common.addListener('onCollisionStart', onCollisionStart)
+        const onPlayerCollisionStart: OnPlayerCollisionStart = async (
+          [_, bodyCollided],
+          _raw,
+        ) => {
+          if (body && bodyCollided === body) {
+            await game.destroy(this as SpawnableEntity)
+          }
+        }
 
-        return { game, body, onCollisionStart }
+        game.events.common.addListener('onCollisionStart', onCollisionStart)
+        game.events.client?.addListener(
+          'onPlayerCollisionStart',
+          onPlayerCollisionStart,
+        )
+
+        return { game, body, onCollisionStart, onPlayerCollisionStart }
       },
 
       initRenderContext(_, { camera, stage }) {
@@ -122,9 +137,13 @@ export const createProjectile = createSpawnableEntity<
         }
       },
 
-      teardown({ game, onCollisionStart }) {
+      teardown({ game, onCollisionStart, onPlayerCollisionStart }) {
         game.physics.unregister(this, body)
         game.events.common.removeListener('onCollisionStart', onCollisionStart)
+        game.events.client?.removeListener(
+          'onPlayerCollisionStart',
+          onPlayerCollisionStart,
+        )
       },
 
       teardownRenderContext({ container }) {
