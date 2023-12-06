@@ -150,7 +150,7 @@ export const createArcherMob = createSpawnableEntity<
             const xDiff = player.body.position.x - body.position.x
 
             if (Math.abs(xDiff) <= hitRadius) {
-              netClient?.sendCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
+              void netClient?.sendCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
                 uid,
               })
 
@@ -166,7 +166,7 @@ export const createArcherMob = createSpawnableEntity<
             const other = a.uid === uid ? b : a
 
             if (other.tags.includes('Projectile')) {
-              netClient?.sendCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
+              void netClient?.sendCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
                 uid,
               })
 
@@ -227,7 +227,7 @@ export const createArcherMob = createSpawnableEntity<
           if (mobData.value.health <= 0) {
             await game.destroy(this as SpawnableEntity)
           } else {
-            network.broadcastCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
+            void network.broadcastCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
               uid,
               health: mobData.value.health,
             })

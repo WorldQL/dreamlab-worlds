@@ -172,7 +172,7 @@ export const createZombieMob = createSpawnableEntity<
             const other = a.uid === uid ? b : a
 
             if (other.tags.includes('Projectile')) {
-              netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
 
               if (mobData.value.health - 1 <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
@@ -191,7 +191,7 @@ export const createZombieMob = createSpawnableEntity<
             const mobHeight = body.bounds.max.y - body.bounds.min.y
             const threshold = mobHeight
             if (heightDifference < -threshold) {
-              netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
               const bounceForce = { x: 0, y: -5 }
               deferUntilPhysicsStep(game, () => {
                 Matter.Body.applyForce(
