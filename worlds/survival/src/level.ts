@@ -126,7 +126,8 @@ export const level: Level = [
     args: {
       width: 200,
       height: 200,
-      spriteSource: '/worlds/survival/assets/items/bow.png',
+      spriteSource:
+        'https://s3-assets.dreamlab.gg/uploaded-from-editor/bow-1702293278974.png',
       displayName: 'Basic Bow',
       lore: "Once wielded by 'Sharp-Eye' Sam, the fastest archer in the West, this bow's arrows are said to whistle with the winds of the prairie and never miss a zombie's heart.",
       animationName: 'bow',
@@ -146,7 +147,8 @@ export const level: Level = [
       anchorX: 0.29,
       anchorY: 0.58,
       rotation: 45,
-      spriteSource: '/worlds/survival/assets/items/hand_cannon.png',
+      spriteSource:
+        'https://s3-assets.dreamlab.gg/uploaded-from-editor/hand_cannon-1702293310960.png',
       displayName: 'Scatter Shot Shotgun',
       lore: "Forged in a lawless frontier town, this shotgun's scatter shot was the bane of undead hordes, turning any cowboy into a one-person army against the zombie outbreak.",
       animationName: 'shoot',
@@ -166,7 +168,8 @@ export const level: Level = [
       anchorX: 0.24,
       anchorY: 0.6,
       rotation: 60,
-      spriteSource: '/worlds/survival/assets/items/classic_revolver.png',
+      spriteSource:
+        'https://s3-assets.dreamlab.gg/uploaded-from-editor/classic_revolver-1702293335440.png',
       displayName: 'Burst Revolver',
       lore: "Crafted by the legendary gunsmith 'Bullseye' Betty, this revolver's rapid bursts made it a favorite among cowboys holding the line in the great zombie sieges of the Old West.",
       animationName: 'shoot',

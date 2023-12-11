@@ -3,7 +3,7 @@ import type { CSSProperties } from 'https://esm.sh/react@18.2.0'
 export const styles: { [key: string]: CSSProperties } = {
   pickupOverlay: {
     position: 'absolute',
-    bottom: '70%',
+    top: '10%',
     left: '50%',
     transform: 'translateX(-50%)',
     display: 'flex',
@@ -216,7 +216,8 @@ export const styles: { [key: string]: CSSProperties } = {
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundImage: 'url("/worlds/survival/assets/background.png")',
+    backgroundImage:
+      'url("https://s3-assets.dreamlab.gg/uploaded-from-editor/background-1702293365691.jpg")',
     backgroundSize: 'cover',
     backgroundPosition: 'center center',
   },
