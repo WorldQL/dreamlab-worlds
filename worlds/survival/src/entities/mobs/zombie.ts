@@ -135,8 +135,9 @@ export const createZombieMob = createSpawnableEntity<
         return Matter.Query.point([body], position).length > 0
       },
 
-      init({ game }) {
+      init({ game, physics }) {
         game.physics.register(this, body)
+        physics.linkTransform(body, transform)
 
         const netServer = onlyNetServer(game)
         const netClient = onlyNetClient(game)
