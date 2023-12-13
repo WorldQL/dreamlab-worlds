@@ -19,7 +19,6 @@ export const sharedInit: InitShared = async game => {
   game.register('@dreamlab/Region', createRegion)
   game.register('@dreamlab/BreakableSolid', createBreakableSolid)
   game.register('@dreamlab/InventoryItem', createInventoryItem)
-  game.register('@dreamlab/Platform', createPlatform)
   game.register('@dreamlab/Projectile', createProjectile)
 
   // Draw hard-coded regions for debugging (see regions.ts for hard-coded region locations)
