@@ -30,6 +30,7 @@ export const sharedInit: InitShared = async game => {
         position: { x: region.center.x, y: region.center.y },
         rotation: 0,
       },
+      tags: ['editor/doNotSave'],
     }),
   )
 
