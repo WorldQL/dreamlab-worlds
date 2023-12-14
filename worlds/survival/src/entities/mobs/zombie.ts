@@ -27,6 +27,7 @@ import type { Resource, Texture } from 'pixi.js'
 import { AnimatedSprite, Container, Graphics } from 'pixi.js'
 import { getPreloadedAssets } from '../../AssetLoader'
 import { events } from '../../events'
+import InventoryManager from '../../inventory/InventoryManager'
 
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
@@ -160,9 +161,20 @@ export const createZombieMob = createSpawnableEntity<
             const xDiff = player.body.position.x - body.position.x
 
             if (Math.abs(xDiff) <= hitRadius) {
-              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              let damage = 1
+              if (item) {
+                const inventoryManager = InventoryManager.getInstance()
+                const inventoryItem =
+                  inventoryManager.getInventoryItemFromBaseGear(item)
 
-              if (mobData.value.health - 1 <= 0) {
+                if (inventoryItem) {
+                  damage = inventoryItem.damage
+                }
+              }
+
+              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid, damage })
+
+              if (mobData.value.health - damage <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
               }
             }
@@ -174,9 +186,10 @@ export const createZombieMob = createSpawnableEntity<
             const other = a.uid === uid ? b : a
 
             if (other.tags.includes('Projectile')) {
-              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              const damage = other.args.damage ?? 1
+              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid, damage })
 
-              if (mobData.value.health - 1 <= 0) {
+              if (mobData.value.health - damage <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
               }
             }
@@ -193,7 +206,8 @@ export const createZombieMob = createSpawnableEntity<
             const mobHeight = body.bounds.max.y - body.bounds.min.y
             const threshold = mobHeight
             if (heightDifference < -threshold) {
-              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid })
+              const damage = 2
+              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid, damage })
               const bounceForce = { x: 0, y: -4 }
               deferUntilPhysicsStep(game, () => {
                 Matter.Body.applyForce(
@@ -233,6 +247,8 @@ export const createZombieMob = createSpawnableEntity<
           if (!('uid' in data)) return
           if (typeof data.uid !== 'string') return
           if (data.uid !== uid) return
+          if (!('damage' in data)) return
+          if (typeof data.damage !== 'number') return
 
           const player = game.entities
             .filter(isNetPlayer)
@@ -244,7 +260,7 @@ export const createZombieMob = createSpawnableEntity<
           const force = knockback * -mobData.value.direction
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
-          mobData.value.health -= 1
+          mobData.value.health -= data.damage
           if (mobData.value.health <= 0) {
             await game.destroy(this as SpawnableEntity)
           } else {

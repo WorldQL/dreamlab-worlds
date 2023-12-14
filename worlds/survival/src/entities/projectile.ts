@@ -15,6 +15,7 @@ const ArgsSchema = z.object({
   width: z.number().positive().min(1),
   height: z.number().positive().min(1),
   direction: z.number(),
+  damage: z.number().default(1),
   spriteSource: SpriteSourceSchema.optional(),
 })
 
@@ -168,7 +169,7 @@ export const createProjectile = createSpawnableEntity<
         container.position = pos
         container.rotation = body.angle
 
-        const alpha = debug.value ? 0.5 : 0
+        const alpha = debug.value ? 0.8 : 0.5
         gfxBounds.alpha = alpha
       },
     }
