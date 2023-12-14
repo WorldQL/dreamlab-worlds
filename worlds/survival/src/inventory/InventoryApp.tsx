@@ -16,6 +16,18 @@ import {
   handleInventoryDragStart,
 } from './listeners/InventoryDrag.js'
 
+const isAttackAnimation = (currentAnimation: string) => {
+  switch (currentAnimation) {
+    case 'greatsword':
+    case 'punch':
+    case 'bow':
+    case 'shoot':
+      return true
+    default:
+      return false
+  }
+}
+
 export const InventoryApp: FC = () => {
   const player = usePlayer()
   const [inventoryData, setInventoryData] = useState(
@@ -42,6 +54,7 @@ export const InventoryApp: FC = () => {
   const onInventoryDigits = useCallback(
     (digit: number, pressed: boolean) => {
       if (!pressed || !player) return
+      if (isAttackAnimation(player.currentAnimation)) return
       const idx = digit - 1
       setActiveSlot(idx)
       player.setGear(inventoryData[idx]?.baseGear)
