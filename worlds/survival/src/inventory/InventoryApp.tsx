@@ -65,7 +65,9 @@ export const InventoryApp: FC = () => {
   useEffect(() => {
     const updateInventory = () => {
       setInventoryData([...InventoryManager.getInstance().getInventoryData()])
-      player?.setGear(inventoryData[activeSlot]?.baseGear)
+      player?.setGear(
+        InventoryManager.getInstance().getInventoryData()[activeSlot]?.baseGear,
+      )
     }
 
     events.addListener('onInventoryUpdate', updateInventory)
