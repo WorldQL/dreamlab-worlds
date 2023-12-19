@@ -17,7 +17,7 @@ const onPointerOut = (): void => {
 
 const onPointerMove = (ev: PointerEvent, camera: Camera): void => {
   const screenPosition = Vec.create(ev.offsetX, ev.offsetY)
-  cursorPosition = camera.localToWorld(screenPosition)
+  cursorPosition = camera.screenToWorld(screenPosition)
 }
 
 type Args = typeof ArgsSchema
