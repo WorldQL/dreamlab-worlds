@@ -152,11 +152,14 @@ export const createInventoryItem = createSpawnableEntity<
 
       const gfxBounds = new Graphics()
       const sprite = args.spriteSource
-        ? createSprite(args.spriteSource, {
-            width: args.width,
-            height: args.height,
-            zIndex: transform.zIndex,
-          })
+        ? createSprite(
+            { url: args.spriteSource },
+            {
+              width: args.width,
+              height: args.height,
+              zIndex: transform.zIndex,
+            },
+          )
         : undefined
 
       if (sprite) {
