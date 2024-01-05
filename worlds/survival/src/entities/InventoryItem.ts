@@ -189,11 +189,14 @@ export const createInventoryItem = createSpawnableEntity<
 
         render.sprite?.destroy()
         render.sprite = spriteSource
-          ? createSprite(spriteSource, {
-              width,
-              height,
-              zIndex: transform.zIndex,
-            })
+          ? createSprite(
+              { url: spriteSource },
+              {
+                width,
+                height,
+                zIndex: transform.zIndex,
+              },
+            )
           : undefined
 
         if (render.sprite) render.stage.addChild(render.sprite)
