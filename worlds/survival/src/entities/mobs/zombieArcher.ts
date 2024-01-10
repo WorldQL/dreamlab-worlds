@@ -167,7 +167,7 @@ export const createArcherMob = createSpawnableEntity<
           if (a.uid === uid || b.uid === uid) {
             const other = a.uid === uid ? b : a
 
-            if (other.tags.includes('Projectile')) {
+            if (other.definition.tags.includes('Projectile')) {
               void netClient?.sendCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
                 uid,
               })
