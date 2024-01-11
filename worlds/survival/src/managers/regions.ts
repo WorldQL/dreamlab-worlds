@@ -33,7 +33,6 @@ export const ZombieTypes = [
 ]
 
 export interface Region {
-  id: string
   zombieTypes: typeof ZombieTypes
   bounds: { width: number; height: number }
   center: { x: number; y: number }
@@ -193,35 +192,35 @@ class RegionManager {
 
 export const regionManager = new RegionManager()
 
-regionManager.setRegions([
-  {
-    id: 'center',
-    zombieTypes: [ZombieTypes[0]!, ZombieTypes[1]!],
-    bounds: { width: 4_000, height: 1_100 },
-    center: { x: 0, y: 4_000 },
-    difficulty: 2,
-    waves: 2,
-    waveInterval: Math.random() * (15 - 5) + 5,
-    endCooldown: 60,
-  },
-  {
-    id: 'left',
-    zombieTypes: [ZombieTypes[1]!, ZombieTypes[2]!],
-    bounds: { width: 4_000, height: 1_100 },
-    center: { x: -5_000, y: 4_000 },
-    difficulty: 3,
-    waves: 2,
-    waveInterval: Math.random() * (15 - 5) + 5,
-    endCooldown: 60,
-  },
-  {
-    id: 'right',
-    zombieTypes: [ZombieTypes[2]!, ZombieTypes[3]!],
-    bounds: { width: 4_000, height: 1_100 },
-    center: { x: 5_000, y: 4_000 },
-    difficulty: 4,
-    waves: 1,
-    waveInterval: Math.random() * (15 - 5) + 5,
-    endCooldown: 200,
-  },
-])
+// regionManager.setRegions([
+//   {
+// id: 'center',
+// zombieTypes: [ZombieTypes[0]!, ZombieTypes[1]!],
+// bounds: { width: 4_000, height: 1_100 },
+// center: { x: 0, y: 4_000 },
+// difficulty: 2,
+// waves: 2,
+// waveInterval: Math.random() * (15 - 5) + 5,
+// endCooldown: 60,
+//   },
+//   {
+//     id: 'left',
+//     zombieTypes: [ZombieTypes[1]!, ZombieTypes[2]!],
+//     bounds: { width: 4_000, height: 1_100 },
+//     center: { x: -5_000, y: 4_000 },
+//     difficulty: 3,
+//     waves: 2,
+//     waveInterval: Math.random() * (15 - 5) + 5,
+//     endCooldown: 60,
+//   },
+//   {
+//     id: 'right',
+//     zombieTypes: [ZombieTypes[2]!, ZombieTypes[3]!],
+//     bounds: { width: 4_000, height: 1_100 },
+//     center: { x: 5_000, y: 4_000 },
+//     difficulty: 4,
+//     waves: 1,
+//     waveInterval: Math.random() * (15 - 5) + 5,
+//     endCooldown: 200,
+//   },
+// ])

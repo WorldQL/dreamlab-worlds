@@ -11,9 +11,32 @@ import { Graphics } from 'pixi.js'
 
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
-  width: z.number().positive().min(1),
-  height: z.number().positive().min(1),
-  spriteSource: SpriteSourceSchema.optional(),
+  width: z.number().positive().min(1).default(1_000),
+  height: z.number().positive().min(1).default(1_000),
+  spriteSource: SpriteSourceSchema.optional().default({ url: '' }),
+  zombieTypes: z
+    .array(
+      z.object({
+        width: z.number().default(80),
+        height: z.number().default(185),
+        maxHealth: z.number().default(5),
+        speed: z.number().default(5),
+        knockback: z.number().default(2),
+      }),
+    )
+    .default([]),
+  bounds: z.object({
+    width: z.number().default(1_000),
+    height: z.number().default(1_000),
+  }),
+  center: z.object({
+    x: z.number().default(0),
+    y: z.number().default(0),
+  }),
+  difficulty: z.number().default(1),
+  waves: z.number().default(1),
+  waveInterval: z.number().default(5),
+  endCooldown: z.number().default(60),
 })
 
 interface Data {
