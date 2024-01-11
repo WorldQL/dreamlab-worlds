@@ -25,14 +25,18 @@ const ArgsSchema = z.object({
       }),
     )
     .default([]),
-  bounds: z.object({
-    width: z.number().default(1_000),
-    height: z.number().default(1_000),
-  }),
-  center: z.object({
-    x: z.number().default(0),
-    y: z.number().default(0),
-  }),
+  bounds: z
+    .object({
+      width: z.number(),
+      height: z.number(),
+    })
+    .default({ width: 1000, height: 1000 }),
+  center: z
+    .object({
+      x: z.number(),
+      y: z.number(),
+    })
+    .default({ x: 0, y: 0 }),
   difficulty: z.number().default(1),
   waves: z.number().default(1),
   waveInterval: z.number().default(5),
