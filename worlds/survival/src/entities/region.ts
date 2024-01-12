@@ -30,7 +30,7 @@ const ArgsSchema = z.object({
       width: z.number(),
       height: z.number(),
     })
-    .default({ width: 1000, height: 1000 }),
+    .default({ width: 1_000, height: 1_000 }),
   center: z
     .object({
       x: z.number(),

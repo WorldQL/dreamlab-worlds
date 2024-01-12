@@ -185,7 +185,7 @@ export const createZombieMob = createSpawnableEntity<
           if (a.uid === uid || b.uid === uid) {
             const other = a.uid === uid ? b : a
 
-            if (other.definition.tags.includes('Projectile')) {
+            if (other.definition.entity.includes('Projectile')) {
               const damage = other.args.damage ?? 1
               void netClient?.sendCustomMessage(HIT_CHANNEL, { uid, damage })
 
