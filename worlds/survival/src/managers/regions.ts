@@ -33,6 +33,7 @@ export const ZombieTypes = [
 ]
 
 export interface Region {
+  uid: string
   zombieTypes: typeof ZombieTypes
   bounds: { width: number; height: number }
   center: { x: number; y: number }
@@ -110,6 +111,17 @@ class RegionManager {
       playerPosition.y >= regionTop &&
       playerPosition.y <= regionBottom
     )
+  }
+
+  public updateRegion(uid: string, updatedRegion: Region) {
+    const regionIndex = this.regions.findIndex(region => region.uid === uid)
+    if (regionIndex !== -1) {
+      console.log('found', uid)
+      this.regions[regionIndex] = {
+        ...this.regions[regionIndex],
+        ...updatedRegion,
+      }
+    }
   }
 
   private getSpawnPositionAwayFromPlayer(
@@ -191,36 +203,3 @@ class RegionManager {
 }
 
 export const regionManager = new RegionManager()
-
-// regionManager.setRegions([
-//   {
-// id: 'center',
-// zombieTypes: [ZombieTypes[0]!, ZombieTypes[1]!],
-// bounds: { width: 4_000, height: 1_100 },
-// center: { x: 0, y: 4_000 },
-// difficulty: 2,
-// waves: 2,
-// waveInterval: Math.random() * (15 - 5) + 5,
-// endCooldown: 60,
-//   },
-//   {
-//     id: 'left',
-//     zombieTypes: [ZombieTypes[1]!, ZombieTypes[2]!],
-//     bounds: { width: 4_000, height: 1_100 },
-//     center: { x: -5_000, y: 4_000 },
-//     difficulty: 3,
-//     waves: 2,
-//     waveInterval: Math.random() * (15 - 5) + 5,
-//     endCooldown: 60,
-//   },
-//   {
-//     id: 'right',
-//     zombieTypes: [ZombieTypes[2]!, ZombieTypes[3]!],
-//     bounds: { width: 4_000, height: 1_100 },
-//     center: { x: 5_000, y: 4_000 },
-//     difficulty: 4,
-//     waves: 1,
-//     waveInterval: Math.random() * (15 - 5) + 5,
-//     endCooldown: 200,
-//   },
-// ])

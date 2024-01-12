@@ -10,6 +10,7 @@ const onInstantiateRegion = (entity: Entity) => {
   if (entity.definition.entity.includes('SpawnRegion')) {
     const regionArgs = entity.args
     const newRegion = {
+      uid: entity.uid,
       zombieTypes: regionArgs.zombieTypes,
       bounds: regionArgs.bounds,
       center: regionArgs.center,
@@ -20,6 +21,25 @@ const onInstantiateRegion = (entity: Entity) => {
     }
     regionManager.addRegion(newRegion)
   }
+}
+
+const onUpdateRegion = (entity: Entity) => {
+  if (!isSpawnableEntity(entity)) return
+  if (!entity.definition.entity.includes('SpawnRegion')) return
+
+  const regionArgs = entity.args
+  const updatedRegion = {
+    uid: entity.uid,
+    zombieTypes: regionArgs.zombieTypes,
+    bounds: regionArgs.bounds,
+    center: regionArgs.center,
+    difficulty: regionArgs.difficulty,
+    waves: regionArgs.waves,
+    waveInterval: regionArgs.waveInterval,
+    endCooldown: regionArgs.endCooldown,
+  }
+
+  regionManager.updateRegion(updatedRegion.uid, updatedRegion)
 }
 
 export const init: InitServer = async game => {
@@ -55,6 +75,7 @@ export const init: InitServer = async game => {
   }
 
   game.events.common.addListener('onInstantiate', onInstantiateRegion)
+  game.events.common.addListener('onArgsChanged', onUpdateRegion)
 
   await checkPlayersInRegions()
   setInterval(checkPlayersInRegions, 5_000)
