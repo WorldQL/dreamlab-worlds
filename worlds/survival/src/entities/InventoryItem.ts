@@ -20,18 +20,20 @@ const projectileTypeValues = Object.values(ProjectileTypes).filter(
 
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
-  width: z.number().positive().min(1),
-  height: z.number().positive().min(1),
-  displayName: z.string(),
-  animationName: z.string(),
-  spriteSource: z.string(),
+  width: z.number().positive().min(1).default(200),
+  height: z.number().positive().min(1).default(200),
+  displayName: z.string().default('Default Item'),
+  animationName: z
+    .enum(['bow', 'shoot', 'greatsword', 'idle', 'jump', 'jog', 'walk'])
+    .default('shoot'),
+  spriteSource: z.string().default(''),
   damage: z.number().default(1),
   lore: z.string().default('Default Item Lore'),
   bone: z.enum(['handLeft', 'handRight']).default('handRight'),
   anchorX: z.number().default(0.5),
   anchorY: z.number().default(0.5),
   rotation: z.number().default(0),
-  speedMultiplier: z.number().optional(),
+  speedMultiplier: z.number().optional().default(1),
   projectileType: z.enum(projectileTypeValues).optional(),
 })
 
