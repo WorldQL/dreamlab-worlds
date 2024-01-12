@@ -10,6 +10,7 @@ import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 import type { Sprite } from 'pixi.js'
 
+// Conditionally spawned. Not setting defaults.
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
   width: z.number().positive().min(1),
@@ -83,7 +84,7 @@ export const createProjectile = createSpawnableEntity<
           if (a.uid === uid || b.uid === uid) {
             const other = a.uid === uid ? b : a
 
-            if (!other.definition.tags.includes('Projectile')) {
+            if (!other.definition.entity.includes('Projectile')) {
               await game.destroy(this as SpawnableEntity)
             }
           }
