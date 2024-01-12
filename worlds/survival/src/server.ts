@@ -23,6 +23,7 @@ const onInstantiateRegion = (entity: Entity) => {
   }
 }
 
+// TODO: investigate why this function never gets called
 const onUpdateRegion = (entity: Entity) => {
   if (!isSpawnableEntity(entity)) return
   if (!entity.definition.entity.includes('SpawnRegion')) return
