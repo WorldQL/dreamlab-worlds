@@ -20,20 +20,5 @@ export const sharedInit: InitShared = async game => {
   game.register('@dreamlab/InventoryItem', createInventoryItem)
   game.register('@dreamlab/Projectile', createProjectile)
 
-  // Draw hard-coded regions for debugging (see regions.ts for hard-coded region locations)
-  const regionSpawns = regionManager.getRegions().map(async region =>
-    game.spawn({
-      entity: '@dreamlab/Region',
-      args: { width: region.bounds.width, height: region.bounds.height },
-      transform: {
-        position: { x: region.center.x, y: region.center.y },
-        rotation: 0,
-      },
-      tags: ['editor/doNotSave'],
-    }),
-  )
-
-  await Promise.all(regionSpawns)
-
   initProjectileWeapons(game)
 }
