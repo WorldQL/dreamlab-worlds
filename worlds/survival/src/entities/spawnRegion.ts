@@ -54,7 +54,7 @@ interface Render {
   sprite: Sprite | undefined
 }
 
-export const createRegion = createSpawnableEntity<
+export const createSpawnRegion = createSpawnableEntity<
   Args,
   SpawnableEntity<Data, Render, Args>,
   Data,

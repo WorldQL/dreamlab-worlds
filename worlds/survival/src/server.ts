@@ -7,7 +7,7 @@ import { sharedInit } from './shared.js'
 
 const onInstantiateRegion = (entity: Entity) => {
   if (!isSpawnableEntity(entity)) return
-  if (entity.definition.entity.includes('Region')) {
+  if (entity.definition.entity.includes('SpawnRegion')) {
     const regionArgs = entity.args
     const newRegion = {
       zombieTypes: regionArgs.zombieTypes,
