@@ -30,11 +30,11 @@ import { events } from '../../events'
 
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
-  width: z.number().positive().min(1).default(200),
-  height: z.number().positive().min(1).default(200),
-  maxHealth: z.number().positive().min(1).default(10),
-  speed: z.number().positive().min(1).default(1),
-  knockback: z.number().positive().min(0).default(2),
+  width: z.number().positive().min(1),
+  height: z.number().positive().min(1),
+  maxHealth: z.number().positive().min(1),
+  speed: z.number().positive().min(1),
+  knockback: z.number().positive().min(0),
   spriteSource: SpriteSourceSchema.optional(),
 })
 
