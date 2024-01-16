@@ -87,7 +87,7 @@ export const createArcherMob = createSpawnableEntity<
     { uid, tags, transform },
     { width, height, maxHealth, speed, knockback },
   ) => {
-    const ZOMBIE_DAMAGE_FROM_PLAYER = '@dreamlab/ZombieMob/damageFromPlayer'
+    const ZOMBIE_DAMAGE_FROM_PLAYER = '@cvz/ZombieMob/damageFromPlayer'
     const { position, zIndex } = transform
 
     const body = Matter.Bodies.rectangle(
@@ -127,8 +127,17 @@ export const createArcherMob = createSpawnableEntity<
         return Matter.Query.point([body], position).length > 0
       },
 
-      init({ game }) {
+      init({ game, physics }) {
         game.physics.register(this, body)
+        physics.linkTransform(body, transform)
+
+        if (!tags.includes('net/replicated')) {
+          tags.push(
+            'net/replicated',
+            'net/server-authoritative',
+            'editor/doNotSave',
+          )
+        }
 
         const netServer = onlyNetServer(game)
         const netClient = onlyNetClient(game)
@@ -441,7 +450,7 @@ export const createArcherMob = createSpawnableEntity<
             const yOffset = 75
 
             await game.spawn({
-              entity: '@dreamlab/Projectile',
+              entity: '@cvz/Projectile',
               args: {
                 width: 50,
                 height: 10,
@@ -453,6 +462,7 @@ export const createArcherMob = createSpawnableEntity<
                   y: body.position.y - yOffset,
                 },
                 rotation: 0,
+                zIndex: 100_000,
               },
               tags: [
                 'net/replicated',

@@ -182,7 +182,7 @@ class RegionManager {
           playerPosition,
         )
         return game.spawn({
-          entity: '@dreamlab/ZombieMob',
+          entity: '@cvz/ZombieMob',
           args: randomZombieType as Record<string, unknown>,
           transform: { position: [spawnPosition.x, spawnPosition.y] },
           tags: [

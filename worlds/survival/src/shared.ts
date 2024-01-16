@@ -10,14 +10,14 @@ import { createSpawnRegion } from './entities/spawnRegion.js'
 import { initProjectileWeapons } from './managers/shooters.js'
 
 export const sharedInit: InitShared = async game => {
-  game.register('@dreamlab/ZombieMob', createZombieMob)
-  game.register('@dreamlab/ArcherMob', createArcherMob)
-  game.register('@dreamlab/Hook', createGrappleHook)
-  game.register('@dreamlab/Ladder', createLadder)
-  game.register('@dreamlab/SpawnRegion', createSpawnRegion)
-  game.register('@dreamlab/BreakableSolid', createBreakableSolid)
-  game.register('@dreamlab/InventoryItem', createInventoryItem)
-  game.register('@dreamlab/Projectile', createProjectile)
+  game.register('@cvz/ZombieMob', createZombieMob)
+  game.register('@cvz/ArcherMob', createArcherMob)
+  game.register('@cvz/Hook', createGrappleHook)
+  game.register('@cvz/Ladder', createLadder)
+  game.register('@cvz/SpawnRegion', createSpawnRegion)
+  game.register('@cvz/BreakableSolid', createBreakableSolid)
+  game.register('@cvz/InventoryItem', createInventoryItem)
+  game.register('@cvz/Projectile', createProjectile)
 
   initProjectileWeapons(game)
 }

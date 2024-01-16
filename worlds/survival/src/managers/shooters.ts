@@ -14,7 +14,7 @@ const delay = async (ms: number | undefined) =>
   })
 
 const ATTACK_COOLDOWN = 250
-const SHOOT_CHANNEL = '@dreamlab/Projectile/fired'
+const SHOOT_CHANNEL = '@cvz/Projectile/fired'
 const SHOT_DELAY = 100
 const Y_OFFSET_DEFAULT = 75
 
@@ -33,13 +33,14 @@ export const initProjectileWeapons = (game: Game<false>) => {
     const xOffset = direction === 1 ? 165 : -165
     const additionalOffsetY = animation === 'shoot' ? -50 : 0
     return game.spawn({
-      entity: '@dreamlab/Projectile',
+      entity: '@cvz/Projectile',
       args: { width: 50, height: 10, direction },
       transform: {
         position: {
           x: position[0] + xOffset,
           y: position[1] - yOffset + additionalOffsetY,
         },
+        zIndex: 100_000,
         rotation: angleOffset,
       },
       tags: ['net/replicated', 'net/server-authoritative', 'editor/doNotSave'],

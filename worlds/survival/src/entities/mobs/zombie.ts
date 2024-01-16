@@ -76,7 +76,7 @@ interface Render {
   sprite: AnimatedSprite
 }
 
-const zombieSymbol = Symbol.for('@dreamlab/core/entities/zombie')
+const zombieSymbol = Symbol.for('@cvz/core/entities/zombie')
 export const isZombie = (
   entity: unknown,
 ): entity is SpawnableEntity<Data, Render> => {
@@ -95,7 +95,7 @@ export const createZombieMob = createSpawnableEntity<
     { uid, tags, transform },
     { width, height, maxHealth, speed, knockback },
   ) => {
-    const HIT_CHANNEL = '@dreamlab/Hittable/hit'
+    const HIT_CHANNEL = '@cvz/Hittable/hit'
     const { position, zIndex } = transform
 
     const body = Matter.Bodies.rectangle(
@@ -139,6 +139,14 @@ export const createZombieMob = createSpawnableEntity<
       init({ game, physics }) {
         game.physics.register(this, body)
         physics.linkTransform(body, transform)
+
+        if (!tags.includes('net/replicated')) {
+          tags.push(
+            'net/replicated',
+            'net/server-authoritative',
+            'editor/doNotSave',
+          )
+        }
 
         const netServer = onlyNetServer(game)
         const netClient = onlyNetClient(game)
