@@ -8,6 +8,12 @@ export const init: InitClient = async game => {
   await preloadAssets()
   initializeUI(game)
   deferUntilPlayer(game, async player => {
+    const spawnpoints = game.queryTags('any', ['spawnpoint'])
+    if (spawnpoints.length > 0) {
+      const spawn = spawnpoints[Math.floor(Math.random() * spawnpoints.length)]
+      if (spawn) player.teleport(spawn.transform.position, true)
+    }
+
     await player.setCharacterId('c_y9ydqx2pghxl04emgnxu6r5g')
   })
 
