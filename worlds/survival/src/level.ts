@@ -49,7 +49,7 @@ export const level: LooseSpawnableDefinition[] = [
       zIndex: -100,
     },
     uid: 'd6yo1be0iq3p41fwp9khe3qv',
-    tags: ['editorLocked'],
+    tags: ['editor/locked'],
   },
   {
     entity: '@dreamlab/InventoryItem',
@@ -153,7 +153,7 @@ export const level: LooseSpawnableDefinition[] = [
       zIndex: -6,
     },
     uid: 'sr6mkpvzlhnw2kfd3r2ivvh7',
-    tags: ['editorLocked'],
+    tags: ['editor/locked'],
   },
   {
     entity: '@dreamlab/Nonsolid',
@@ -1684,7 +1684,7 @@ export const level: LooseSpawnableDefinition[] = [
       zIndex: -11,
     },
     uid: 'rzderw50hhlz49s0cs3o7z9i',
-    tags: ['editorLocked'],
+    tags: ['editor/locked'],
   },
   {
     entity: '@dreamlab/Nonsolid',
