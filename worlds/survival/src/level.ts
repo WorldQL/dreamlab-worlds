@@ -71,7 +71,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "uid": "f8fklys97n10tk12hkv7s6j4",
     "tags": [
-      "spawnpoint"
+      "spawnpoint",
+      "editor/locked"
     ]
   },
   {
@@ -91,7 +92,7 @@ export const level: LooseSpawnableDefinition[] = [
     "uid": "xd319i3mvlv0obcewdsr7enx",
     "tags": [
       "spawnpoint",
-      "editorLocked"
+      "editor/locked"
     ]
   },
   {
@@ -111,7 +112,7 @@ export const level: LooseSpawnableDefinition[] = [
     "uid": "eahr1gmcqt8bwn4rwccknbzj",
     "tags": [
       "spawnpoint",
-      "editorLocked"
+      "editor/locked"
     ]
   },
   {
@@ -131,7 +132,7 @@ export const level: LooseSpawnableDefinition[] = [
     "uid": "r3zem8feddr83piz3nixha71",
     "tags": [
       "spawnpoint",
-      "editorLocked"
+      "editor/locked"
     ]
   },
   {
@@ -151,7 +152,7 @@ export const level: LooseSpawnableDefinition[] = [
     "uid": "lj8r4wpc0rrrqxa2uhdh9nch",
     "tags": [
       "spawnpoint",
-      "editorLocked"
+      "editor/locked"
     ]
   },
   {
@@ -171,7 +172,7 @@ export const level: LooseSpawnableDefinition[] = [
     "uid": "t38e1xid3fo9sd86wt2twco1",
     "tags": [
       "spawnpoint",
-      "editorLocked"
+      "editor/locked"
     ]
   },
   {
@@ -193,7 +194,7 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "uid": "sr6mkpvzlhnw2kfd3r2ivvh7",
     "tags": [
-      "editorLocked"
+      "editor/locked"
     ]
   },
   {
@@ -1726,7 +1727,7 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "uid": "rzderw50hhlz49s0cs3o7z9i",
     "tags": [
-      "editorLocked"
+      "editor/locked"
     ]
   },
   {
