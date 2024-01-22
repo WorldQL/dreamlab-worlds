@@ -9,12 +9,12 @@ import InventoryManager from '../inventory/inventoryManager'
 import PlayerManager from '../managers/playerData'
 import { styles } from './styles'
 
-interface ItemScreenProps {
+interface ItemPopupProps {
   game: Game<false>
   item: InventoryItem | undefined
 }
 
-export const ItemScreen: FC<ItemScreenProps> = ({ game, item }) => {
+export const ItemScreen: FC<ItemPopupProps> = ({ game, item }) => {
   const player = usePlayer()
   const [purchaseComplete, setPurchaseComplete] = useState(false)
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)

@@ -5,11 +5,11 @@ import { renderUI, useGame, usePlayer } from '@dreamlab.gg/ui/react'
 import type { CSSProperties, FC } from 'https://esm.sh/react@18.2.0'
 import { useState } from 'https://esm.sh/react@18.2.0'
 import { InventoryApp } from '../inventory/inventoryApp'
-import { GameScreen } from './active'
-import { ItemScreen } from './item'
+import { GameScreen } from './gameScreen'
+import { ItemScreen } from './itemPopup'
 import { styles } from './styles'
 
-export interface ScreenProps {
+export interface StartScreenProps {
   game: Game<false>
   player: Player
 }

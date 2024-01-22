@@ -1,5 +1,5 @@
 import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
-import { createSpawnableEntity } from '@dreamlab.gg/core'
+import { createSpawnableEntity, isEntity } from '@dreamlab.gg/core'
 import { z } from '@dreamlab.gg/core/dist/sdk'
 import { SpriteSourceSchema } from '@dreamlab.gg/core/dist/textures'
 import type { Camera } from '@dreamlab.gg/core/entities'
@@ -25,16 +25,17 @@ import {
 import Matter from 'matter-js'
 import type { Resource, Texture } from 'pixi.js'
 import { AnimatedSprite, Container, Graphics } from 'pixi.js'
-import { getPreloadedAssets } from '../../assetLoader'
-import { events } from '../../events'
+import { getPreloadedAssets } from '../../../assetLoader'
+import { events } from '../../../events'
+import InventoryManager from '../../../inventory/inventoryManager'
 
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
-  width: z.number().positive().min(1),
-  height: z.number().positive().min(1),
-  maxHealth: z.number().positive().min(1),
-  speed: z.number().positive().min(1),
-  knockback: z.number().positive().min(0),
+  width: z.number().positive().min(1).default(200),
+  height: z.number().positive().min(1).default(200),
+  maxHealth: z.number().positive().min(1).default(10),
+  speed: z.number().positive().min(1).default(1),
+  knockback: z.number().positive().min(0).default(2),
   spriteSource: SpriteSourceSchema.optional(),
 })
 
@@ -49,7 +50,6 @@ interface MobData {
   hitCooldownCounter: number
   currentPatrolDistance: number
   currentAnimation: zombieAnimations
-  projectileCooldownCounter: number
   directionChangeCooldown: number
 }
 
@@ -76,7 +76,15 @@ interface Render {
   sprite: AnimatedSprite
 }
 
-export const createArcherMob = createSpawnableEntity<
+const zombieSymbol = Symbol.for('@cvz/core/entities/zombie')
+export const isZombie = (
+  entity: unknown,
+): entity is SpawnableEntity<Data, Render> => {
+  if (!isEntity(entity)) return false
+  return zombieSymbol in entity && entity[zombieSymbol] === true
+}
+
+export const createZombieMob = createSpawnableEntity<
   Args,
   SpawnableEntity<Data, Render, Args>,
   Data,
@@ -87,7 +95,7 @@ export const createArcherMob = createSpawnableEntity<
     { uid, tags, transform },
     { width, height, maxHealth, speed, knockback },
   ) => {
-    const ZOMBIE_DAMAGE_FROM_PLAYER = '@cvz/ZombieMob/damageFromPlayer'
+    const HIT_CHANNEL = '@cvz/Hittable/hit'
     const { position, zIndex } = transform
 
     const body = Matter.Bodies.rectangle(
@@ -102,15 +110,16 @@ export const createArcherMob = createSpawnableEntity<
     )
 
     const patrolDistance = 300
-    const projectileCooldown = 2 * 60 // 2 seconds
     const hitRadius = width / 2 + 120
-    const hitCooldown = 1 // Second(s)
+    const hitCooldown = 0.5 // Second(s)
     const healthIndicatorWidth = width + 50
     const healthIndicatorHeight = 20
 
     const zombieAnimations: Record<string, Texture<Resource>[]> = {}
 
     return {
+      [zombieSymbol]: true,
+
       get tags() {
         return tags
       },
@@ -148,7 +157,6 @@ export const createArcherMob = createSpawnableEntity<
           hitCooldownCounter: 0,
           currentPatrolDistance: 0,
           currentAnimation: 'walk' as zombieAnimations,
-          projectileCooldownCounter: 0,
           directionChangeCooldown: 0,
         })
 
@@ -161,11 +169,20 @@ export const createArcherMob = createSpawnableEntity<
             const xDiff = player.body.position.x - body.position.x
 
             if (Math.abs(xDiff) <= hitRadius) {
-              void netClient?.sendCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
-                uid,
-              })
+              let damage = 1
+              if (item) {
+                const inventoryManager = InventoryManager.getInstance()
+                const inventoryItem =
+                  inventoryManager.getInventoryItemFromBaseGear(item)
 
-              if (mobData.value.health - 1 <= 0) {
+                if (inventoryItem) {
+                  damage = inventoryItem.damage
+                }
+              }
+
+              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid, damage })
+
+              if (mobData.value.health - damage <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
               }
             }
@@ -177,11 +194,10 @@ export const createArcherMob = createSpawnableEntity<
             const other = a.uid === uid ? b : a
 
             if (other.definition.entity.includes('Projectile')) {
-              void netClient?.sendCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
-                uid,
-              })
+              const damage = other.args.damage ?? 1
+              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid, damage })
 
-              if (mobData.value.health - 1 <= 0) {
+              if (mobData.value.health - damage <= 0) {
                 events.emit('onPlayerScore', maxHealth * 25)
               }
             }
@@ -193,14 +209,31 @@ export const createArcherMob = createSpawnableEntity<
           _raw,
         ) => {
           if (body && bodyCollided === body) {
-            events.emit('onPlayerDamage', 1)
-            const force = 4 * -player.facingDirection
-            deferUntilPhysicsStep(game, () => {
-              Matter.Body.applyForce(player.body, player.body.position, {
-                x: force,
-                y: -1,
+            const heightDifference = player.body.position.y - body.position.y
+
+            const mobHeight = body.bounds.max.y - body.bounds.min.y
+            const threshold = mobHeight
+            if (heightDifference < -threshold) {
+              const damage = 2
+              void netClient?.sendCustomMessage(HIT_CHANNEL, { uid, damage })
+              const bounceForce = { x: 0, y: -4 }
+              deferUntilPhysicsStep(game, () => {
+                Matter.Body.applyForce(
+                  player.body,
+                  player.body.position,
+                  bounceForce,
+                )
               })
-            })
+            } else {
+              events.emit('onPlayerDamage', 1)
+              const force = 4 * -player.facingDirection
+              deferUntilPhysicsStep(game, () => {
+                Matter.Body.applyForce(player.body, player.body.position, {
+                  x: force,
+                  y: -1,
+                })
+              })
+            }
           }
         }
 
@@ -222,6 +255,8 @@ export const createArcherMob = createSpawnableEntity<
           if (!('uid' in data)) return
           if (typeof data.uid !== 'string') return
           if (data.uid !== uid) return
+          if (!('damage' in data)) return
+          if (typeof data.damage !== 'number') return
 
           const player = game.entities
             .filter(isNetPlayer)
@@ -230,25 +265,21 @@ export const createArcherMob = createSpawnableEntity<
           if (!player) throw new Error('missing netplayer')
 
           mobData.value.hitCooldownCounter = hitCooldown * 60
-          mobData.value.currentAnimation = 'recoil'
-          const force = knockback * mobData.value.direction
+          const force = knockback * -mobData.value.direction
           Matter.Body.applyForce(body, body.position, { x: force, y: -1.75 })
 
-          mobData.value.health -= 1
+          mobData.value.health -= data.damage
           if (mobData.value.health <= 0) {
             await game.destroy(this as SpawnableEntity)
           } else {
-            void network.broadcastCustomMessage(ZOMBIE_DAMAGE_FROM_PLAYER, {
+            void network.broadcastCustomMessage(HIT_CHANNEL, {
               uid,
               health: mobData.value.health,
             })
           }
         }
 
-        netServer?.addCustomMessageListener(
-          ZOMBIE_DAMAGE_FROM_PLAYER,
-          onHitServer,
-        )
+        netServer?.addCustomMessageListener(HIT_CHANNEL, onHitServer)
 
         return {
           game,
@@ -259,7 +290,6 @@ export const createArcherMob = createSpawnableEntity<
           onPlayerAttack,
           onCollisionStart,
           onPlayerCollisionStart,
-
           mobData,
         }
       },
@@ -272,6 +302,14 @@ export const createArcherMob = createSpawnableEntity<
         const sprite = new AnimatedSprite(zombieAnimations.walk!)
         sprite.gotoAndPlay(0)
         sprite.anchor.set(0.45, 0.535)
+
+        const originalWidth = sprite.texture.width
+        const originalHeight = sprite.texture.height
+        const scaleX = (width * 1.5) / originalWidth
+        const scaleY = (height * 1.5) / originalHeight
+        const uniformScale = Math.max(scaleX, scaleY)
+
+        sprite.scale.set(uniformScale, uniformScale)
 
         const container = new Container()
         container.sortableChildren = true
@@ -345,142 +383,103 @@ export const createArcherMob = createSpawnableEntity<
           onPlayerCollisionStart,
         )
 
-        netServer?.removeCustomMessageListener(
-          ZOMBIE_DAMAGE_FROM_PLAYER,
-          onHitServer,
-        )
+        netServer?.removeCustomMessageListener(HIT_CHANNEL, onHitServer)
       },
 
-      teardownRenderContext({ container, ctrHealth }) {
+      teardownRenderContext({ container, ctrHealth, sprite }) {
         container.destroy({ children: true })
         ctrHealth.destroy({ children: true })
+        sprite.destroy()
       },
 
       async onPhysicsStep(_, { game, mobData }) {
-        Matter.Body.setAngle(body, 0)
-        Matter.Body.setAngularVelocity(body, 0)
+        if (game.server) {
+          Matter.Body.setAngle(body, 0)
+          Matter.Body.setAngularVelocity(body, 0)
 
-        if (mobData.value.hitCooldownCounter > 0) {
-          mobData.value.hitCooldownCounter -= 1
-        }
+          if (mobData.value.hitCooldownCounter > 0) {
+            mobData.value.hitCooldownCounter -= 1
+          }
 
-        if (mobData.value.directionChangeCooldown > 0) {
-          mobData.value.directionChangeCooldown -= 1
-        }
+          if (mobData.value.directionChangeCooldown > 0) {
+            mobData.value.directionChangeCooldown -= 1
+          }
 
-        let closestPlayer: Matter.Body | null = null
-        let minDistance = Number.POSITIVE_INFINITY
+          let closestPlayer: Matter.Body | null = null
+          let minDistance = Number.POSITIVE_INFINITY
 
-        const searchArea = {
-          min: { x: body.position.x - 5_000, y: body.position.y - 5_000 },
-          max: { x: body.position.x + 5_000, y: body.position.y + 5_000 },
-        }
+          const searchArea = {
+            min: { x: body.position.x - 5_000, y: body.position.y - 5_000 },
+            max: { x: body.position.x + 5_000, y: body.position.y + 5_000 },
+          }
 
-        const bodiesInRegion = Matter.Query.region(
-          Matter.Composite.allBodies(game.physics.engine.world),
-          searchArea,
-        )
+          const bodiesInRegion = Matter.Query.region(
+            Matter.Composite.allBodies(game.physics.engine.world),
+            searchArea,
+          )
 
-        for (const player of bodiesInRegion) {
-          if (player.label === 'player') {
-            const dx = player.position.x - body.position.x
-            const dy = player.position.y - body.position.y
-            const distanceSquared = dx * dx + dy * dy
+          for (const player of bodiesInRegion) {
+            if (player.label === 'player') {
+              const dx = player.position.x - body.position.x
+              const dy = player.position.y - body.position.y
+              const distanceSquared = dx * dx + dy * dy
 
-            if (distanceSquared < minDistance) {
-              minDistance = distanceSquared
-              closestPlayer = player
+              if (distanceSquared < minDistance) {
+                minDistance = distanceSquared
+                closestPlayer = player
+              }
             }
           }
-        }
 
-        minDistance = Math.sqrt(minDistance)
+          minDistance = Math.sqrt(minDistance)
 
-        if (mobData.value.hitCooldownCounter > 0) {
-          mobData.value.currentAnimation = 'recoil'
-        } else if (closestPlayer && minDistance < 150) {
-          mobData.value.currentAnimation = 'punch'
-        } else if (mobData.value.currentAnimation !== 'walk') {
-          mobData.value.currentAnimation = 'walk'
-        }
-
-        if (closestPlayer && minDistance < 2_000) {
-          const verticalDistance = Math.abs(
-            closestPlayer.position.y - body.position.y,
-          )
-          const horizontalDistance = Math.abs(
-            closestPlayer.position.x - body.position.x,
-          )
-
-          if (
-            verticalDistance < horizontalDistance &&
-            mobData.value.directionChangeCooldown === 0
-          ) {
-            mobData.value.direction =
-              closestPlayer.position.x > body.position.x ? 1 : -1
-            mobData.value.directionChangeCooldown = 1
+          if (mobData.value.hitCooldownCounter > 0) {
+            mobData.value.currentAnimation = 'recoil'
+          } else if (closestPlayer && minDistance < 150) {
+            mobData.value.currentAnimation = 'punch'
+          } else if (mobData.value.currentAnimation !== 'walk') {
+            mobData.value.currentAnimation = 'walk'
           }
 
-          Matter.Body.translate(body, {
-            x: speed * mobData.value.direction,
-            y: 0,
-          })
-        } else {
-          // patrol back and fourth when player is far from entity
-          if (mobData.value.currentPatrolDistance > patrolDistance) {
-            mobData.value.currentPatrolDistance = 0
-            mobData.value.direction *= -1
-          }
+          if (closestPlayer && minDistance < 2_000) {
+            const verticalDistance = Math.abs(
+              closestPlayer.position.y - body.position.y,
+            )
+            const horizontalDistance = Math.abs(
+              closestPlayer.position.x - body.position.x,
+            )
 
-          Matter.Body.translate(body, {
-            x: (speed / 2) * mobData.value.direction,
-            y: 0,
-          })
+            if (
+              verticalDistance < horizontalDistance &&
+              mobData.value.directionChangeCooldown === 0
+            ) {
+              mobData.value.direction =
+                closestPlayer.position.x > body.position.x ? 1 : -1
+              mobData.value.directionChangeCooldown = 1
+            }
 
-          mobData.value.currentPatrolDistance += Math.abs(speed / 2)
-        }
+            Matter.Body.translate(body, {
+              x: speed * mobData.value.direction,
+              y: 0,
+            })
+          } else {
+            // patrol back and fourth when player is far from entity
+            if (mobData.value.currentPatrolDistance > patrolDistance) {
+              mobData.value.currentPatrolDistance = 0
+              mobData.value.direction *= -1
+            }
 
-        if (!closestPlayer || minDistance > 5_000) {
-          await game.destroy(this as SpawnableEntity)
-        }
-
-        if (game.server) {
-          if (mobData.value.projectileCooldownCounter === 0) {
-            const xOffset = mobData.value.direction === 1 ? 150 : -150
-            const yOffset = 75
-
-            await game.spawn({
-              entity: '@cvz/Projectile',
-              args: {
-                width: 50,
-                height: 10,
-                direction: mobData.value.direction,
-              },
-              transform: {
-                position: {
-                  x: body.position.x + xOffset,
-                  y: body.position.y - yOffset,
-                },
-                rotation: 0,
-                zIndex: 100_000,
-              },
-              tags: [
-                'net/replicated',
-                'net/server-authoritative',
-                'editor/doNotSave',
-              ],
+            Matter.Body.translate(body, {
+              x: (speed / 2) * mobData.value.direction,
+              y: 0,
             })
 
-            if (mobData.value.projectileCooldownCounter === 0) {
-              mobData.value.projectileCooldownCounter = projectileCooldown
-            }
-          } else {
-            mobData.value.projectileCooldownCounter -= 1
+            mobData.value.currentPatrolDistance += Math.abs(speed / 2)
           }
-        }
 
-        if (game.server && (!closestPlayer || minDistance > 6_000)) {
-          await game.destroy(this as SpawnableEntity)
+          if (!closestPlayer || minDistance > 5_000) {
+            await game.destroy(this as SpawnableEntity)
+          }
         }
       },
 
