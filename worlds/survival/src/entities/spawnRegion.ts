@@ -15,11 +15,11 @@ const ArgsSchema = z.object({
   zombieTypes: z
     .array(
       z.object({
-        width: z.number().default(80),
-        height: z.number().default(185),
-        maxHealth: z.number().default(5),
-        speed: z.number().default(5),
-        knockback: z.number().default(2),
+        width: z.number(),
+        height: z.number(),
+        maxHealth: z.number(),
+        speed: z.number(),
+        knockback: z.number(),
       }),
     )
     .default([

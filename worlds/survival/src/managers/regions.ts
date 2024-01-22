@@ -1,40 +1,15 @@
 import type { Game } from '@dreamlab.gg/core'
 import Matter from 'matter-js'
 
-export const ZombieTypes = [
-  {
-    width: 80,
-    height: 185,
-    maxHealth: 5,
-    speed: 5,
-    knockback: 2,
-  }, // smallZombie
-  {
-    width: 80,
-    height: 260,
-    maxHealth: 4,
-    speed: 2,
-    knockback: 0.5,
-  }, // weakZombie
-  {
-    width: 130,
-    height: 260,
-    maxHealth: 9,
-    speed: 3,
-    knockback: 1.5,
-  }, // zombie
-  {
-    width: 130,
-    height: 380,
-    maxHealth: 15,
-    speed: 2,
-    knockback: 1,
-  }, // strongZombie
-]
-
 export interface Region {
   uid: string
-  zombieTypes: typeof ZombieTypes
+  zombieTypes: {
+    width: number
+    height: number
+    maxHealth: number
+    speed: number
+    knockback: number
+  }[]
   bounds: { width: number; height: number }
   center: { x: number; y: number }
   difficulty: number
@@ -46,30 +21,33 @@ export interface Region {
 }
 
 class RegionManager {
-  private regions: Region[] = []
+  private regions: Map<string, Region> = new Map()
 
   public addRegion(region: Region) {
-    this.regions.push(region)
+    this.regions.set(region.uid, region)
   }
 
   public setRegions(newRegions: Region[]) {
-    this.regions = newRegions
+    for (const region of newRegions) this.regions.set(region.uid, region)
   }
 
   public findRegionByPlayerLocation(playerPosition: {
     x: number
     y: number
   }): Region | undefined {
-    return this.regions.find(region =>
-      this.isPlayerInRegion(playerPosition, region),
-    )
+    for (const region of this.regions.values()) {
+      if (this.isPlayerInRegion(playerPosition, region)) {
+        return region
+      }
+    }
+
+    return undefined
   }
 
   public async startRegionInterval(game: Game<false>, region: Region) {
     if (region.spawnIntervalId) return
 
     let currentWave = 0
-
     const spawn = async () => {
       if (currentWave < region.waves) {
         await this.spawnZombies(game, region)
@@ -114,16 +92,13 @@ class RegionManager {
   }
 
   public updateRegion(uid: string, updatedRegion: Region) {
-    const regionIndex = this.regions.findIndex(region => region.uid === uid)
-    if (regionIndex !== -1) {
-      console.log('found', uid)
-      this.regions[regionIndex] = {
-        ...this.regions[regionIndex],
-        ...updatedRegion,
+    if (this.regions.has(uid)) {
+      const existingRegion = this.regions.get(uid)
+      if (existingRegion) {
+        this.regions.set(uid, { ...existingRegion, ...updatedRegion })
       }
     }
   }
-
   private getSpawnPositionAwayFromPlayer(
     region: Region,
     playerPosition: { x: number; y: number },
@@ -198,7 +173,7 @@ class RegionManager {
   }
 
   public getRegions(): Region[] {
-    return this.regions
+    return [...this.regions.values()]
   }
 }
 
