@@ -10,9 +10,9 @@ import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
 import type { Sprite } from 'pixi.js'
-import { events } from '../events'
-import { ProjectileTypes } from '../inventory/inventoryManager'
-import type { InventoryItem } from '../inventory/inventoryManager'
+import { events } from '../../events'
+import { ProjectileTypes } from '../../inventory/inventoryManager'
+import type { InventoryItem } from '../../inventory/inventoryManager'
 
 const projectileTypeValues = Object.values(ProjectileTypes).filter(
   value => typeof value === 'string',

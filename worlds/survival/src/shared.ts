@@ -1,4 +1,5 @@
 import type { InitShared } from '@dreamlab.gg/core/sdk'
+import { createProjectileSpawner } from './entities/projectileSpawner.js'
 import { createBreakableSolid } from './entities/spawnable/breakableSolid.js'
 import { createGrappleHook } from './entities/spawnable/grappleHook.js'
 import { createInventoryItem } from './entities/spawnable/inventoryItem.js'
@@ -7,7 +8,6 @@ import { createZombieMob } from './entities/spawnable/mobs/zombie.js'
 import { createArcherMob } from './entities/spawnable/mobs/zombieArcher.js'
 import { createProjectile } from './entities/spawnable/projectile.js'
 import { createSpawnRegion } from './entities/spawnable/spawnRegion.js'
-import { initProjectileWeapons } from './managers/shooters.js'
 
 export const sharedInit: InitShared = async game => {
   game.register('@cvz/ZombieMob', createZombieMob)
@@ -19,5 +19,5 @@ export const sharedInit: InitShared = async game => {
   game.register('@cvz/InventoryItem', createInventoryItem)
   game.register('@cvz/Projectile', createProjectile)
 
-  initProjectileWeapons(game)
+  await game.instantiate(createProjectileSpawner())
 }
