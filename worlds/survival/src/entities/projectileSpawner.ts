@@ -2,6 +2,7 @@ import type { Entity, Game } from '@dreamlab.gg/core'
 import { createEntity } from '@dreamlab.gg/core'
 import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { isNetPlayer } from '@dreamlab.gg/core/dist/entities'
+import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import type { Gear } from '@dreamlab.gg/core/dist/managers'
 import type { MessageListenerServer } from '@dreamlab.gg/core/dist/network'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/dist/network'
@@ -11,6 +12,8 @@ import InventoryManager, {
 
 interface Data {
   game: Game<false>
+  onPlayerAttack: EventHandler<'onPlayerAttack'>
+  onHitServer: MessageListenerServer
 }
 
 export interface ProjectileSpawner extends Entity<Data> {}
@@ -20,10 +23,10 @@ const delay = async (ms: number | undefined) =>
     setTimeout(resolve, ms)
   })
 
+const SHOOT_CHANNEL = '@cvz/Projectile/Spawned'
 const ATTACK_COOLDOWN = 250
-const SHOOT_CHANNEL = '@cvz/Projectile/fired'
-const SHOT_DELAY = 100
 const Y_OFFSET_DEFAULT = 75
+const SHOT_DELAY = 100
 
 export const createProjectileSpawner = () => {
   let lastSpawnedTime: number | null = null
@@ -81,90 +84,86 @@ export const createProjectileSpawner = () => {
         await spawnProjectile(direction, animation, position, angle, yOffset)
       }
 
-      netServer?.addCustomMessageListener(SHOOT_CHANNEL, onHitServer)
+      const onPlayerAttack = async (player: Player, gear: Gear | undefined) => {
+        if (
+          player.currentAnimation === 'bow' ||
+          player.currentAnimation === 'shoot'
+        ) {
+          // Only proceed if the player has gear and the cooldown period has passed
+          if (!gear || Date.now() - (lastSpawnedTime || 0) <= ATTACK_COOLDOWN)
+            return
+          lastSpawnedTime = Date.now()
 
-      game.events.common.addListener(
-        'onPlayerAttack',
-        async (player: Player, gear: Gear | undefined) => {
-          if (
-            player.currentAnimation === 'bow' ||
-            player.currentAnimation === 'shoot'
-          ) {
-            if (!gear) return
-            const currentTime = Date.now()
-            if (
-              !lastSpawnedTime ||
-              currentTime - lastSpawnedTime > ATTACK_COOLDOWN
-            )
-              lastSpawnedTime = currentTime
-            else return
+          const invItem =
+            InventoryManager.getInstance().getInventoryItemFromBaseGear(gear)
 
-            const invItem =
-              InventoryManager.getInstance().getInventoryItemFromBaseGear(gear)
+          const sendProjectileMessage = (angle: number, yOffset?: number) =>
+            void netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+              direction: player.facingDirection,
+              animation: player.currentAnimation,
+              position: [player.body.position.x, player.body.position.y],
+              angle,
+              yOffset,
+            })
 
-            const sendProjectileMessage = (angle: number, yOffset?: number) =>
-              void netClient?.sendCustomMessage(SHOOT_CHANNEL, {
-                direction: player.facingDirection,
-                animation: player.currentAnimation,
-                position: [player.body.position.x, player.body.position.y],
-                angle,
-                yOffset,
-              })
-
-            switch (invItem?.projectileType) {
-              case ProjectileTypes.SINGLE_SHOT:
-              case ProjectileTypes.DOUBLE_SHOT:
-              case ProjectileTypes.BURST_SHOT:
-                for (
-                  let idx = 0;
-                  idx <
-                  (invItem.projectileType === ProjectileTypes.SINGLE_SHOT
-                    ? 1
-                    : invItem.projectileType === ProjectileTypes.DOUBLE_SHOT
-                    ? 2
-                    : 3);
-                  idx++
-                ) {
-                  sendProjectileMessage(0)
-                  // eslint-disable-next-line no-await-in-loop
-                  if (idx < 2) await delay(SHOT_DELAY)
-                }
-
-                break
-              case ProjectileTypes.SCATTER_SHOT:
-              case ProjectileTypes.DOUBLE_SCATTER_SHOT: {
-                const scatterShots =
-                  invItem.projectileType === ProjectileTypes.SCATTER_SHOT
-                    ? 1
-                    : 2
-                for (let idx = 0; idx < scatterShots; idx++) {
-                  sendProjectileMessage(0.1, 70)
-                  sendProjectileMessage(0)
-                  sendProjectileMessage(-0.1, 80)
-                  // eslint-disable-next-line no-await-in-loop
-                  if (idx < 1) await delay(SHOT_DELAY)
-                }
-
-                break
+          switch (invItem?.projectileType) {
+            case ProjectileTypes.SINGLE_SHOT:
+            case ProjectileTypes.DOUBLE_SHOT:
+            case ProjectileTypes.BURST_SHOT:
+              for (
+                let idx = 0;
+                idx <
+                (invItem.projectileType === ProjectileTypes.SINGLE_SHOT
+                  ? 1
+                  : invItem.projectileType === ProjectileTypes.DOUBLE_SHOT
+                  ? 2
+                  : 3);
+                idx++
+              ) {
+                sendProjectileMessage(0)
+                // eslint-disable-next-line no-await-in-loop
+                if (idx < 2) await delay(SHOT_DELAY)
               }
 
-              case undefined:
-                throw new Error('Not implemented yet: undefined case')
-              case ProjectileTypes.EXPLOSIVE_SHOT:
-                throw new Error(
-                  'Not implemented yet: ProjectileTypes.EXPLOSIVE_SHOT case',
-                )
-            }
-          }
-        },
-      )
+              break
+            case ProjectileTypes.SCATTER_SHOT:
+            case ProjectileTypes.DOUBLE_SCATTER_SHOT: {
+              const scatterShots =
+                invItem.projectileType === ProjectileTypes.SCATTER_SHOT ? 1 : 2
+              for (let idx = 0; idx < scatterShots; idx++) {
+                sendProjectileMessage(0.1, 70)
+                sendProjectileMessage(0)
+                sendProjectileMessage(-0.1, 80)
+                // eslint-disable-next-line no-await-in-loop
+                if (idx < 1) await delay(SHOT_DELAY)
+              }
 
-      return { game }
+              break
+            }
+
+            case undefined:
+              throw new Error('Not implemented yet: undefined case')
+            case ProjectileTypes.EXPLOSIVE_SHOT:
+              throw new Error(
+                'Not implemented yet: ProjectileTypes.EXPLOSIVE_SHOT case',
+              )
+          }
+        }
+      }
+
+      netServer?.addCustomMessageListener(SHOOT_CHANNEL, onHitServer)
+      game.events.common.addListener('onPlayerAttack', onPlayerAttack)
+
+      return { game, onPlayerAttack, onHitServer }
     },
 
     async initRenderContext() {},
 
-    teardown(_) {},
+    teardown({ game, onPlayerAttack, onHitServer }) {
+      const netServer = onlyNetServer(game)
+      netServer?.removeCustomMessageListener(SHOOT_CHANNEL, onHitServer)
+      game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
+    },
 
     teardownRenderContext() {},
 
