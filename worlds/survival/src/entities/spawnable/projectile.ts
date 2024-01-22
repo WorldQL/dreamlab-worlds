@@ -80,14 +80,16 @@ export const createProjectile = createSpawnableEntity<
       init({ game }) {
         game.physics.register(this, body)
 
-        const onCollisionStart: OnCollisionStart = async ([a, b]) => {
+        const onCollisionStart: OnCollisionStart = async ([a, b], raw) => {
           if (a.uid === uid || b.uid === uid) {
             const other = a.uid === uid ? b : a
 
-            if (
-              !other.definition.entity.includes('Projectile') &&
-              !other.definition.entity.includes('Background')
-            ) {
+            const bodies = [raw.bodyA, raw.bodyB]
+
+            const isSensor = bodies.some(body => body.isSensor)
+            const isProjectile = other.definition.entity.includes('Projectile')
+
+            if (!isSensor && !isProjectile) {
               await game.destroy(this as SpawnableEntity)
             }
           }
