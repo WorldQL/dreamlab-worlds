@@ -84,7 +84,10 @@ export const createProjectile = createSpawnableEntity<
           if (a.uid === uid || b.uid === uid) {
             const other = a.uid === uid ? b : a
 
-            if (!other.definition.entity.includes('Projectile')) {
+            if (
+              !other.definition.entity.includes('Projectile') &&
+              !other.definition.entity.includes('Background')
+            ) {
               await game.destroy(this as SpawnableEntity)
             }
           }
