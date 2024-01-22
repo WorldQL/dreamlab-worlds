@@ -1,7 +1,7 @@
 import type { FC } from 'https://esm.sh/react@18.2.0'
 import { useEffect, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events'
-import PlayerManager from '../managers/playerData'
+import PlayerManager from '../playerDataManager'
 import { DeathScreen } from './deathScreen'
 import type { StartScreenProps } from './startScreen'
 import { styles } from './styles'

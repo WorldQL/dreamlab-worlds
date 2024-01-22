@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events'
 import type { InventoryItem } from '../inventory/inventoryManager'
 import InventoryManager from '../inventory/inventoryManager'
-import PlayerManager from '../managers/playerData'
+import PlayerManager from '../playerDataManager'
 import { styles } from './styles'
 
 interface ItemPopupProps {

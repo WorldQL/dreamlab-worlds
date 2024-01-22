@@ -1,4 +1,5 @@
-import { events } from '../events'
+// TODO: refactor?
+import { events } from './events'
 
 const MAX_HEALTH = 10
 const INITIAL_SCORE = 0
