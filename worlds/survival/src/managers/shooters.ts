@@ -6,7 +6,7 @@ import type { MessageListenerServer } from '@dreamlab.gg/core/dist/network'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/dist/network'
 import InventoryManager, {
   ProjectileTypes,
-} from '../inventory/InventoryManager'
+} from '../inventory/inventoryManager'
 
 const delay = async (ms: number | undefined) =>
   new Promise(resolve => {

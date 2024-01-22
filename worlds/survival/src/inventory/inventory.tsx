@@ -1,7 +1,7 @@
 import React from 'https://esm.sh/react@18.2.0'
-import type { InventoryData, InventoryItem } from './InventoryManager.js'
-import InventorySlot from './InventorySlot.js'
-import { inventoryStyles as styles } from './InventoryStyle.js'
+import type { InventoryData, InventoryItem } from './inventoryManager.js'
+import InventorySlot from './inventorySlot.js'
+import { inventoryStyles as styles } from './inventoryStyle.js'
 
 interface Props {
   data: InventoryData

@@ -25,7 +25,7 @@ import {
 import Matter from 'matter-js'
 import type { Resource, Texture } from 'pixi.js'
 import { AnimatedSprite, Container, Graphics } from 'pixi.js'
-import { getPreloadedAssets } from '../../AssetLoader'
+import { getPreloadedAssets } from '../../assetLoader'
 import { events } from '../../events'
 
 type Args = typeof ArgsSchema

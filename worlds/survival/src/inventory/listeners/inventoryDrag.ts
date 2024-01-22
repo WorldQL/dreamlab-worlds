@@ -1,8 +1,8 @@
-import InventoryManager from '../InventoryManager'
 import type {
   InventoryDragEndEvent,
   InventoryDragStartEvent,
-} from '../events/InventoryDragEvent'
+} from '../events/inventoryDragEvent'
+import InventoryManager from '../inventoryManager'
 
 export const handleInventoryDragStart = (event: InventoryDragStartEvent) => {
   console.log(`Started dragging from slot [${event.cursorSlot}]`)

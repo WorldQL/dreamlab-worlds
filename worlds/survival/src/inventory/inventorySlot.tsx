@@ -1,6 +1,6 @@
 import React, { useState } from 'https://esm.sh/react@18.2.0'
-import type { InventoryItem } from './InventoryManager.js'
-import { inventoryStyles as styles } from './InventoryStyle.js'
+import type { InventoryItem } from './inventoryManager.js'
+import { inventoryStyles as styles } from './inventoryStyle.js'
 
 interface Props {
   slot: InventoryItem

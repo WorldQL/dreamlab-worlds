@@ -1,6 +1,6 @@
 import type { Player } from '@dreamlab.gg/core/dist/entities'
 import { EventEmitter } from '@dreamlab.gg/core/events'
-import type { InventoryItem } from './inventory/InventoryManager'
+import type { InventoryItem } from './inventory/inventoryManager'
 
 interface Events {
   onPlayerScore: [number]

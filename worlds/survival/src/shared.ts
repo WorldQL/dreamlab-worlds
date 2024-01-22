@@ -1,7 +1,7 @@
 import type { InitShared } from '@dreamlab.gg/core/sdk'
-import { createInventoryItem } from './entities/InventoryItem.js'
 import { createBreakableSolid } from './entities/breakableSolid.js'
 import { createGrappleHook } from './entities/grappleHook.js'
+import { createInventoryItem } from './entities/inventoryItem.js'
 import { createLadder } from './entities/ladder.js'
 import { createZombieMob } from './entities/mobs/zombie.js'
 import { createArcherMob } from './entities/mobs/zombieArcher.js'

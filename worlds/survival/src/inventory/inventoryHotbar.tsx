@@ -1,6 +1,6 @@
 import React from 'react'
-import type { InventoryData } from './InventoryManager'
-import { inventoryStyles as styles } from './InventoryStyle'
+import type { InventoryData } from './inventoryManager'
+import { inventoryStyles as styles } from './inventoryStyle'
 
 interface InventoryHotbarProps {
   readonly inventoryData: InventoryData

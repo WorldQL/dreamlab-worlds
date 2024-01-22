@@ -1,6 +1,6 @@
 import { deferUntilPlayer } from '@dreamlab.gg/core/dist/utils'
 import type { InitClient } from '@dreamlab.gg/core/sdk'
-import { preloadAssets } from './AssetLoader.js'
+import { preloadAssets } from './assetLoader.js'
 import { initializeUI } from './screens/start.js'
 import { sharedInit } from './shared.js'
 

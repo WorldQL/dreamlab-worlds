@@ -2,19 +2,19 @@ import { useInput, usePlayer } from '@dreamlab.gg/ui/react'
 import type { FC } from 'https://esm.sh/react@18.2.0'
 import { useCallback, useEffect, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events.js'
-import Inventory from './Inventory.js'
-import InventoryHotbar from './InventoryHotbar.js'
-import InventoryManager from './InventoryManager.js'
-import type { InventoryClickEvent } from './events/InventoryClickEvent.js'
+import type { InventoryClickEvent } from './events/inventoryClickEvent.js'
 import type {
   InventoryDragEndEvent,
   InventoryDragStartEvent,
-} from './events/InventoryDragEvent.js'
-import { handleInventoryClick } from './listeners/InventoryClick.js'
+} from './events/inventoryDragEvent.js'
+import Inventory from './inventory.js'
+import InventoryHotbar from './inventoryHotbar.js'
+import InventoryManager from './inventoryManager.js'
+import { handleInventoryClick } from './listeners/inventoryClick.js'
 import {
   handleInventoryDragEnd,
   handleInventoryDragStart,
-} from './listeners/InventoryDrag.js'
+} from './listeners/inventoryDrag.js'
 
 const isAttackAnimation = (currentAnimation: string) => {
   switch (currentAnimation) {
