@@ -1,12 +1,15 @@
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import type { SpawnableEntity } from '@dreamlab.gg/core'
+import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
+import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import type { Camera } from '@dreamlab.gg/core/entities'
-import { cloneTransform, simpleBoundsTest, Vec } from '@dreamlab.gg/core/math'
+import { cloneTransform, toRadians, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import type { Debug } from '@dreamlab.gg/core/utils'
 import { drawBox } from '@dreamlab.gg/core/utils'
+import Matter from 'matter-js'
 import type { Container } from 'pixi.js'
 import { Graphics } from 'pixi.js'
+import { events } from '../../events'
 
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
@@ -26,9 +29,9 @@ const ArgsSchema = z.object({
       {
         width: 80,
         height: 185,
-        maxHealth: 5,
-        speed: 5,
-        knockback: 2,
+        maxHealth: 8,
+        speed: 3,
+        knockback: 1.5,
       },
     ]),
   bounds: z
@@ -44,13 +47,16 @@ const ArgsSchema = z.object({
     })
     .default({ x: 0, y: 0 }),
   difficulty: z.number().default(1),
-  waves: z.number().default(1),
-  waveInterval: z.number().default(5),
-  endCooldown: z.number().default(60),
+  waves: z.number().default(3),
+  waveInterval: z.number().default(2),
+  endCooldown: z.number().default(15),
 })
 
 interface Data {
+  game: Game<false>
   debug: Debug
+  onPlayerCollisionStart: EventHandler<'onPlayerCollisionStart'>
+  onPlayerCollisionEnd: EventHandler<'onPlayerCollisionEnd'>
 }
 
 interface Render {
@@ -64,7 +70,22 @@ export const createSpawnRegion = createSpawnableEntity<
   SpawnableEntity<Data, Render, Args>,
   Data,
   Render
->(ArgsSchema, ({ tags, transform }, args) => {
+>(ArgsSchema, ({ uid, tags, transform }, args) => {
+  const trigger = Matter.Bodies.rectangle(
+    transform.position.x,
+    transform.position.y,
+    args.width,
+    args.height,
+    {
+      label: 'region_trigger',
+      render: { visible: false },
+      angle: toRadians(transform.rotation),
+
+      isStatic: true,
+      isSensor: true,
+    },
+  )
+
   return {
     get tags() {
       return tags
@@ -78,12 +99,8 @@ export const createSpawnRegion = createSpawnableEntity<
       return { width: args.width, height: args.height }
     },
 
-    isPointInside(point) {
-      return simpleBoundsTest(
-        { width: args.width, height: args.height },
-        transform,
-        point,
-      )
+    isPointInside(position) {
+      return Matter.Query.point([trigger], position).length > 0
     },
 
     onArgsUpdate(path, _previous, _data, render) {
@@ -98,8 +115,40 @@ export const createSpawnRegion = createSpawnableEntity<
       args.height = height
     },
 
-    init({ game }) {
-      return { debug: game.debug }
+    init({ game, physics }) {
+      physics.register(this, trigger)
+      physics.linkTransform(trigger, transform)
+
+      const onPlayerCollisionStart: EventHandler<
+        'onPlayerCollisionStart'
+      > = async ([_player, other]) => {
+        if (other !== trigger) return
+        events.emit('onRegionStart', uid)
+      }
+
+      const onPlayerCollisionEnd: EventHandler<
+        'onPlayerCollisionEnd'
+      > = async ([_player, other]) => {
+        if (other !== trigger) return
+        events.emit('onRegionEnd', uid)
+      }
+
+      game.events.client?.addListener(
+        'onPlayerCollisionStart',
+        onPlayerCollisionStart,
+      )
+
+      game.events.client?.addListener(
+        'onPlayerCollisionEnd',
+        onPlayerCollisionEnd,
+      )
+
+      return {
+        game,
+        debug: game.debug,
+        onPlayerCollisionStart,
+        onPlayerCollisionEnd,
+      }
     },
 
     initRenderContext(_, { stage, camera }) {
@@ -118,7 +167,17 @@ export const createSpawnRegion = createSpawnableEntity<
       return { camera, stage, gfx }
     },
 
-    teardown(_) {},
+    teardown({ game, onPlayerCollisionStart, onPlayerCollisionEnd }) {
+      game.events.client?.removeListener(
+        'onPlayerCollisionStart',
+        onPlayerCollisionStart,
+      )
+
+      game.events.client?.removeListener(
+        'onPlayerCollisionEnd',
+        onPlayerCollisionEnd,
+      )
+    },
 
     teardownRenderContext({ gfx }) {
       gfx.destroy()

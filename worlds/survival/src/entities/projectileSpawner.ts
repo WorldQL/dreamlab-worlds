@@ -23,7 +23,7 @@ const delay = async (ms: number | undefined) =>
     setTimeout(resolve, ms)
   })
 
-const SHOOT_CHANNEL = '@cvz/Projectile/Spawned'
+const SPAWNED_CHANNEL = '@cvz/Projectile/Spawned'
 const ATTACK_COOLDOWN = 250
 const Y_OFFSET_DEFAULT = 75
 const SHOT_DELAY = 100
@@ -98,7 +98,7 @@ export const createProjectileSpawner = () => {
             InventoryManager.getInstance().getInventoryItemFromBaseGear(gear)
 
           const sendProjectileMessage = (angle: number, yOffset?: number) =>
-            void netClient?.sendCustomMessage(SHOOT_CHANNEL, {
+            void netClient?.sendCustomMessage(SPAWNED_CHANNEL, {
               direction: player.facingDirection,
               animation: player.currentAnimation,
               position: [player.body.position.x, player.body.position.y],
@@ -151,7 +151,7 @@ export const createProjectileSpawner = () => {
         }
       }
 
-      netServer?.addCustomMessageListener(SHOOT_CHANNEL, onHitServer)
+      netServer?.addCustomMessageListener(SPAWNED_CHANNEL, onHitServer)
       game.events.common.addListener('onPlayerAttack', onPlayerAttack)
 
       return { game, onPlayerAttack, onHitServer }
@@ -161,13 +161,11 @@ export const createProjectileSpawner = () => {
 
     teardown({ game, onPlayerAttack, onHitServer }) {
       const netServer = onlyNetServer(game)
-      netServer?.removeCustomMessageListener(SHOOT_CHANNEL, onHitServer)
+      netServer?.removeCustomMessageListener(SPAWNED_CHANNEL, onHitServer)
       game.events.common.removeListener('onPlayerAttack', onPlayerAttack)
     },
 
     teardownRenderContext() {},
-
-    onRenderFrame(_) {},
   })
 
   return projectileSpawner

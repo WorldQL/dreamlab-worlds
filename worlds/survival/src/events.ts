@@ -9,6 +9,9 @@ interface Events {
   onPlayerNearItem: [Player, InventoryItem | undefined]
   onInventoryUpdate: []
   onGoldUpdate: []
+
+  onRegionStart: string
+  onRegionEnd: string
 }
 
 export const events = new EventEmitter<Events>()
