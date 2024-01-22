@@ -31,7 +31,7 @@ const ArgsSchema = z.object({
         height: 185,
         maxHealth: 8,
         speed: 3,
-        knockback: 1.5,
+        knockback: 2,
       },
     ]),
   bounds: z
@@ -48,8 +48,8 @@ const ArgsSchema = z.object({
     .default({ x: 0, y: 0 }),
   difficulty: z.number().default(1),
   waves: z.number().default(3),
-  waveInterval: z.number().default(2),
-  endCooldown: z.number().default(15),
+  waveInterval: z.number().default(45),
+  endCooldown: z.number().default(30),
 })
 
 interface Data {
