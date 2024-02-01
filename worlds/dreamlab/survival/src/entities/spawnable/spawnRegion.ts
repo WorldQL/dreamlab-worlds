@@ -55,6 +55,7 @@ const ArgsSchema = z.object({
 interface Data {
   game: Game<false>
   debug: Debug
+  body: Matter.Body
   onPlayerCollisionStart: EventHandler<'onPlayerCollisionStart'>
   onPlayerCollisionEnd: EventHandler<'onPlayerCollisionEnd'>
 }
@@ -103,10 +104,21 @@ export const createSpawnRegion = createSpawnableEntity<
       return Matter.Query.point([trigger], position).length > 0
     },
 
-    onArgsUpdate(path, _previous, _data, render) {
-      if (render && (path === 'width' || path === 'height')) {
+    onArgsUpdate(path, previous, data, render) {
+      if (path === 'width' || path === 'height') {
+        const { width: originalWidth, height: originalHeight } = previous
         const { width, height } = args
-        drawBox(render.gfx, { width, height }, { stroke: 'blue' })
+
+        const scaleX = width / originalWidth
+        const scaleY = height / originalHeight
+
+        Matter.Body.setAngle(data.body, 0)
+        Matter.Body.scale(data.body, scaleX, scaleY)
+        Matter.Body.setAngle(trigger, toRadians(transform.rotation))
+
+        if (render) {
+          drawBox(render.gfx, { width, height }, { stroke: 'green' })
+        }
       }
     },
 
@@ -146,6 +158,7 @@ export const createSpawnRegion = createSpawnableEntity<
       return {
         game,
         debug: game.debug,
+        body: trigger,
         onPlayerCollisionStart,
         onPlayerCollisionEnd,
       }
