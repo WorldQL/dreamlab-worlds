@@ -47,10 +47,10 @@ type zombieAnimations = 'punch' | 'recoil' | 'walk'
 interface MobData {
   health: number
   direction: number
-  hitCooldownCounter: number
-  currentPatrolDistance: number
+  hitCooldown: number
+  patrolDistance: number
   currentAnimation: zombieAnimations
-  directionChangeCooldown: number
+  directionCooldown: number
 }
 
 interface Data {
@@ -149,15 +149,15 @@ export const createZombieMob = createSpawnableEntity<
       const mobData = syncedValue(game, uid, 'mobData', {
         health: args.maxHealth,
         direction: 1,
-        hitCooldownCounter: 0,
-        currentPatrolDistance: 0,
+        hitCooldown: 0,
+        patrolDistance: 0,
         currentAnimation: 'walk' as zombieAnimations,
-        directionChangeCooldown: 0,
+        directionCooldown: 0,
       })
 
       const onPlayerAttack: OnPlayerAttack = (player, item) => {
         if (
-          mobData.value.hitCooldownCounter <= 0 &&
+          mobData.value.hitCooldown <= 0 &&
           item?.animationName !== 'bow' &&
           item?.animationName !== 'shoot'
         ) {
@@ -248,7 +248,7 @@ export const createZombieMob = createSpawnableEntity<
         )
         if (!player) throw new Error('missing netplayer')
 
-        mobData.value.hitCooldownCounter = hitCooldown * 60
+        mobData.value.hitCooldown = hitCooldown * 60
         Matter.Body.applyForce(body, body.position, {
           x: args.knockback * -mobData.value.direction,
           y: -1.75,
@@ -419,13 +419,10 @@ export const createZombieMob = createSpawnableEntity<
         Matter.Body.setAngle(body, 0)
         Matter.Body.setAngularVelocity(body, 0)
 
-        mobData.value.hitCooldownCounter = Math.max(
+        mobData.value.hitCooldown = Math.max(0, mobData.value.hitCooldown - 1)
+        mobData.value.directionCooldown = Math.max(
           0,
-          mobData.value.hitCooldownCounter - 1,
-        )
-        mobData.value.directionChangeCooldown = Math.max(
-          0,
-          mobData.value.directionChangeCooldown - 1,
+          mobData.value.directionCooldown - 1,
         )
 
         let closestPlayer: Matter.Body | null = null
@@ -456,7 +453,7 @@ export const createZombieMob = createSpawnableEntity<
 
         minDistance = Math.sqrt(minDistance)
 
-        if (mobData.value.hitCooldownCounter > 0) {
+        if (mobData.value.hitCooldown > 0) {
           mobData.value.currentAnimation = 'recoil'
         } else if (closestPlayer && minDistance < 150) {
           mobData.value.currentAnimation = 'punch'
@@ -474,11 +471,11 @@ export const createZombieMob = createSpawnableEntity<
 
           if (
             verticalDistance < horizontalDistance &&
-            mobData.value.directionChangeCooldown === 0
+            mobData.value.directionCooldown === 0
           ) {
             mobData.value.direction =
               closestPlayer.position.x > body.position.x ? 1 : -1
-            mobData.value.directionChangeCooldown = 1
+            mobData.value.directionCooldown = 1
           }
 
           Matter.Body.translate(body, {
@@ -487,8 +484,8 @@ export const createZombieMob = createSpawnableEntity<
           })
         } else {
           // patrol back and fourth when player is far from entity
-          if (mobData.value.currentPatrolDistance > patrolDistance) {
-            mobData.value.currentPatrolDistance = 0
+          if (mobData.value.patrolDistance > patrolDistance) {
+            mobData.value.patrolDistance = 0
             mobData.value.direction *= -1
           }
 
@@ -497,7 +494,7 @@ export const createZombieMob = createSpawnableEntity<
             y: 0,
           })
 
-          mobData.value.currentPatrolDistance += Math.abs(args.speed / 2)
+          mobData.value.patrolDistance += Math.abs(args.speed / 2)
         }
 
         if (!closestPlayer || minDistance > 5_000) {
@@ -530,7 +527,7 @@ export const createZombieMob = createSpawnableEntity<
 
       const alpha = debug.value ? 0.5 : 0
       gfxBounds.alpha = alpha
-      gfxHittest.alpha = mobData.value.hitCooldownCounter === 0 ? alpha / 3 : 0
+      gfxHittest.alpha = mobData.value.hitCooldown === 0 ? alpha / 3 : 0
 
       drawBox(
         gfxHealthAmount,
