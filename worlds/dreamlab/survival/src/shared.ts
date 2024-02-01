@@ -5,9 +5,9 @@ import { createBreakableSolid } from './entities/spawnable/breakableSolid.js'
 import { createGrappleHook } from './entities/spawnable/grappleHook.js'
 import { createInventoryItem } from './entities/spawnable/inventoryItem.js'
 import { createLadder } from './entities/spawnable/ladder.js'
-import { createZombieMob } from './entities/spawnable/mobs/zombie.js'
 import { createProjectile } from './entities/spawnable/projectile.js'
 import { createSpawnRegion } from './entities/spawnable/spawnRegion.js'
+import { createZombieMob } from './entities/spawnable/zombie.js'
 
 export const sharedInit: InitShared = async game => {
   game.register('@cvz/ZombieMob', createZombieMob)
