@@ -70,6 +70,7 @@ interface Render {
   camera: Camera
   container: Container
   gfxBounds: Graphics
+  gfxHealthBorder: Graphics
   gfxHittest: Graphics
   ctrHealth: Container
   gfxHealthAmount: Graphics
@@ -105,10 +106,9 @@ export const createZombieMob = createSpawnableEntity<
   )
 
   const patrolDistance = 300
-  const hitRadius = args.width / 2 + 120
   const hitCooldown = 0.5 // Second(s)
-  const healthIndicatorWidth = args.width + 50
-  const healthIndicatorHeight = 20
+  // const healthIndicatorWidth = args.width + 50
+  // const healthIndicatorHeight = 20
 
   const zombieAnimations: Record<string, Texture<Resource>[]> = {}
 
@@ -323,7 +323,7 @@ export const createZombieMob = createSpawnableEntity<
       )
       drawCircle(
         gfxHittest,
-        { radius: hitRadius },
+        { radius: args.width / 2 + 120 },
         { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
       )
 
@@ -332,7 +332,7 @@ export const createZombieMob = createSpawnableEntity<
 
       drawBox(
         gfxHealthBorder,
-        { width: healthIndicatorWidth, height: healthIndicatorHeight },
+        { width: args.width + 50, height: 20 },
         {
           fill: 'white',
           stroke: 'black',
@@ -355,6 +355,7 @@ export const createZombieMob = createSpawnableEntity<
         camera,
         container,
         gfxBounds,
+        gfxHealthBorder,
         gfxHittest,
         ctrHealth,
         gfxHealthAmount,
@@ -401,6 +402,24 @@ export const createZombieMob = createSpawnableEntity<
 
         if (render) {
           drawBox(render.gfxBounds, { width, height })
+          drawCircle(
+            render.gfxHittest,
+            { radius: args.width / 2 + 120 },
+            { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
+          )
+          drawBox(
+            render.gfxHealthBorder,
+            { width: args.width + 50, height: 20 },
+            {
+              fill: 'white',
+              stroke: 'black',
+              fillAlpha: 1,
+              strokeAlign: 1,
+              strokeWidth: 4,
+            },
+          )
+          render.ctrHealth.position.y = -args.height / 2 - 30
+
           if (render.sprite) {
             render.sprite.width = width
             render.sprite.height = height
@@ -532,7 +551,7 @@ export const createZombieMob = createSpawnableEntity<
       drawBox(
         gfxHealthAmount,
         {
-          width: (mobData.value.health / args.maxHealth) * healthIndicatorWidth,
+          width: (mobData.value.health / args.maxHealth) * args.width + 50,
           height: 20,
         },
         { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
