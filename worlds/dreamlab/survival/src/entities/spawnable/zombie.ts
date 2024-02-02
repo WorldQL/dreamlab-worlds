@@ -107,8 +107,6 @@ export const createZombieMob = createSpawnableEntity<
 
   const patrolDistance = 300
   const hitCooldown = 0.5 // Second(s)
-  // const healthIndicatorWidth = args.width + 50
-  // const healthIndicatorHeight = 20
 
   const zombieAnimations: Record<string, Texture<Resource>[]> = {}
 
@@ -163,7 +161,7 @@ export const createZombieMob = createSpawnableEntity<
         ) {
           const xDiff = player.body.position.x - body.position.x
 
-          if (Math.abs(xDiff) <= hitRadius) {
+          if (Math.abs(xDiff) <= args.width / 2 + 120) {
             let damage = 1
             if (item) {
               const inventoryManager = InventoryManager.getInstance()
