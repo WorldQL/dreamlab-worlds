@@ -3,9 +3,9 @@ import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
 import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import type { Camera } from '@dreamlab.gg/core/entities'
 import { createGear } from '@dreamlab.gg/core/managers'
-import { Vec } from '@dreamlab.gg/core/math'
+import { toRadians, Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
-import { createSprite } from '@dreamlab.gg/core/textures'
+import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
 import { drawBox } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import { Container, Graphics } from 'pixi.js'
@@ -26,7 +26,7 @@ const ArgsSchema = z.object({
   animationName: z
     .enum(['bow', 'shoot', 'greatsword', 'idle', 'jump', 'jog', 'walk'])
     .default('shoot'),
-  spriteSource: z.string().default(''),
+  spriteSource: SpriteSourceSchema.optional(),
   damage: z.number().default(1),
   lore: z.string().default('Default Item Lore'),
   bone: z.enum(['handLeft', 'handRight']).default('handRight'),
@@ -101,7 +101,7 @@ export const createInventoryItem = createSpawnableEntity<
         if (body && bodyCollided === body && game.client) {
           const baseGear = {
             displayName: args.displayName,
-            textureURL: args.spriteSource,
+            textureURL: args.spriteSource ? args.spriteSource.url : '',
             animationName: args.animationName,
             anchor: { x: args.anchorX, y: args.anchorY },
             rotation: args.rotation,
@@ -155,7 +155,7 @@ export const createInventoryItem = createSpawnableEntity<
       const gfxBounds = new Graphics()
       const sprite = args.spriteSource
         ? createSprite(
-            { url: args.spriteSource },
+            { url: args.spriteSource.url },
             {
               width: args.width,
               height: args.height,
@@ -185,14 +185,14 @@ export const createInventoryItem = createSpawnableEntity<
       }
     },
 
-    onArgsUpdate(path, _previous, _data, render) {
-      if (render && path === 'spriteSource') {
+    onArgsUpdate(path, previous, data, render) {
+      if (render && path.startsWith('spriteSource')) {
         const { width, height, spriteSource } = args
 
         render.sprite?.destroy()
         render.sprite = spriteSource
           ? createSprite(
-              { url: spriteSource },
+              { url: spriteSource.url },
               {
                 width,
                 height,
@@ -202,6 +202,26 @@ export const createInventoryItem = createSpawnableEntity<
           : undefined
 
         if (render.sprite) render.stage.addChild(render.sprite)
+      }
+
+      if (path === 'width' || path === 'height') {
+        const { width: originalWidth, height: originalHeight } = previous
+        const { width, height } = args
+
+        const scaleX = width / originalWidth
+        const scaleY = height / originalHeight
+
+        Matter.Body.setAngle(data.body, 0)
+        Matter.Body.scale(data.body, scaleX, scaleY)
+        Matter.Body.setAngle(body, toRadians(transform.rotation))
+
+        if (render) {
+          drawBox(render.gfx, { width, height })
+          if (render.sprite) {
+            render.sprite.width = width
+            render.sprite.height = height
+          }
+        }
       }
     },
 
