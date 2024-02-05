@@ -5,7 +5,6 @@ export enum ProjectileTypes {
   BURST_SHOT = 'BURST_SHOT',
   DOUBLE_SCATTER_SHOT = 'DOUBLE_SCATTER_SHOT',
   DOUBLE_SHOT = 'DOUBLE_SHOT',
-  EXPLOSIVE_SHOT = 'EXPLOSIVE_SHOT',
   SCATTER_SHOT = 'SCATTER_SHOT',
   SINGLE_SHOT = 'SINGLE_SHOT',
 }
@@ -67,7 +66,7 @@ class InventoryManager {
 
   public getInventoryItemFromBaseGear(baseGear: BaseGear) {
     for (const item of this.inventoryData) {
-      if (item?.baseGear?.displayName === baseGear?.displayName) return item
+      if (item?.baseGear === baseGear) return item
     }
 
     return undefined

@@ -143,10 +143,6 @@ export const createProjectileSpawner = () => {
 
             case undefined:
               throw new Error('Not implemented yet: undefined case')
-            case ProjectileTypes.EXPLOSIVE_SHOT:
-              throw new Error(
-                'Not implemented yet: ProjectileTypes.EXPLOSIVE_SHOT case',
-              )
           }
         }
       }
