@@ -1,4 +1,4 @@
-import type { Player } from '@dreamlab.gg/core/dist/entities'
+import type { Player } from '@dreamlab.gg/core/entities'
 import { EventEmitter } from '@dreamlab.gg/core/events'
 import type { InventoryItem } from './inventory/inventoryManager'
 
@@ -10,8 +10,15 @@ interface Events {
   onInventoryUpdate: []
   onGoldUpdate: []
 
-  onRegionStart: string
-  onRegionEnd: string
+  onEnterRegion: [string]
+  onExitRegion: [string]
+
+  onRegionStart: [string]
+  onRegionEnd: [string]
+  onRegionWaveStart: [string]
+  onRegionCooldownStart: [string]
+  onRegionCooldownEnd: [string]
+  onRegionZombieSpawning: [{ x: number; y: number }[]]
 }
 
 export const events = new EventEmitter<Events>()

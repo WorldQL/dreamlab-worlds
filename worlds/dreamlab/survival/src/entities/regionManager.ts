@@ -1,6 +1,5 @@
 import type { Entity, Game } from '@dreamlab.gg/core'
 import { createEntity, isSpawnableEntity } from '@dreamlab.gg/core'
-import { isNetPlayer } from '@dreamlab.gg/core/dist/entities'
 import type { MessageListenerServer } from '@dreamlab.gg/core/dist/network'
 import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/dist/network'
 import Matter from 'matter-js'
@@ -8,7 +7,8 @@ import { events } from '../events'
 
 interface Data {
   game: Game<false>
-  onHitServer: MessageListenerServer
+  onServerRegionStart: MessageListenerServer
+  onServerRegionEnd: MessageListenerServer
 }
 
 export interface Region {
@@ -20,15 +20,16 @@ export interface Region {
     speed: number
     knockback: number
   }[]
-  bounds: { width: number; height: number }
-  center: { x: number; y: number }
-  difficulty: number
+  position: { x: number; y: number }
+  width: number
+  height: number
   waves: number
+  zombiesPerWave: number
   waveInterval: number
   endCooldown: number
   currentWave: number
-  isInCooldown?: boolean
-  spawnIntervalId?: NodeJS.Timeout
+  isInCooldown: boolean
+  spawnIntervalId: NodeJS.Timeout | undefined
 }
 
 export interface RegionManager extends Entity<Data> {}
@@ -39,51 +40,41 @@ const stopRegionInterval = (region: Region) => {
   }
 
   region.spawnIntervalId = undefined
+  events.emit('onRegionEnd', region.uid)
 }
 
 const isPlayerInRegion = (
   playerPosition: { x: number; y: number },
   region: Region,
 ) => {
-  const regionLeft = region.center.x - region.bounds.width / 2
-  const regionRight = region.center.x + region.bounds.width / 2
-  const regionTop = region.center.y - region.bounds.height / 2
-  const regionBottom = region.center.y + region.bounds.height / 2
-  return (
-    playerPosition.x >= regionLeft &&
-    playerPosition.x <= regionRight &&
-    playerPosition.y >= regionTop &&
-    playerPosition.y <= regionBottom
-  )
+  const buffer = 300
+  const isWithinXBounds =
+    playerPosition.x >= region.position.x - region.width / 2 - buffer &&
+    playerPosition.x <= region.position.x + region.width / 2 + buffer
+
+  const isWithinYBounds =
+    playerPosition.y >= region.position.y - region.height / 2 - buffer &&
+    playerPosition.y <= region.position.y + region.height / 2 + buffer
+
+  return isWithinXBounds && isWithinYBounds
 }
 
-const getSpawnPositionAwayFromPlayer = (
-  region: Region,
-  playerPosition: { x: number; y: number },
-) => {
-  const minDistance = 500
-  let spawnPosition: { x: number; y: number }
-  do {
-    const regionLeft = region.center.x - region.bounds.width / 2
-    const regionRight = region.center.x + region.bounds.width / 2
-    const regionTop = region.center.y - region.bounds.height / 2
-    const regionBottom = region.center.y + region.bounds.height / 2
-    const spawnX = Math.random() * (regionRight - regionLeft) + regionLeft
-    const spawnY = Math.random() * (regionBottom - regionTop) + regionTop
-    spawnPosition = { x: spawnX, y: spawnY }
-  } while (
-    Math.hypot(
-      spawnPosition.x - playerPosition.x,
-      spawnPosition.y - playerPosition.y,
-    ) < minDistance
-  )
+const getSpawnPosition = (region: Region) => {
+  const regionLeft = region.position.x - region.width / 2
+  const regionRight = region.position.x + region.width / 2
+  const regionTop = region.position.y - region.height / 2
+  const regionBottom = region.position.y + region.height / 2
 
-  return spawnPosition
+  const randomX = Math.random() * (regionRight - regionLeft) + regionLeft
+  const randomY = Math.random() * (regionBottom - regionTop) + regionTop
+
+  return { x: randomX, y: randomY }
 }
 
 export const createRegionManager = () => {
   const regions: Map<string, Region> = new Map()
-  const SPAWNED_CHANNEL = '@cvz/Zombie/Spawned'
+  const START_CHANNEL = '@cvz/Region/Start'
+  const END_CHANNEL = '@cvz/Region/End'
 
   const onInstantiateRegion = (entity: Entity) => {
     if (!isSpawnableEntity(entity)) return
@@ -91,14 +82,17 @@ export const createRegionManager = () => {
       const regionArgs = entity.args
       const region = {
         uid: entity.uid,
+        position: entity.transform.position,
+        width: regionArgs.width,
+        height: regionArgs.height,
         zombieTypes: regionArgs.zombieTypes,
-        bounds: regionArgs.bounds,
-        center: regionArgs.center,
-        difficulty: regionArgs.difficulty,
+        zombiesPerWave: regionArgs.zombiesPerWave,
         waves: regionArgs.waves,
         waveInterval: regionArgs.waveInterval,
         endCooldown: regionArgs.endCooldown,
         currentWave: 0,
+        isInCooldown: false,
+        spawnIntervalId: undefined,
       }
       regions.set(region.uid, region)
     }
@@ -111,14 +105,16 @@ export const createRegionManager = () => {
     const regionArgs = entity.args
     const updatedRegion = {
       uid: entity.uid,
+      position: entity.transform.position,
       zombieTypes: regionArgs.zombieTypes,
       bounds: regionArgs.bounds,
-      center: regionArgs.center,
-      difficulty: regionArgs.difficulty,
+      zombiesPerWave: regionArgs.zombiesPerWave,
       waves: regionArgs.waves,
       waveInterval: regionArgs.waveInterval,
       endCooldown: regionArgs.endCooldown,
       currentWave: 0,
+      isInCooldown: false,
+      spawnIntervalId: undefined,
     }
 
     if (regions.has(updatedRegion.uid)) {
@@ -132,113 +128,122 @@ export const createRegionManager = () => {
     }
   }
 
+  // eslint-disable-next-line no-empty-pattern
+  const onServerRegionEnd: MessageListenerServer = async ({}, _, data) => {
+    const { uid } = data as {
+      uid: string
+    }
+    const region = regions.get(uid)
+    if (region) stopRegionInterval(region)
+  }
+
   const regionManager: RegionManager = createEntity({
     async init({ game }) {
       const netClient = onlyNetClient(game)
       const netServer = onlyNetServer(game)
 
       const spawnZombies = async (region: Region) => {
-        const players = Matter.Composite.allBodies(
-          game.physics.engine.world,
-        ).filter(
-          b =>
-            b.label === 'player' &&
-            isPlayerInRegion({ x: b.position.x, y: b.position.y }, region),
-        )
-        if (players.length === 0) {
-          stopRegionInterval(region)
-          return
-        }
-
         const zombies = Matter.Composite.allBodies(
           game.physics.engine.world,
         ).filter(b => b.label === 'zombie')
         if (zombies.length >= 30) return
 
-        const additionalZombies = Math.floor(players.length / 2)
-        const zombieCount = region.difficulty + additionalZombies
+        events.emit('onRegionWaveStart', region.uid)
+        const zombieCount = region.zombiesPerWave
 
-        const spawnPromises = players.flatMap(player => {
-          const playerPosition = { x: player.position.x, y: player.position.y }
-          return Array.from({ length: zombieCount }, async () => {
-            const randomZombieTypeIndex =
-              Math.random() < 0.7
-                ? Math.floor(Math.random() * region.zombieTypes.length)
-                : region.zombieTypes.length - 1
-            const randomZombieType = region.zombieTypes[randomZombieTypeIndex]
-            const spawnPosition = getSpawnPositionAwayFromPlayer(
-              region,
-              playerPosition,
-            )
-            return game.spawn({
-              entity: '@cvz/ZombieMob',
-              args: randomZombieType as Record<string, unknown>,
-              transform: { position: [spawnPosition.x, spawnPosition.y] },
-              tags: [
-                'net/replicated',
-                'net/server-authoritative',
-                'editor/doNotSave',
-              ],
-            })
+        const delay = async (ms: number) =>
+          new Promise(resolve => {
+            setTimeout(resolve, ms)
+          })
+
+        const positions: { x: number; y: number }[] = []
+        for (let idx = 0; idx < zombieCount; idx++) {
+          const spawnPosition = getSpawnPosition(region)
+          positions.push(spawnPosition)
+        }
+
+        events.emit('onRegionZombieSpawning', positions)
+
+        await delay(3_000)
+        const spawnPromises = positions.map(async spawnPosition => {
+          const randomZombieTypeIndex = Math.floor(
+            Math.random() * region.zombieTypes.length,
+          )
+          const randomZombieType = region.zombieTypes[randomZombieTypeIndex]
+
+          return game.spawn({
+            entity: '@cvz/ZombieMob',
+            args: randomZombieType as Record<string, unknown>,
+            transform: { position: [spawnPosition.x, spawnPosition.y] },
+            tags: [
+              'net/replicated',
+              'net/server-authoritative',
+              'editor/doNotSave',
+            ],
           })
         })
 
         await Promise.all(spawnPromises)
       }
 
-      const onHitServer: MessageListenerServer = async (
-        { peerID },
+      const manageRegionWaves = async (region: Region) => {
+        if (region.currentWave >= region.waves) {
+          if (!region.isInCooldown) {
+            region.isInCooldown = true
+            events.emit('onRegionCooldownStart', region.uid)
+            setTimeout(() => {
+              region.isInCooldown = false
+              region.currentWave = 0
+              events.emit('onRegionCooldownEnd', region.uid)
+              stopRegionInterval(region)
+            }, region.endCooldown * 1_000)
+          }
+        } else {
+          await spawnZombies(region)
+          region.currentWave++
+          // If there are more waves to handle, set up the next call
+          if (region.currentWave < region.waves) {
+            const interval = setTimeout(
+              async () => manageRegionWaves(region),
+              Math.max(region.waveInterval - 3, 0) * 1_000,
+            )
+            region.spawnIntervalId = interval
+          } else {
+            // Handle cooldown if this was the last wave
+            await manageRegionWaves(region)
+          }
+        }
+      }
+
+      const onServerRegionStart: MessageListenerServer = async (
+        // eslint-disable-next-line no-empty-pattern
+        {},
         _,
         data,
       ) => {
         if (!netServer) throw new Error('missing network')
-        const player = game.entities
-          .filter(isNetPlayer)
-          .find(netplayer => netplayer.peerID === peerID)
-        if (!player) throw new Error('missing netplayer')
         const { uid } = data as {
           uid: string
         }
         const region = regions.get(uid)
-        if (region?.spawnIntervalId) return
-        const spawn = async () => {
-          if (!region) return
-          if (region.currentWave < region.waves) {
-            await spawnZombies(region)
-            region.currentWave++
-          } else {
-            stopRegionInterval(region)
-            region.isInCooldown = true
-            setTimeout(async () => {
-              region.currentWave = 0
-              region.isInCooldown = false
-              events.emit('onRegionStart', region.uid)
-            }, region.endCooldown * 1_000)
+        if (region) {
+          if (region.isInCooldown || region.spawnIntervalId) {
             return
           }
 
-          const newSpawnIntervalId = setTimeout(
-            spawn,
-            region.waveInterval * 1_000,
-          )
-          region.spawnIntervalId = newSpawnIntervalId
+          await manageRegionWaves(region)
+          events.emit('onRegionStart', region.uid)
         }
-
-        await spawn()
       }
 
-      const onStartRegion = async (uid: string) => {
+      const onEnterRegion = async (uid: string) => {
         const region = regions.get(uid)
         if (!region) return
 
-        if (region.isInCooldown || region.spawnIntervalId) {
-          return
-        }
-
-        await netClient?.sendCustomMessage(SPAWNED_CHANNEL, { uid })
+        await netClient?.sendCustomMessage(START_CHANNEL, { uid })
       }
 
-      const onEndRegion = async (uid: string) => {
+      const onExitRegion = async (uid: string) => {
         const region = regions.get(uid)
         if (!region) return
 
@@ -250,26 +255,28 @@ export const createRegionManager = () => {
             isPlayerInRegion({ x: b.position.x, y: b.position.y }, region),
         )
         if (players.length === 0) {
-          stopRegionInterval(region)
+          await netClient?.sendCustomMessage(END_CHANNEL, { uid })
         }
       }
 
-      netServer?.addCustomMessageListener(SPAWNED_CHANNEL, onHitServer)
+      netServer?.addCustomMessageListener(START_CHANNEL, onServerRegionStart)
+      netServer?.addCustomMessageListener(END_CHANNEL, onServerRegionEnd)
 
       game.events.common.addListener('onInstantiate', onInstantiateRegion)
       game.events.common.addListener('onArgsChanged', onUpdateRegion)
 
-      events.addListener('onRegionStart', onStartRegion)
-      events.addListener('onRegionEnd', onEndRegion)
+      events.addListener('onEnterRegion', onEnterRegion)
+      events.addListener('onExitRegion', onExitRegion)
 
-      return { game, onHitServer }
+      return { game, onServerRegionStart, onServerRegionEnd }
     },
 
     async initRenderContext() {},
 
-    teardown({ game, onHitServer }) {
+    teardown({ game, onServerRegionStart, onServerRegionEnd }) {
       const netServer = onlyNetServer(game)
-      netServer?.removeCustomMessageListener(SPAWNED_CHANNEL, onHitServer)
+      netServer?.removeCustomMessageListener(START_CHANNEL, onServerRegionStart)
+      netServer?.removeCustomMessageListener(END_CHANNEL, onServerRegionEnd)
 
       game.events.common.removeListener('onInstantiate', onInstantiateRegion)
       game.events.common.removeListener('onArgsChanged', onUpdateRegion)
