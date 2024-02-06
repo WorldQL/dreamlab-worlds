@@ -28,13 +28,14 @@ const ArgsSchema = z.object({
     .default('shoot'),
   spriteSource: SpriteSourceSchema.optional(),
   damage: z.number().default(1),
+  range: z.number().default(1),
   lore: z.string().default('Default Item Lore'),
   bone: z.enum(['handLeft', 'handRight']).default('handRight'),
   anchorX: z.number().default(0.5),
   anchorY: z.number().default(0.5),
   rotation: z.number().default(0),
   speedMultiplier: z.number().optional().default(1),
-  projectileType: z.enum(projectileTypeValues).optional(),
+  projectileType: z.enum(projectileTypeValues).default('NONE'),
 })
 
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
@@ -115,6 +116,7 @@ export const createInventoryItem = createSpawnableEntity<
             baseGear: newItem,
             lore: args.lore,
             damage: args.damage,
+            range: args.range,
             value: 100,
             projectileType:
               ProjectileTypes[

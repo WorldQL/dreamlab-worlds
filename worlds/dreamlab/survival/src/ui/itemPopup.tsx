@@ -5,7 +5,9 @@ import type { FC } from 'https://esm.sh/react@18.2.0'
 import { useEffect, useRef, useState } from 'https://esm.sh/react@18.2.0'
 import { events } from '../events'
 import type { InventoryItem } from '../inventory/inventoryManager'
-import InventoryManager from '../inventory/inventoryManager'
+import InventoryManager, {
+  ProjectileTypes,
+} from '../inventory/inventoryManager'
 import PlayerManager from '../playerDataManager'
 import { styles } from './styles'
 
@@ -109,10 +111,13 @@ export const ItemScreen: FC<ItemPopupProps> = ({ game, item }) => {
         <div style={styles.statsSection}>
           <span style={styles.statName}>Stats:</span>
           <span style={styles.statValue}>Damage: {currentItem.damage}</span>
-          {currentItem.projectileType && (
+          {currentItem.projectileType !== ProjectileTypes.NONE &&
+          currentItem.baseGear.animationName !== 'greatsword' ? (
             <span style={styles.statValue}>
               Barrel: {currentItem.projectileType}
             </span>
+          ) : (
+            <span style={styles.statValue}>Range: {currentItem.range}</span>
           )}
         </div>
         <span style={styles.loreSection}>{currentItem.lore}</span>

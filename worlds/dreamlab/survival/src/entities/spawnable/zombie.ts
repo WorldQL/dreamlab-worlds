@@ -161,18 +161,20 @@ export const createZombieMob = createSpawnableEntity<
         ) {
           const xDiff = player.body.position.x - body.position.x
 
-          if (Math.abs(xDiff) <= args.width / 2 + 120) {
-            let damage = 1
-            if (item) {
-              const inventoryManager = InventoryManager.getInstance()
-              const inventoryItem =
-                inventoryManager.getInventoryItemFromBaseGear(item)
+          let damage = 1
+          let range = args.width / 2 + 120
+          if (item) {
+            const inventoryManager = InventoryManager.getInstance()
+            const inventoryItem =
+              inventoryManager.getInventoryItemFromBaseGear(item)
 
-              if (inventoryItem) {
-                damage = inventoryItem.damage
-              }
+            if (inventoryItem) {
+              damage = inventoryItem.damage
+              range *= Math.max(inventoryItem.range, 1)
             }
+          }
 
+          if (Math.abs(xDiff) <= range) {
             void netClient?.sendCustomMessage(HIT_CHANNEL, { uid, damage })
 
             if (mobData.value.health - damage <= 0) {

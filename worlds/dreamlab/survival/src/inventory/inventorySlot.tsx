@@ -1,4 +1,5 @@
 import React, { useState } from 'https://esm.sh/react@18.2.0'
+import { ProjectileTypes } from './inventoryManager.js'
 import type { InventoryItem } from './inventoryManager.js'
 import { inventoryStyles as styles } from './inventoryStyle.js'
 
@@ -19,15 +20,18 @@ const InventorySlot: React.FC<Props> = ({ slot }) => {
   const renderTooltipContent = () => {
     if (!slot?.baseGear) return null
 
-    const { baseGear: baseItem, damage, projectileType } = slot
+    const { baseGear: baseItem, damage, range, projectileType } = slot
     const { displayName, speedMultiplier } = baseItem
 
     return (
       <div>
         <div>{displayName}</div>
         <div>Damage: {damage}</div>
+        {projectileType === ProjectileTypes.NONE && <div>Range: {range}</div>}
         <div>Attack Speed: {speedMultiplier ?? 1}</div>
-        {projectileType && <div>Barrel: {projectileType}</div>}
+        {projectileType !== ProjectileTypes.NONE && (
+          <div>Barrel: {projectileType}</div>
+        )}
       </div>
     )
   }
