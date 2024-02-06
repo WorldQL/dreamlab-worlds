@@ -245,6 +245,7 @@ export const createZombieMob = createSpawnableEntity<
           ev => isNetPlayer(ev) && ev.peerID === peerID,
         )
         if (!player) throw new Error('missing netplayer')
+        if (mobData.value.hitCooldown > 0) return
 
         mobData.value.hitCooldown = hitCooldown * 60
         Matter.Body.applyForce(body, body.position, {
