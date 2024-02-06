@@ -45,9 +45,9 @@ const ArgsSchema = z.object({
 type zombiePosition = { x: number; y: number }[] | undefined
 
 interface RegionData {
-  isCooldown: number
-  waveStarted: number
-  regionActive: number
+  isCooldown: boolean
+  waveStarted: boolean
+  regionActive: boolean
   positions: zombiePosition
 }
 
@@ -110,9 +110,9 @@ export const createSpawnRegion = createSpawnableEntity<
       physics.linkTransform(trigger, transform)
 
       const regionData = syncedValue(game, uid, 'regionData', {
-        isCooldown: 0,
-        waveStarted: 0,
-        regionActive: 0,
+        isCooldown: false as boolean,
+        waveStarted: false as boolean,
+        regionActive: false as boolean,
         positions: undefined as zombiePosition,
       })
 
@@ -142,34 +142,34 @@ export const createSpawnRegion = createSpawnableEntity<
 
       events.on('onRegionCooldownStart', regionId => {
         if (uid === regionId) {
-          regionData.value.isCooldown = 1
+          regionData.value.isCooldown = true
         }
       })
 
       events.on('onRegionCooldownEnd', regionId => {
         if (uid === regionId) {
-          regionData.value.isCooldown = 0
+          regionData.value.isCooldown = false
         }
       })
 
       events.on('onRegionWaveStart', regionId => {
         if (uid === regionId) {
-          regionData.value.waveStarted = 1
+          regionData.value.waveStarted = true
           setTimeout(() => {
-            regionData.value.waveStarted = 0
-          }, 2_000)
+            regionData.value.waveStarted = false
+          }, 3_000)
         }
       })
 
       events.on('onRegionStart', regionId => {
         if (uid === regionId) {
-          regionData.value.regionActive = 1
+          regionData.value.regionActive = true
         }
       })
 
       events.on('onRegionEnd', regionId => {
         if (uid === regionId) {
-          regionData.value.regionActive = 0
+          regionData.value.regionActive = false
         }
       })
 
@@ -259,33 +259,32 @@ export const createSpawnRegion = createSpawnableEntity<
       gfx.clear()
       gfxCircle.clear()
 
-      let fill = 0x0
       let fillAlpha = 0
-      let stroke = regionData.value.regionActive === 1 ? 0x38761d : 0x0
+      let fillColor = 0x0
+      const strokeAlpha = 1
+      let strokeColor = 0x0
       const strokeWidth = 8
-      let strokeAlpha = 1
 
-      if (regionData.value.isCooldown === 1) {
-        fill = 0x85c1e9
+      if (regionData.value.regionActive) strokeColor = 0x38761d
+      if (regionData.value.isCooldown) {
+        fillColor = 0x85c1e9
         fillAlpha = 0.5
-        stroke = 0x3498db
-        strokeAlpha = 1
+        strokeColor = 0x3498db
       }
 
-      if (regionData.value.waveStarted === 1) {
-        fill = 0x0
+      if (regionData.value.waveStarted) {
+        fillColor = 0x0
         fillAlpha = 0
-        stroke = 0x9b0000
-        strokeAlpha = 1
+        strokeColor = 0x9b0000
       }
 
       drawBox(
         gfx,
         { width: args.width, height: args.height },
         {
-          fill,
+          fill: fillColor,
           fillAlpha,
-          stroke,
+          stroke: strokeColor,
           strokeWidth,
           strokeAlpha,
         },
