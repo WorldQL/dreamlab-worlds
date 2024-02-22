@@ -30,7 +30,7 @@ const ArgsSchema = SolidArgs.extend({
 })
 
 export { ArgsSchema as InventoryItemArgs }
-export class Platform<A extends Args = Args> extends Solid<A> {
+export class Item<A extends Args = Args> extends Solid<A> {
   private time = 0
   private floatHeight = 5
   private rotationSpeed = 0.01
