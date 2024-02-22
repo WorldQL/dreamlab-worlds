@@ -1,234 +1,141 @@
-import { createSpawnableEntity } from '@dreamlab.gg/core'
-import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
-import type { Camera } from '@dreamlab.gg/core/entities'
-import { cloneTransform, distance, Vec } from '@dreamlab.gg/core/math'
-import type { Vector } from '@dreamlab.gg/core/math'
-import { z } from '@dreamlab.gg/core/sdk'
-import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
+import type { RenderTime, SpawnableContext, Time } from '@dreamlab.gg/core'
+import { Solid, SolidArgs } from '@dreamlab.gg/core/dist/entities'
+import { camera, game } from '@dreamlab.gg/core/dist/labs'
+import { z } from '@dreamlab.gg/core/dist/sdk'
+import { distance, Vec } from '@dreamlab.gg/core/math'
+import type { Vector } from 'matter-js'
 import Matter from 'matter-js'
-import { Container, Graphics } from 'pixi.js'
-import type { Sprite } from 'pixi.js'
-
-let cursorPosition: Vector | undefined
-
-const onPointerOut = (): void => {
-  cursorPosition = undefined
-}
-
-const onPointerMove = (ev: PointerEvent, camera: Camera): void => {
-  const screenPosition = Vec.create(ev.offsetX, ev.offsetY)
-  cursorPosition = camera.screenToWorld(screenPosition)
-}
 
 type Args = typeof ArgsSchema
-const ArgsSchema = z.object({
-  width: z.number().positive().min(1),
-  height: z.number().positive().min(1),
+const ArgsSchema = SolidArgs.extend({
   mustConnectWithBody: z.boolean().default(false),
-  spriteSource: SpriteSourceSchema.optional(),
 })
 
-interface Data {
-  game: Game<boolean>
-  body: Matter.Body
-}
+export { ArgsSchema as GrappleHookArgs }
+export class GrappleHook<A extends Args = Args> extends Solid<A> {
+  private cursorPosition: Vector | undefined = undefined
+  private hasReachedTarget = false
 
-interface Render {
-  camera: Camera
-  container: Container
-  gfxBounds: Graphics
-  sprite: Sprite | undefined
-}
+  public constructor(ctx: SpawnableContext<A>) {
+    super(ctx)
 
-export const createGrappleHook = createSpawnableEntity<
-  Args,
-  SpawnableEntity<Data, Render, Args>,
-  Data,
-  Render
->(
-  ArgsSchema,
-  (
-    { tags, transform },
-    { width, height, mustConnectWithBody, spriteSource },
-  ) => {
-    const { position, zIndex } = transform
-
-    const HOOK_CATEGORY = 0x0004
-
-    const body = Matter.Bodies.circle(position.x, position.y, 10, {
-      label: 'grapplingHook',
-      render: { visible: false },
-      collisionFilter: {
-        category: HOOK_CATEGORY,
-        mask: 0x0000,
-      },
-
-      frictionAir: 0.2,
-    })
-
-    let hasReachedTarget = false
-
-    return {
-      get tags() {
-        return tags
-      },
-
-      get transform() {
-        return cloneTransform(transform)
-      },
-
-      get zIndex() {
-        return zIndex
-      },
-
-      rectangleBounds() {
-        return undefined
-      },
-
-      isPointInside() {
-        return false
-      },
-
-      init({ game }) {
-        game.physics.register(this, body)
-        game.client?.inputs.registerInput('@cvz/hook', 'Grapple Hook', 'KeyQ')
-
-        return { game, body }
-      },
-
-      initRenderContext({ game }, { camera, stage }) {
-        const container = new Container()
-        container.sortableChildren = true
-        container.zIndex = zIndex
-        const gfxBounds = new Graphics()
-        gfxBounds.zIndex = zIndex
-        const sprite = spriteSource
-          ? createSprite(spriteSource, {
-              width,
-              height,
-              zIndex,
-            })
-          : undefined
-
-        if (sprite) {
-          container.addChild(sprite)
-        } else {
-          gfxBounds.beginFill(0x404040)
-          gfxBounds.drawCircle(0, 0, 10)
-          gfxBounds.endFill()
-          container.addChild(gfxBounds)
-        }
-
-        stage.addChild(container)
-
-        game.client?.render.container.addEventListener('pointerover', ev =>
-          onPointerMove(ev, camera),
-        )
-        game.client?.render.container.addEventListener(
-          'pointerout',
-          onPointerOut,
-        )
-        game.client?.render.container.addEventListener('pointermove', ev =>
-          onPointerMove(ev, camera),
-        )
-
-        return {
-          camera,
-          container,
-          gfxBounds,
-          sprite,
-        }
-      },
-
-      teardown({ game }) {
-        game.physics.unregister(this, body)
-      },
-
-      teardownRenderContext({ container }) {
-        container.destroy({ children: true })
-      },
-
-      onPhysicsStep(_, { game }) {
-        const playerBody = Matter.Composite.allBodies(
-          game.physics.engine.world,
-        ).find(b => b.label === 'player')
-        if (!playerBody) return
-
-        const inputs = game.client?.inputs
-        const isCrouching = inputs?.getInput('@cvz/hook') ?? false
-
-        if (isCrouching && cursorPosition) {
-          if (mustConnectWithBody) {
-            const bodiesAtCursor = Matter.Query.point(
-              Matter.Composite.allBodies(game.physics.engine.world),
-              cursorPosition,
-            )
-
-            if (bodiesAtCursor.length === 0) {
-              return
-            }
-          }
-
-          if (body.render.visible === false) {
-            Matter.Body.setPosition(body, playerBody.position)
-            body.render.visible = true
-          }
-
-          const reachedTarget = distance(body.position, cursorPosition) <= 1
-
-          if (!reachedTarget) {
-            const dir = Vec.normalise(Vec.sub(cursorPosition, body.position))
-            const forceMagnitude = 0.005
-            const force = Vec.mult(dir, forceMagnitude)
-            Matter.Body.applyForce(body, body.position, force)
-          } else {
-            hasReachedTarget = true
-            Matter.Body.setVelocity(body, { x: 0, y: 0 })
-            const playerToHookDirection = Vec.normalise(
-              Vec.sub(body.position, playerBody.position),
-            )
-            const pullForceMagnitude = 1.5
-            const pullForce = Vec.mult(
-              playerToHookDirection,
-              pullForceMagnitude,
-            )
-            Matter.Body.applyForce(playerBody, playerBody.position, pullForce)
-          }
-        } else if (!isCrouching) {
-          body.render.visible = false
-        }
-      },
-
-      onRenderFrame(_, { game }, { camera, container, gfxBounds, sprite }) {
-        if (body.render.visible) {
-          const debug = game.debug
-          const pos = Vec.add(body.position, camera.offset)
-          gfxBounds.visible = true
-          container.position = pos
-
-          if (!hasReachedTarget && cursorPosition) {
-            const dx = cursorPosition.x - body.position.x
-            const dy = cursorPosition.y - body.position.y
-            const angle = Math.atan2(dy, dx)
-            container.rotation = angle
-          } else {
-            container.rotation = body.angle
-          }
-
-          const alpha = debug.value ? 0.5 : 0
-          gfxBounds.alpha = alpha
-
-          if (sprite) {
-            sprite.visible = body.render.visible
-          }
-        } else {
-          gfxBounds.visible = false
-          hasReachedTarget = false
-          if (sprite) {
-            sprite.visible = false
-          }
-        }
-      },
+    this.body.collisionFilter = {
+      category: 0x0004,
+      mask: 0x0000,
     }
-  },
-)
+    this.body.frictionAir = 0.2
+    this.body.label = 'grappleHook'
+
+    const $game = game('client')
+    if (!$game) return
+
+    $game.client?.render.container.addEventListener('pointerover', ev => () => {
+      const screenPosition = Vec.create(ev.offsetX, ev.offsetY)
+      this.cursorPosition = camera().screenToWorld(screenPosition)
+    })
+    $game.client?.render.container.addEventListener('pointerout', () => {
+      this.cursorPosition = undefined
+    })
+    $game.client?.render.container.addEventListener('pointermove', ev => () => {
+      const screenPosition = Vec.create(ev.offsetX, ev.offsetY)
+      this.cursorPosition = camera().screenToWorld(screenPosition)
+    })
+  }
+
+  public override onPhysicsStep(_: Time): void {
+    const $game = game('client')
+    if (!$game) {
+      return
+    }
+
+    Matter.Body.setAngle(this.body, 0)
+    Matter.Body.setAngularVelocity(this.body, 0)
+
+    const playerBody = Matter.Composite.allBodies(
+      $game.physics.engine.world,
+    ).find(b => b.label === 'player')
+    if (!playerBody) return
+
+    const inputs = $game.client?.inputs
+    const isCrouching = inputs?.getInput('@cvz/hook') ?? false
+
+    if (isCrouching && this.cursorPosition) {
+      if (this.args.mustConnectWithBody) {
+        const bodiesAtCursor = Matter.Query.point(
+          Matter.Composite.allBodies($game.physics.engine.world),
+          this.cursorPosition,
+        )
+
+        if (bodiesAtCursor.length === 0) {
+          return
+        }
+      }
+
+      if (this.body.render.visible === false) {
+        Matter.Body.setPosition(this.body, playerBody.position)
+        this.body.render.visible = true
+      }
+
+      const reachedTarget =
+        distance(this.body.position, this.cursorPosition) <= 1
+
+      if (!reachedTarget) {
+        const dir = Vec.normalise(
+          Vec.sub(this.cursorPosition, this.body.position),
+        )
+        const forceMagnitude = 0.005
+        const force = Vec.mult(dir, forceMagnitude)
+        Matter.Body.applyForce(this.body, this.body.position, force)
+      } else {
+        this.hasReachedTarget = true
+        Matter.Body.setVelocity(this.body, { x: 0, y: 0 })
+        const playerToHookDirection = Vec.normalise(
+          Vec.sub(this.body.position, playerBody.position),
+        )
+        const pullForceMagnitude = 1.5
+        const pullForce = Vec.mult(playerToHookDirection, pullForceMagnitude)
+        Matter.Body.applyForce(playerBody, playerBody.position, pullForce)
+      }
+    } else if (!isCrouching) {
+      this.body.render.visible = false
+    }
+  }
+
+  public override onRenderFrame(time: RenderTime) {
+    super.onRenderFrame(time)
+
+    const $game = game('client')
+    if (!$game) {
+      return
+    }
+
+    if (this.body.render.visible) {
+      const debug = $game.debug
+      const pos = Vec.add(this.body.position, camera().offset)
+      this.gfx!.visible = true
+      this.container!.position = pos
+
+      if (!this.hasReachedTarget && this.cursorPosition) {
+        const dx = this.cursorPosition.x - this.body.position.x
+        const dy = this.cursorPosition.y - this.body.position.y
+        const angle = Math.atan2(dy, dx)
+        this.container!.rotation = angle
+      } else {
+        this.container!.rotation = this.body.angle
+      }
+
+      const alpha = debug.value ? 0.5 : 0
+      this.gfx!.alpha = alpha
+
+      if (this.sprite) {
+        this.sprite.visible = this.body.render.visible
+      }
+    } else {
+      this.gfx!.visible = false
+      this.hasReachedTarget = false
+      if (this.sprite) {
+        this.sprite.visible = false
+      }
+    }
+  }
+}
