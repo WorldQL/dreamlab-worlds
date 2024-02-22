@@ -1,183 +1,65 @@
-import { createSpawnableEntity } from '@dreamlab.gg/core'
-import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
-import type { Camera } from '@dreamlab.gg/core/entities'
-import type { EventHandler } from '@dreamlab.gg/core/events'
-import { cloneTransform, Vec } from '@dreamlab.gg/core/math'
-import { z } from '@dreamlab.gg/core/sdk'
-import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
-import { drawBox } from '@dreamlab.gg/core/utils'
+import type { SpawnableContext, SpawnableEntity, Time } from '@dreamlab.gg/core'
+import { Solid, SolidArgs } from '@dreamlab.gg/core/dist/entities'
+import { z } from '@dreamlab.gg/core/dist/sdk'
+import { events, game } from '@dreamlab.gg/core/labs'
 import Matter from 'matter-js'
-import { Container, Graphics } from 'pixi.js'
-import type { Sprite } from 'pixi.js'
 
-// Conditionally spawned. Not setting defaults.
 type Args = typeof ArgsSchema
-const ArgsSchema = z.object({
-  width: z.number().positive().min(1),
-  height: z.number().positive().min(1),
+const ArgsSchema = SolidArgs.extend({
   direction: z.number(),
   damage: z.number().default(1),
-  spriteSource: SpriteSourceSchema.optional(),
 })
 
-type OnCollisionStart = EventHandler<'onCollisionStart'>
-type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
+export { ArgsSchema as ProjectileArgs }
+export class Projectile<A extends Args = Args> extends Solid<A> {
+  public constructor(ctx: SpawnableContext<A>) {
+    super(ctx)
+    this.body.density = 0.001
+    this.body.frictionAir = 0
+    this.body.friction = 1
+    this.body.restitution = 0
 
-interface Data {
-  game: Game<boolean>
-  body: Matter.Body
-  onCollisionStart: OnCollisionStart
-  onPlayerCollisionStart: OnPlayerCollisionStart
-}
+    this.body.label = 'projectile'
 
-interface Render {
-  camera: Camera
-  container: Container
-  gfxBounds: Graphics
-  sprite: Sprite | undefined
-}
+    // might have to use client
+    const $game = game()
 
-export const createProjectile = createSpawnableEntity<
-  Args,
-  SpawnableEntity<Data, Render, Args>,
-  Data,
-  Render
->(
-  ArgsSchema,
-  ({ uid, tags, transform }, { width, height, direction, spriteSource }) => {
-    const { position, rotation, zIndex } = transform
+    events('client')?.on('onPlayerCollisionStart', ([_player, other]) => {
+      if (other.id === this.body.id) {
+        $game.destroy(this as SpawnableEntity)
+      }
+    })
 
-    const body = Matter.Bodies.rectangle(
-      position.x,
-      position.y,
-      width,
-      height,
-      {
-        label: 'Projectile',
-        render: { visible: false },
-        density: 0.001,
-        frictionAir: 0,
-        friction: 1,
-        restitution: 0,
-      },
-    )
+    events('common')?.on('onCollisionStart', ([a, b], raw) => {
+      if (a.uid === this.uid || b.uid === this.uid) {
+        const other = a.uid === this.uid ? b : a
 
-    return {
-      get tags() {
-        return [...tags, 'Projectile']
-      },
+        const bodies = [raw.bodyA, raw.bodyB]
 
-      transform: cloneTransform(transform),
+        const isSensor = bodies.some(body => body.isSensor)
+        const isProjectile = other.definition.entity.includes('Projectile')
 
-      rectangleBounds() {
-        return { width, height }
-      },
-
-      isPointInside(position) {
-        return Matter.Query.point([body], position).length > 0
-      },
-
-      init({ game }) {
-        game.physics.register(this, body)
-
-        const onCollisionStart: OnCollisionStart = async ([a, b], raw) => {
-          if (a.uid === uid || b.uid === uid) {
-            const other = a.uid === uid ? b : a
-
-            const bodies = [raw.bodyA, raw.bodyB]
-
-            const isSensor = bodies.some(body => body.isSensor)
-            const isProjectile = other.definition.entity.includes('Projectile')
-
-            if (!isSensor && !isProjectile) {
-              await game.destroy(this as SpawnableEntity)
-            }
-          }
+        if (!isSensor && !isProjectile) {
+          $game.destroy(this as SpawnableEntity)
         }
+      }
+    })
+  }
 
-        const onPlayerCollisionStart: OnPlayerCollisionStart = async (
-          [_, bodyCollided],
-          _raw,
-        ) => {
-          if (body && bodyCollided === body) {
-            await game.destroy(this as SpawnableEntity)
-          }
-        }
-
-        game.events.common.addListener('onCollisionStart', onCollisionStart)
-        game.events.client?.addListener(
-          'onPlayerCollisionStart',
-          onPlayerCollisionStart,
-        )
-
-        return { game, body, onCollisionStart, onPlayerCollisionStart }
-      },
-
-      initRenderContext(_, { camera, stage }) {
-        const container = new Container()
-        container.sortableChildren = true
-        container.zIndex = zIndex
-
-        const gfxBounds = new Graphics()
-        const sprite = spriteSource
-          ? createSprite(spriteSource, {
-              width,
-              height,
-              zIndex,
-            })
-          : undefined
-
-        if (sprite) {
-          container.addChild(sprite)
-        } else {
-          drawBox(gfxBounds, { width, height }, { stroke: '#00f' })
-          container.addChild(gfxBounds)
-        }
-
-        stage.addChild(container)
-
-        return {
-          camera,
-          container,
-          gfxBounds,
-          sprite,
-        }
-      },
-
-      teardown({ game, onCollisionStart, onPlayerCollisionStart }) {
-        game.physics.unregister(this, body)
-        game.events.common.removeListener('onCollisionStart', onCollisionStart)
-        game.events.client?.removeListener(
-          'onPlayerCollisionStart',
-          onPlayerCollisionStart,
-        )
-      },
-
-      teardownRenderContext({ container }) {
-        container.destroy({ children: true })
-      },
-
-      onPhysicsStep(_) {
-        Matter.Body.setAngle(body, rotation)
-
-        const speed = 50
-        const velocity = {
-          x: speed * Math.cos(rotation) * direction,
-          y: speed * Math.sin(rotation),
-        }
-        Matter.Body.setVelocity(body, velocity)
-      },
-
-      onRenderFrame(_, { game }, { camera, container, gfxBounds }) {
-        const debug = game.debug
-        const pos = Vec.add(body.position, camera.offset)
-
-        container.position = pos
-        container.rotation = body.angle
-
-        const alpha = debug.value ? 0.8 : 0.5
-        gfxBounds.alpha = alpha
-      },
+  public override onPhysicsStep(_: Time): void {
+    const $game = game('client')
+    if (!$game) {
+      return
     }
-  },
-)
+
+    Matter.Body.setAngle(this.body, 0)
+    Matter.Body.setAngularVelocity(this.body, 0)
+
+    const speed = 50
+    const velocity = {
+      x: speed * Math.cos(this.transform.rotation) * this.args.direction,
+      y: speed * Math.sin(this.transform.rotation),
+    }
+    Matter.Body.setVelocity(this.body, velocity)
+  }
+}
