@@ -64,8 +64,8 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
 
   public constructor(ctx: SpawnableContext<A>) {
     super(ctx)
-    this.body.friction = 0
-    this.body.label = 'platform'
+    this.body.isSensor = true
+    this.body.label = 'spawnRegion'
 
     magicEvents('client')?.on('onPlayerCollisionStart', ([_player, other]) => {
       if (other.id === this.body.id) {
