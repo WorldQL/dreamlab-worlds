@@ -57,7 +57,7 @@ export const InventoryApp: FC = () => {
       if (isAttackAnimation(player.currentAnimation)) return
       const idx = digit - 1
       setActiveSlot(idx)
-      player.setGear(inventoryData[idx]?.baseGear)
+      player.gear = inventoryData[idx]?.baseGear
     },
     [player, inventoryData, setActiveSlot],
   )
@@ -66,7 +66,7 @@ export const InventoryApp: FC = () => {
     const updateInventory = () => {
       const invData = InventoryManager.getInstance().getInventoryData()
       setInventoryData([...invData])
-      player?.setGear(invData[activeSlot]?.baseGear)
+      if (player) player.gear = invData[activeSlot]?.baseGear
     }
 
     events.addListener('onInventoryUpdate', updateInventory)
