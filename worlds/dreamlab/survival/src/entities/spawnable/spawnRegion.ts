@@ -150,7 +150,8 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
       strokeColor = 0x9b0000
     }
 
-    // gfx is readonly, might need to make a new entity instead of extending Solid...
+    this.gfx?.redraw({ width: this.args.width, height: this.args.height })
+    // TODO: modify redraw to include DrawOptions
     // this.gfx = drawBox(
     //   { width: this.args.width, height: this.args.height },
     //   {
