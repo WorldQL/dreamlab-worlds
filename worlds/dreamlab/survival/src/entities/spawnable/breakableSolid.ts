@@ -1,256 +1,259 @@
-import { createSpawnableEntity } from '@dreamlab.gg/core'
-import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
-import type { Camera } from '@dreamlab.gg/core/entities'
-import { cloneTransform, toRadians, Vec } from '@dreamlab.gg/core/math'
-import { z } from '@dreamlab.gg/core/sdk'
-import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
-import { drawBox } from '@dreamlab.gg/core/utils'
-import Matter from 'matter-js'
-import { Container, Graphics } from 'pixi.js'
-import type { Sprite } from 'pixi.js'
+// TODO: refactor this?
 
-type Args = typeof ArgsSchema
-const ArgsSchema = z.object({
-  width: z.number().positive().min(1),
-  height: z.number().positive().min(1),
-  spriteSource: SpriteSourceSchema.optional(),
-})
+// import { createSpawnableEntity } from '@dreamlab.gg/core'
+// import type { Game, SpawnableEntity } from '@dreamlab.gg/core'
+// import type { Camera } from '@dreamlab.gg/core/entities'
+// import { cloneTransform, toRadians, Vec } from '@dreamlab.gg/core/math'
+// import { z } from '@dreamlab.gg/core/sdk'
+// import { createSprite, SpriteSourceSchema } from '@dreamlab.gg/core/textures'
+// import { drawBox } from '@dreamlab.gg/core/utils'
+// import Matter from 'matter-js'
+// import { Container, Graphics } from 'pixi.js'
+// import type { Sprite } from 'pixi.js'
 
-interface Data {
-  game: Game<boolean>
-  bodyLeft: Matter.Body
-  bodyRight: Matter.Body
-}
+// type Args = typeof ArgsSchema
+// const ArgsSchema = z.object({
+//   width: z.number().positive().min(1),
+//   height: z.number().positive().min(1),
+//   spriteSource: SpriteSourceSchema.optional(),
+// })
 
-interface Render {
-  camera: Camera
-  stage: Container
-  gfxBoundsLeft: Graphics | Sprite
-  gfxBoundsRight: Graphics | Sprite
-}
+// interface Data {
+//   game: Game<boolean>
+//   bodyLeft: Matter.Body
+//   bodyRight: Matter.Body
+// }
 
-export const createBreakableSolid = createSpawnableEntity<
-  Args,
-  SpawnableEntity<Data, Render, Args>,
-  Data,
-  Render
->(ArgsSchema, ({ tags, transform }, args) => {
-  const { position, rotation, zIndex } = transform
+// interface Render {
+//   camera: Camera
+//   stage: Container
+//   gfxBoundsLeft: Graphics | Sprite
+//   gfxBoundsRight: Graphics | Sprite
+// }
 
-  const halfWidth = args.width / 2
+// export const createBreakableSolid = createSpawnableEntity<
+//   Args,
+//   SpawnableEntity<Data, Render, Args>,
+//   Data,
+//   Render
+// >(ArgsSchema, ({ tags, transform }, args) => {
+//   const { position, rotation, zIndex } = transform
 
-  const bodyOptions = {
-    label: 'breakable_solid_piece',
-    render: { visible: true },
-    angle: toRadians(rotation),
-    isStatic: true,
-    friction: 0.5,
-    restitution: 0.8,
-    mass: 20,
-  }
+//   const halfWidth = args.width / 2
 
-  const splitVertically =
-    (rotation >= 45 && rotation < 135) || (rotation >= 225 && rotation < 315)
+//   const bodyOptions = {
+//     label: 'breakable_solid_piece',
+//     render: { visible: true },
+//     angle: toRadians(rotation),
+//     isStatic: true,
+//     friction: 0.5,
+//     restitution: 0.8,
+//     mass: 20,
+//   }
 
-  const createBody = (px: number, py: number, wd: number, ht: number) =>
-    Matter.Bodies.rectangle(px, py, wd, ht, bodyOptions)
+//   const splitVertically =
+//     (rotation >= 45 && rotation < 135) || (rotation >= 225 && rotation < 315)
 
-  let bodyLeft: Matter.Body
-  let bodyRight: Matter.Body
+//   const createBody = (px: number, py: number, wd: number, ht: number) =>
+//     Matter.Bodies.rectangle(px, py, wd, ht, bodyOptions)
 
-  if (splitVertically) {
-    bodyLeft = createBody(position.x, position.y, halfWidth, args.height)
-    bodyRight = createBody(
-      position.x,
-      position.y + halfWidth,
-      halfWidth,
-      args.height,
-    )
-  } else {
-    bodyLeft = createBody(position.x, position.y, halfWidth, args.height)
-    bodyRight = createBody(
-      position.x + halfWidth,
-      position.y,
-      halfWidth,
-      args.height,
-    )
-  }
+//   let bodyLeft: Matter.Body
+//   let bodyRight: Matter.Body
 
-  let isBroken = false
+//   if (splitVertically) {
+//     bodyLeft = createBody(position.x, position.y, halfWidth, args.height)
+//     bodyRight = createBody(
+//       position.x,
+//       position.y + halfWidth,
+//       halfWidth,
+//       args.height,
+//     )
+//   } else {
+//     bodyLeft = createBody(position.x, position.y, halfWidth, args.height)
+//     bodyRight = createBody(
+//       position.x + halfWidth,
+//       position.y,
+//       halfWidth,
+//       args.height,
+//     )
+//   }
 
-  const hasAttacker = (entities: Matter.Body[]) => {
-    return entities.some((ev: { label: string }) => ev.label === 'player')
-  }
+//   let isBroken = false
 
-  return {
-    get tags() {
-      return tags
-    },
+//   const hasAttacker = (entities: Matter.Body[]) => {
+//     return entities.some((ev: { label: string }) => ev.label === 'player')
+//   }
 
-    get transform() {
-      return cloneTransform(transform)
-    },
+//   return {
+//     get tags() {
+//       return tags
+//     },
 
-    rectangleBounds() {
-      return { width: args.width, height: args.height }
-    },
+//     get transform() {
+//       return cloneTransform(transform)
+//     },
 
-    isPointInside(position) {
-      return (
-        Matter.Query.point([bodyLeft], position).length > 0 ||
-        Matter.Query.point([bodyRight], position).length > 0
-      )
-    },
+//     rectangleBounds() {
+//       return { width: args.width, height: args.height }
+//     },
 
-    init({ game }) {
-      game.physics.register(this, bodyLeft)
-      game.physics.register(this, bodyRight)
-      return { game, bodyLeft, bodyRight }
-    },
+//     isPointInside(position) {
+//       return (
+//         Matter.Query.point([bodyLeft], position).length > 0 ||
+//         Matter.Query.point([bodyRight], position).length > 0
+//       )
+//     },
 
-    initRenderContext(_, { camera, stage }) {
-      const container = new Container()
-      container.sortableChildren = true
-      container.zIndex = zIndex
+//     init({ game }) {
+//       game.physics.register(this, bodyLeft)
+//       game.physics.register(this, bodyRight)
+//       return { game, bodyLeft, bodyRight }
+//     },
 
-      let gfxBoundsLeft
-      let gfxBoundsRight
+//     initRenderContext(_, { camera, stage }) {
+//       const container = new Container()
+//       container.sortableChildren = true
+//       container.zIndex = zIndex
 
-      if (args.spriteSource) {
-        gfxBoundsLeft = createSprite(args.spriteSource, {
-          width: halfWidth,
-          height: args.height,
-          zIndex,
-        })
-        gfxBoundsRight = createSprite(args.spriteSource, {
-          width: halfWidth,
-          height: args.height,
-          zIndex,
-        })
+//       let gfxBoundsLeft
+//       let gfxBoundsRight
 
-        gfxBoundsLeft.anchor.set(0.5, 0.5)
-        gfxBoundsRight.anchor.set(0.5, 0.5)
-      } else {
-        gfxBoundsLeft = new Graphics()
-        gfxBoundsRight = new Graphics()
-        drawBox(
-          gfxBoundsLeft,
-          { width: halfWidth, height: args.height },
-          { stroke: '#964B00' },
-        )
-        drawBox(
-          gfxBoundsRight,
-          { width: halfWidth, height: args.height },
-          { stroke: '#964B00' },
-        )
-      }
+//       if (args.spriteSource) {
+//         gfxBoundsLeft = createSprite(args.spriteSource, {
+//           width: halfWidth,
+//           height: args.height,
+//           zIndex,
+//         })
+//         gfxBoundsRight = createSprite(args.spriteSource, {
+//           width: halfWidth,
+//           height: args.height,
+//           zIndex,
+//         })
 
-      container.addChild(gfxBoundsLeft, gfxBoundsRight)
-      stage.addChild(container)
+//         gfxBoundsLeft.anchor.set(0.5, 0.5)
+//         gfxBoundsRight.anchor.set(0.5, 0.5)
+//       } else {
+//         gfxBoundsLeft = new Graphics()
+//         gfxBoundsRight = new Graphics()
+//         drawBox(
+//           gfxBoundsLeft,
+//           { width: halfWidth, height: args.height },
+//           { stroke: '#964B00' },
+//         )
+//         drawBox(
+//           gfxBoundsRight,
+//           { width: halfWidth, height: args.height },
+//           { stroke: '#964B00' },
+//         )
+//       }
 
-      return {
-        camera,
-        stage: container,
-        gfxBoundsLeft,
-        gfxBoundsRight,
-      }
-    },
+//       container.addChild(gfxBoundsLeft, gfxBoundsRight)
+//       stage.addChild(container)
 
-    onArgsUpdate(path, _previous, _data, render) {
-      if (render && path === 'spriteSource') {
-        const { width, height, spriteSource } = args
-        if (spriteSource) {
-          render.gfxBoundsRight?.destroy()
-          render.gfxBoundsLeft?.destroy()
-          render.gfxBoundsRight = createSprite(spriteSource, {
-            width,
-            height,
-            zIndex: transform.zIndex,
-          })
+//       return {
+//         camera,
+//         stage: container,
+//         gfxBoundsLeft,
+//         gfxBoundsRight,
+//       }
+//     },
 
-          if (render.gfxBoundsRight)
-            render.stage.addChild(render.gfxBoundsRight)
-          if (render.gfxBoundsLeft) render.stage.addChild(render.gfxBoundsLeft)
-        }
-      }
-    },
+//     onArgsUpdate(path, _previous, _data, render) {
+//       if (render && path === 'spriteSource') {
+//         const { width, height, spriteSource } = args
+//         if (spriteSource) {
+//           render.gfxBoundsRight?.destroy()
+//           render.gfxBoundsLeft?.destroy()
+//           render.gfxBoundsRight = createSprite(spriteSource, {
+//             width,
+//             height,
+//             zIndex: transform.zIndex,
+//           })
 
-    onResize({ width, height }) {
-      args.width = width
-      args.height = height
-    },
+//           if (render.gfxBoundsRight)
+//             render.stage.addChild(render.gfxBoundsRight)
+//           if (render.gfxBoundsLeft) render.stage.addChild(render.gfxBoundsLeft)
+//         }
+//       }
+//     },
 
-    teardown({ game }) {
-      game.physics.unregister(this, bodyLeft)
-      game.physics.unregister(this, bodyRight)
-    },
+//     onResize({ width, height }) {
+//       args.width = width
+//       args.height = height
+//     },
 
-    teardownRenderContext({ stage: container }) {
-      container.destroy({ children: true })
-    },
+//     teardown({ game }) {
+//       game.physics.unregister(this, bodyLeft)
+//       game.physics.unregister(this, bodyRight)
+//     },
 
-    onPhysicsStep(_, { game }) {
-      const getEntitiesInAreaOfBody = (
-        body: Matter.Body,
-        halfW: number,
-        ht: number,
-      ) => {
-        return Matter.Query.region(
-          game.physics.engine.world.bodies,
-          Matter.Bounds.create([
-            { x: body.position.x - halfW / 4, y: body.position.y - ht / 2 },
-            { x: body.position.x + halfW / 4, y: body.position.y + ht / 2 },
-          ]),
-        )
-      }
+//     teardownRenderContext({ stage: container }) {
+//       container.destroy({ children: true })
+//     },
 
-      const entitiesInAreaLeft = getEntitiesInAreaOfBody(
-        bodyLeft,
-        halfWidth,
-        args.height,
-      )
-      const entitiesInAreaRight = getEntitiesInAreaOfBody(
-        bodyRight,
-        halfWidth,
-        args.height,
-      )
+//     onPhysicsStep(_, { game }) {
+//       const getEntitiesInAreaOfBody = (
+//         body: Matter.Body,
+//         halfW: number,
+//         ht: number,
+//       ) => {
+//         return Matter.Query.region(
+//           game.physics.engine.world.bodies,
+//           Matter.Bounds.create([
+//             { x: body.position.x - halfW / 4, y: body.position.y - ht / 2 },
+//             { x: body.position.x + halfW / 4, y: body.position.y + ht / 2 },
+//           ]),
+//         )
+//       }
 
-      if (
-        (hasAttacker(entitiesInAreaLeft) || hasAttacker(entitiesInAreaRight)) &&
-        !isBroken
-      ) {
-        isBroken = true
-        for (const body of [bodyLeft, bodyRight]) {
-          Matter.Body.setStatic(body, false)
-          const forceDirection = body === bodyLeft ? -0.05 : 0.05
-          Matter.Body.applyForce(
-            body,
-            {
-              x: body.position.x + halfWidth * forceDirection,
-              y: body.position.y,
-            },
-            { x: forceDirection, y: 0 },
-          )
-        }
-      }
-    },
+//       const entitiesInAreaLeft = getEntitiesInAreaOfBody(
+//         bodyLeft,
+//         halfWidth,
+//         args.height,
+//       )
+//       const entitiesInAreaRight = getEntitiesInAreaOfBody(
+//         bodyRight,
+//         halfWidth,
+//         args.height,
+//       )
 
-    onRenderFrame(_, { game }, { camera, gfxBoundsLeft, gfxBoundsRight }) {
-      const debug = game.debug
-      const posLeft = Vec.add(bodyLeft.position, camera.offset)
-      const posRight = Vec.add(bodyRight.position, camera.offset)
+//       if (
+//         (hasAttacker(entitiesInAreaLeft) || hasAttacker(entitiesInAreaRight)) &&
+//         !isBroken
+//       ) {
+//         isBroken = true
+//         for (const body of [bodyLeft, bodyRight]) {
+//           Matter.Body.setStatic(body, false)
+//           const forceDirection = body === bodyLeft ? -0.05 : 0.05
+//           Matter.Body.applyForce(
+//             body,
+//             {
+//               x: body.position.x + halfWidth * forceDirection,
+//               y: body.position.y,
+//             },
+//             { x: forceDirection, y: 0 },
+//           )
+//         }
+//       }
+//     },
 
-      gfxBoundsLeft.position = posLeft
-      gfxBoundsRight.position = posRight
+//     onRenderFrame(_, { game }, { camera, gfxBoundsLeft, gfxBoundsRight }) {
+//       const debug = game.debug
+//       const posLeft = Vec.add(bodyLeft.position, camera.offset)
+//       const posRight = Vec.add(bodyRight.position, camera.offset)
 
-      gfxBoundsLeft.rotation = bodyLeft.angle
-      gfxBoundsRight.rotation = bodyRight.angle
+//       gfxBoundsLeft.position = posLeft
+//       gfxBoundsRight.position = posRight
 
-      if (!args.spriteSource) {
-        const alpha = debug.value ? 0.5 : 0
-        gfxBoundsLeft.alpha = alpha
-        gfxBoundsRight.alpha = alpha
-      }
-    },
-  }
-})
+//       gfxBoundsLeft.rotation = bodyLeft.angle
+//       gfxBoundsRight.rotation = bodyRight.angle
+
+//       if (!args.spriteSource) {
+//         const alpha = debug.value ? 0.5 : 0
+//         gfxBoundsLeft.alpha = alpha
+//         gfxBoundsRight.alpha = alpha
+//       }
+//     },
+//   }
+// })
+export {}

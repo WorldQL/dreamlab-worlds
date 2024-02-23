@@ -7,14 +7,14 @@ import { initializeUI } from './ui/startScreen.js'
 export const init: InitClient = async game => {
   await preloadAssets()
   initializeUI(game)
-  deferUntilPlayer(game, async player => {
+  deferUntilPlayer(async player => {
     const spawnpoints = game.queryTags('any', ['spawnpoint'])
     if (spawnpoints.length > 0) {
       const spawn = spawnpoints[Math.floor(Math.random() * spawnpoints.length)]
       if (spawn) player.teleport(spawn.transform.position, true)
     }
-
-    await player.setCharacterId('c_y9ydqx2pghxl04emgnxu6r5g')
+    // TODO: fix
+    // await player.setCharacterId('c_y9ydqx2pghxl04emgnxu6r5g')
   })
 
   await sharedInit(game)

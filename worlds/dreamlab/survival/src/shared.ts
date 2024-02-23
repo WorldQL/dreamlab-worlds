@@ -1,23 +1,26 @@
 import type { InitShared } from '@dreamlab.gg/core/sdk'
-import { createProjectileSpawner } from './entities/projectileSpawner.js'
-import { createRegionManager } from './entities/regionManager.js'
-import { createBreakableSolid } from './entities/spawnable/breakableSolid.js'
-import { createGrappleHook } from './entities/spawnable/grappleHook.js'
-import { createInventoryItem } from './entities/spawnable/inventoryItem.js'
-import { createLadder } from './entities/spawnable/ladder.js'
-import { createProjectile } from './entities/spawnable/projectile.js'
-import { createSpawnRegion } from './entities/spawnable/spawnRegion.js'
-import { createZombieMob } from './entities/spawnable/zombie.js'
+import { ProjectileSpawner } from './entities/projectileSpawner.js'
+import { RegionManager } from './entities/regionManager.js'
+import {
+  GrappleHook,
+  GrappleHookArgs,
+} from './entities/spawnable/grappleHook.js'
+import { InventoryItemArgs, Item } from './entities/spawnable/inventoryItem.js'
+import { Projectile, ProjectileArgs } from './entities/spawnable/projectile.js'
+import {
+  SpawnRegion,
+  SpawnRegionArgs,
+} from './entities/spawnable/spawnRegion.js'
+import { Zombie, ZombieArgs } from './entities/spawnable/zombie.js'
 
 export const sharedInit: InitShared = async game => {
-  game.register('@cvz/ZombieMob', createZombieMob)
-  game.register('@cvz/Hook', createGrappleHook)
-  game.register('@cvz/Ladder', createLadder)
-  game.register('@cvz/SpawnRegion', createSpawnRegion)
-  game.register('@cvz/BreakableSolid', createBreakableSolid)
-  game.register('@cvz/InventoryItem', createInventoryItem)
-  game.register('@cvz/Projectile', createProjectile)
+  game.register('@cvz/ZombieMob', Zombie, ZombieArgs)
+  game.register('@cvz/Hook', GrappleHook, GrappleHookArgs)
+  game.register('@cvz/SpawnRegion', SpawnRegion, SpawnRegionArgs)
+  // game.register('@cvz/BreakableSolid', createBreakableSolid)
+  game.register('@cvz/InventoryItem', Item, InventoryItemArgs)
+  game.register('@cvz/Projectile', Projectile, ProjectileArgs)
 
-  await game.instantiate(createProjectileSpawner())
-  await game.instantiate(createRegionManager())
+  game.instantiate(new ProjectileSpawner())
+  game.instantiate(new RegionManager())
 }
