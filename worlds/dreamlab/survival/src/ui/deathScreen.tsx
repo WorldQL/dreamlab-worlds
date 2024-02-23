@@ -6,7 +6,7 @@ import { styles } from './styles'
 interface DeathScreenProps {
   game: Game<false>
   score: number
-  onStartOver: () => void
+  onStartOver(): void
 }
 
 export const DeathScreen: FC<DeathScreenProps> = ({ score, onStartOver }) => {

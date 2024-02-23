@@ -5,9 +5,9 @@ import { inventoryStyles as styles } from './inventoryStyle.js'
 
 interface Props {
   data: InventoryData
-  onClick: (slotIndex: number) => void
-  onDragStart: (slotIndex: number) => void
-  onDragEnd: (slotIndex: number) => void
+  onClick(slotIndex: number): void
+  onDragStart(slotIndex: number): void
+  onDragEnd(slotIndex: number): void
 }
 
 const chunkArray = (array: InventoryData, size: number) => {
