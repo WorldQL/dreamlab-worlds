@@ -228,12 +228,12 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
 
       this.mobData.value.health -= damage
       // TODO: fix destroy
-      await (this.mobData.value.health <= 0
-        ? game().destroy(this as unknown as SpawnableEntity)
-        : network.broadcastCustomMessage(this.HIT_CHANNEL, {
-            uid: this.uid,
-            health: this.mobData.value.health,
-          }))
+      // await (this.mobData.value.health <= 0
+      //   ? game().destroy(this as unknown as SpawnableEntity)
+      //   : network.broadcastCustomMessage(this.HIT_CHANNEL, {
+      //       uid: this.uid,
+      //       health: this.mobData.value.health,
+      //     }))
     }
 
     netServer?.addCustomMessageListener(this.HIT_CHANNEL, onHitServer)
