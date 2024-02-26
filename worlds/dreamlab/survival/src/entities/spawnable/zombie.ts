@@ -6,6 +6,7 @@ import type {
   Time,
 } from '@dreamlab.gg/core'
 import { SpawnableEntity } from '@dreamlab.gg/core'
+import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import {
   camera,
   debug,
@@ -26,6 +27,8 @@ import {
 } from '@dreamlab.gg/core/network'
 import type {
   MessageListenerServer,
+  NetClient,
+  NetServer,
   SyncedValue,
 } from '@dreamlab.gg/core/network'
 import type { BoxGraphics, CircleGraphics } from '@dreamlab.gg/core/utils'
@@ -36,7 +39,7 @@ import {
 } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
 import type { Resource, Texture } from 'pixi.js'
-import { AnimatedSprite, Container, Graphics } from 'pixi.js'
+import { AnimatedSprite, Container } from 'pixi.js'
 import { getPreloadedAssets } from '../../assetLoader'
 import { events } from '../../events'
 import InventoryManager from '../../inventory/inventoryManager'
@@ -52,6 +55,9 @@ const ArgsSchema = z.object({
 })
 
 type zombieAnimations = 'punch' | 'recoil' | 'walk'
+type OnPlayerAttack = EventHandler<'onPlayerAttack'>
+type OnCollisionStart = EventHandler<'onCollisionStart'>
+type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
 
 interface MobData {
   health: number
@@ -74,11 +80,19 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
   protected readonly gfxHealthBorder: BoxGraphics | undefined
   protected readonly gfxHealthAmount: BoxGraphics | undefined
 
+  protected onPlayerAttack: OnPlayerAttack | undefined
+  protected onCollisionStart: OnCollisionStart | undefined
+  protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
+  protected onHitServer: MessageListenerServer | undefined
+
+  protected netServer: NetServer | undefined
+  protected netClient: NetClient | undefined
+
   private HIT_CHANNEL = '@cvz/Hittable/hit'
   private patrolDistance = 300
   private hitCooldown = 0.5 // Second(s)
   private zombieAnimations: Record<string, Texture<Resource>[]> = {}
-  private readonly mobData: SyncedValue<MobData> = syncedValue(
+  private mobData: SyncedValue<MobData> = syncedValue(
     game(),
     this.uid,
     'mobData',
@@ -109,14 +123,22 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       },
     )
 
-    const netServer = onlyNetServer(game())
-    const netClient = onlyNetClient(game())
+    if (!this.tags.includes('net/replicated')) {
+      this.tags.push(
+        'net/replicated',
+        'net/server-authoritative',
+        'editor/doNotSave',
+      )
+    }
+
+    this.netServer = onlyNetServer(game())
+    this.netClient = onlyNetClient(game())
 
     physics().register(this, this.body)
     physics().linkTransform(this.body, this.transform)
 
     // onPlayerAttack listener
-    magicEvents('common')?.on('onPlayerAttack', async (player, gear) => {
+    this.onPlayerAttack = async (player, gear) => {
       if (
         this.mobData.value.hitCooldown > 0 ||
         ['bow', 'shoot'].includes(gear?.animationName || '')
@@ -143,7 +165,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       }
 
       if (Math.abs(xDiff) <= range) {
-        await netClient?.sendCustomMessage(this.HIT_CHANNEL, {
+        await this.netClient?.sendCustomMessage(this.HIT_CHANNEL, {
           uid: this.uid,
           damage,
         })
@@ -152,16 +174,16 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
           events.emit('onPlayerScore', this.args.maxHealth * 25)
         }
       }
-    })
+    }
 
     // onCollisionStart Listener
-    magicEvents('common')?.on('onCollisionStart', ([a, b]) => {
+    this.onCollisionStart = ([a, b]) => {
       if (a.uid === this.uid || b.uid === this.uid) {
         const other = a.uid === this.uid ? b : a
 
         if (other.definition.entity.includes('Projectile')) {
           const damage = other.args.damage ?? 1
-          void netClient?.sendCustomMessage(this.HIT_CHANNEL, {
+          void this.netClient?.sendCustomMessage(this.HIT_CHANNEL, {
             uid: this.uid,
             damage,
           })
@@ -171,10 +193,10 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
           }
         }
       }
-    })
+    }
 
     // onPlayerCollisionStart
-    magicEvents('client')?.on('onPlayerCollisionStart', ([player, other]) => {
+    this.onPlayerCollisionStart = ([player, other]) => {
       if (this.body && other === this.body) {
         const heightDifference = player.body.position.y - this.body.position.y
 
@@ -182,7 +204,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
         const threshold = mobHeight
         if (heightDifference < -threshold) {
           const damage = 2
-          void netClient?.sendCustomMessage(this.HIT_CHANNEL, {
+          void this.netClient?.sendCustomMessage(this.HIT_CHANNEL, {
             uid: this.uid,
             damage,
           })
@@ -196,20 +218,20 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
           })
         } else {
           events.emit('onPlayerDamage', 1)
-          const force = 4 * -player.facing
+          const forceDirection = this.mobData.value.direction
+          const forceMagnitude = 4 * forceDirection
           deferUntilPhysicsStep(() => {
             Matter.Body.applyForce(player.body, player.body.position, {
-              x: force,
+              x: forceMagnitude,
               y: -1,
             })
           })
         }
       }
-    })
+    }
 
-    const onHitServer: MessageListenerServer = async ({ peerID }, _, data) => {
-      const network = netServer
-      if (!network) throw new Error('missing network')
+    this.onHitServer = async ({ peerID }, _, data) => {
+      if (!this.netServer) throw new Error('missing network')
 
       const { uid: dataUid, damage } = data
       if (dataUid !== this.uid || typeof damage !== 'number') return
@@ -236,7 +258,14 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       //     }))
     }
 
-    netServer?.addCustomMessageListener(this.HIT_CHANNEL, onHitServer)
+    this.netServer?.addCustomMessageListener(this.HIT_CHANNEL, this.onHitServer)
+
+    magicEvents('client')?.on(
+      'onPlayerCollisionStart',
+      this.onPlayerCollisionStart,
+    )
+    magicEvents('common')?.on('onCollisionStart', this.onCollisionStart)
+    magicEvents('common')?.on('onPlayerAttack', this.onPlayerAttack)
 
     // render animations, sprite, and graphics
     const $game = game('client')
@@ -264,7 +293,6 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       this.healthContainer = new Container()
       this.healthContainer.sortableChildren = true
 
-      this.gfxHitBox!.zIndex = -1
       this.healthContainer.zIndex = 1
       this.healthContainer.position.y = -this.args.height / 2 - 30
 
@@ -278,8 +306,17 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
         { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
       )
 
-      const gfxHealthBorder = new Graphics()
-      const gfxHealthAmount = new Graphics()
+      this.gfxHitBox!.zIndex = -1
+      this.gfxHealthAmount = drawBox(
+        {
+          width:
+            (this.mobData.value.health / this.args.maxHealth) *
+              this.args.width +
+            50,
+          height: 20,
+        },
+        { fill: 'red', fillAlpha: 1, strokeAlpha: 0 },
+      )
 
       this.gfxHealthBorder = drawBox(
         { width: this.args.width + 50, height: 20 },
@@ -292,12 +329,13 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
         },
       )
 
-      this.healthContainer.addChild(gfxHealthBorder)
-      this.healthContainer.addChild(gfxHealthAmount)
+      this.healthContainer.addChild(this.gfxHealthBorder)
+      this.healthContainer.addChild(this.gfxHealthAmount)
 
       this.container.addChild(this.gfx)
       this.container.addChild(this.gfxHitBox)
       this.container.addChild(this.healthContainer)
+      if (this.sprite) stage().addChild(this.sprite)
       stage().addChild(this.container)
 
       this.transform.addZIndexListener(() => {
@@ -351,8 +389,24 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
   }
 
   public override teardown(): void {
-    game().physics.unregister(this, this.body)
+    physics().unregister(this, this.body)
     this.container?.destroy({ children: true })
+
+    magicEvents().common.removeListener('onPlayerAttack', this.onPlayerAttack)
+    magicEvents().common.removeListener(
+      'onCollisionStart',
+      this.onCollisionStart,
+    )
+    magicEvents().client?.removeListener(
+      'onPlayerCollisionStart',
+      this.onPlayerCollisionStart,
+    )
+
+    if (this.onHitServer)
+      this.netServer?.removeCustomMessageListener(
+        this.HIT_CHANNEL,
+        this.onHitServer,
+      )
   }
 
   public override async onPhysicsStep(_: Time): Promise<void> {
@@ -378,21 +432,19 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       max: { x: this.body.position.x + 5_000, y: this.body.position.y + 5_000 },
     }
 
-    const bodiesInRegion = Matter.Query.region(
-      Matter.Composite.allBodies(game().physics.engine.world),
-      searchArea,
+    const playerBodies = game().entities.flatMap(entity =>
+      isNetPlayer(entity) && entity.body ? [entity.body] : [],
     )
+    const playersInRegion = Matter.Query.region(playerBodies, searchArea)
 
-    for (const player of bodiesInRegion) {
-      if (player.label === 'player') {
-        const dx = player.position.x - this.body.position.x
-        const dy = player.position.y - this.body.position.y
-        const distanceSquared = dx * dx + dy * dy
+    for (const player of playersInRegion) {
+      const dx = player.position.x - this.body.position.x
+      const dy = player.position.y - this.body.position.y
+      const distanceSquared = dx * dx + dy * dy
 
-        if (distanceSquared < minDistance) {
-          minDistance = distanceSquared
-          closestPlayer = player
-        }
+      if (distanceSquared < minDistance) {
+        minDistance = distanceSquared
+        closestPlayer = player
       }
     }
 

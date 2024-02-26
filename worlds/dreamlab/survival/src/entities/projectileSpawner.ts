@@ -87,7 +87,7 @@ export class ProjectileSpawner extends Entity {
 
         const sendProjectileMessage = (angle: number, yOffset?: number) =>
           void netClient?.sendCustomMessage(SPAWNED_CHANNEL, {
-            direction: player.facing,
+            direction: player.facing === 'left' ? 1 : -1,
             animation: player.currentAnimation,
             position: [player.body.position.x, player.body.position.y],
             angle,
