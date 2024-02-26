@@ -196,9 +196,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
           })
         } else {
           events.emit('onPlayerDamage', 1)
-          // const force = 4 * -player.facingDirection
-          // TODO: get player's direction
-          const force = 4
+          const force = 4 * -player.facing
           deferUntilPhysicsStep(() => {
             Matter.Body.applyForce(player.body, player.body.position, {
               x: force,
@@ -230,12 +228,12 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
 
       this.mobData.value.health -= damage
       // TODO: fix destroy
-      // await (this.mobData.value.health <= 0
-      //   ? game().destroy(this as unknown as SpawnableEntity)
-      //   : network.broadcastCustomMessage(this.HIT_CHANNEL, {
-      //       uid: this.uid,
-      //       health: this.mobData.value.health,
-      //     }))
+      await (this.mobData.value.health <= 0
+        ? game().destroy(this as unknown as SpawnableEntity)
+        : network.broadcastCustomMessage(this.HIT_CHANNEL, {
+            uid: this.uid,
+            health: this.mobData.value.health,
+          }))
     }
 
     netServer?.addCustomMessageListener(this.HIT_CHANNEL, onHitServer)
@@ -446,7 +444,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
 
     // TODO: fix destroy
     if (!closestPlayer || minDistance > 5_000) {
-      // await game.destroy(this as SpawnableEntity)
+      // await game.destroy(this as SpawnableEntity);
     }
   }
 

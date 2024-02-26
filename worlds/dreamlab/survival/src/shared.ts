@@ -17,10 +17,9 @@ export const sharedInit: InitShared = async game => {
   game.register('@cvz/ZombieMob', Zombie, ZombieArgs)
   game.register('@cvz/Hook', GrappleHook, GrappleHookArgs)
   game.register('@cvz/SpawnRegion', SpawnRegion, SpawnRegionArgs)
-  // game.register('@cvz/BreakableSolid', createBreakableSolid)
   game.register('@cvz/InventoryItem', Item, InventoryItemArgs)
   game.register('@cvz/Projectile', Projectile, ProjectileArgs)
 
-  game.instantiate(new ProjectileSpawner())
-  game.instantiate(new RegionManager())
+  void game.instantiate(new ProjectileSpawner())
+  void game.instantiate(new RegionManager())
 }

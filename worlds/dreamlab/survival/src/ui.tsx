@@ -9,7 +9,7 @@ export const initializeUI = (game: Game<false>) => {
   const ui = renderUI(
     game,
     <StyleSheetManager target={styles}>
-      <App />
+      <App />,
     </StyleSheetManager>,
   )
 

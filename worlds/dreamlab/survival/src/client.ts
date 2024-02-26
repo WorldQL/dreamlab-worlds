@@ -13,8 +13,8 @@ export const init: InitClient = async game => {
       const spawn = spawnpoints[Math.floor(Math.random() * spawnpoints.length)]
       if (spawn) player.teleport(spawn.transform.position, true)
     }
-    // TODO: fix
-    // await player.setCharacterId('c_y9ydqx2pghxl04emgnxu6r5g')
+
+    player.characterId = 'c_y9ydqx2pghxl04emgnxu6r5g'
   })
 
   await sharedInit(game)
