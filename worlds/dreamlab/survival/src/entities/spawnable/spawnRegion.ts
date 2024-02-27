@@ -4,7 +4,7 @@ import {
   game,
   events as magicEvents,
 } from '@dreamlab.gg/core/dist/labs'
-import type { CircleGraphics } from '@dreamlab.gg/core/dist/utils'
+import type { CircleGraphics} from '@dreamlab.gg/core/dist/utils';
 import { drawCircle } from '@dreamlab.gg/core/dist/utils'
 import { Solid, SolidArgs } from '@dreamlab.gg/core/entities'
 import { Vec } from '@dreamlab.gg/core/math'
@@ -134,8 +134,6 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
 
   public override onRenderFrame(time: RenderTime) {
     super.onRenderFrame(time)
-
-    const pos = Vec.add(this.transform.position, camera().offset)
 
     this.gfx!.clear()
     this.gfxCircle!.clear()

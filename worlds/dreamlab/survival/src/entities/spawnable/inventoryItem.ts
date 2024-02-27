@@ -1,5 +1,10 @@
 import type { RenderTime, SpawnableContext } from '@dreamlab.gg/core'
-import { camera, game, events as magicEvent } from '@dreamlab.gg/core/dist/labs'
+import {
+  camera,
+  debug,
+  game,
+  events as magicEvent,
+} from '@dreamlab.gg/core/dist/labs'
 import { Solid, SolidArgs } from '@dreamlab.gg/core/entities'
 import { createGear } from '@dreamlab.gg/core/managers'
 import { Vec } from '@dreamlab.gg/core/math'
@@ -33,7 +38,7 @@ export { ArgsSchema as InventoryItemArgs }
 export class Item<A extends Args = Args> extends Solid<A> {
   private time = 0
   private floatHeight = 5
-  private rotationSpeed = 0.01
+  private rotationSpeed = 0.006
 
   public constructor(ctx: SpawnableContext<A>) {
     super(ctx)
@@ -42,7 +47,6 @@ export class Item<A extends Args = Args> extends Solid<A> {
     this.body.isStatic = true
     this.body.label = 'inventoryItem'
 
-    // might have to use client
     const $game = game()
 
     magicEvent('client')?.on('onPlayerCollisionStart', ([player, other]) => {
@@ -82,8 +86,8 @@ export class Item<A extends Args = Args> extends Solid<A> {
     })
   }
 
-  public override onRenderFrame(time: RenderTime) {
-    super.onRenderFrame(time)
+  public override onRenderFrame(_time: RenderTime) {
+    // super.onRenderFrame(time)
     this.time += 0.05
 
     const yOffset = Math.sin(this.time) * this.floatHeight
@@ -93,8 +97,6 @@ export class Item<A extends Args = Args> extends Solid<A> {
     this.container!.rotation += this.rotationSpeed
     this.container!.position = pos
 
-    const debug = game().debug
-    const alpha = debug.value ? 0.5 : 0
-    this.gfx!.alpha = alpha
+    if (this.gfx) this.gfx.alpha = debug() ? 0.5 : 0
   }
 }
