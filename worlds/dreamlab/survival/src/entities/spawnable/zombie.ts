@@ -237,7 +237,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       if (dataUid !== this.uid || typeof damage !== 'number') return
 
       const player = game().entities.find(
-        ev => isNetPlayer(ev) && ev.entityId === peerID,
+        ev => isNetPlayer(ev) && ev.connectionId === peerID,
       )
       if (!player) throw new Error('missing netplayer')
       if (this.mobData.value.hitCooldown > 0) return
@@ -249,13 +249,8 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       })
 
       this.mobData.value.health -= damage
-      // TODO: fix destroy
-      // await (this.mobData.value.health <= 0
-      //   ? game().destroy(this as unknown as SpawnableEntity)
-      //   : network.broadcastCustomMessage(this.HIT_CHANNEL, {
-      //       uid: this.uid,
-      //       health: this.mobData.value.health,
-      //     }))
+      if (this.mobData.value.health <= 0)
+        game().destroy(this as unknown as SpawnableEntity)
     }
 
     this.netServer?.addCustomMessageListener(this.HIT_CHANNEL, this.onHitServer)
@@ -391,6 +386,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
   public override teardown(): void {
     physics().unregister(this, this.body)
     this.container?.destroy({ children: true })
+    this.sprite?.destroy()
 
     magicEvents().common.removeListener('onPlayerAttack', this.onPlayerAttack)
     magicEvents().common.removeListener(
@@ -494,9 +490,8 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       this.mobData.value.patrolDistance += Math.abs(this.args.speed / 2)
     }
 
-    // TODO: fix destroy
     if (!closestPlayer || minDistance > 5_000) {
-      // await game.destroy(this as SpawnableEntity);
+      game().destroy(this as SpawnableEntity)
     }
   }
 

@@ -4,12 +4,13 @@ import {
   game,
   events as magicEvents,
 } from '@dreamlab.gg/core/dist/labs'
+import type { CircleGraphics} from '@dreamlab.gg/core/dist/utils';
+import { drawCircle } from '@dreamlab.gg/core/dist/utils'
 import { Solid, SolidArgs } from '@dreamlab.gg/core/entities'
-import { toRadians, Vec } from '@dreamlab.gg/core/math'
+import { Vec } from '@dreamlab.gg/core/math'
 import type { SyncedValue } from '@dreamlab.gg/core/network'
 import { syncedValue } from '@dreamlab.gg/core/network'
 import { z } from '@dreamlab.gg/core/sdk'
-import { Graphics } from 'pixi.js'
 import { events } from '../../events'
 
 type Args = typeof ArgsSchema
@@ -49,7 +50,7 @@ interface RegionData {
 
 export { ArgsSchema as SpawnRegionArgs }
 export class SpawnRegion<A extends Args = Args> extends Solid<A> {
-  private gfxCircle = new Graphics()
+  protected gfxCircle: CircleGraphics | undefined
   private regionData: SyncedValue<RegionData> = syncedValue(
     game(),
     this.uid,
@@ -121,6 +122,14 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
         this.regionData.value.regionActive = false
       }
     })
+
+    const $game = game('client')
+    if ($game) {
+      this.gfxCircle = drawCircle({ radius: 75 })
+      this.gfxCircle.zIndex = -1
+
+      this.container?.addChild(this.gfxCircle)
+    }
   }
 
   public override onRenderFrame(time: RenderTime) {
@@ -129,13 +138,13 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
     const pos = Vec.add(this.transform.position, camera().offset)
 
     this.gfx!.clear()
-    this.gfxCircle.clear()
+    this.gfxCircle!.clear()
 
     let fillAlpha = 0
     let fillColor = 0x0
-    // const strokeAlpha = 1
+    const strokeAlpha = 1
     let strokeColor = 0x0
-    // const strokeWidth = 8
+    const strokeWidth = 8
 
     if (this.regionData.value.regionActive) strokeColor = 0x38761d
     if (this.regionData.value.isCooldown) {
@@ -150,18 +159,16 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
       strokeColor = 0x9b0000
     }
 
-    this.gfx?.redraw({ width: this.args.width, height: this.args.height })
-    // TODO: modify redraw to include DrawOptions
-    // this.gfx = drawBox(
-    //   { width: this.args.width, height: this.args.height },
-    //   {
-    //     fill: fillColor,
-    //     fillAlpha,
-    //     stroke: strokeColor,
-    //     strokeWidth,
-    //     strokeAlpha,
-    //   },
-    // )
+    this.gfx?.redraw(
+      { width: this.args.width, height: this.args.height },
+      {
+        fill: fillColor,
+        fillAlpha,
+        stroke: strokeColor,
+        strokeWidth,
+        strokeAlpha,
+      },
+    )
 
     const pulseColors = [0xff0000, 0xd10000]
     const timeBasedIndex = Math.floor(Date.now() / 250) % pulseColors.length
@@ -169,18 +176,19 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
 
     if (this.regionData.value.positions) {
       for (const { x, y } of Object.values(this.regionData.value.positions)) {
-        const adjustedX = x + camera().offset.x
-        const adjustedY = y + camera().offset.y
+        const adjustedX = x + camera().offset.x - this.container!.position.x
+        const adjustedY = y + camera().offset.y - this.container!.position.y
 
-        this.gfxCircle.beginFill(currentColor)
-        this.gfxCircle.drawCircle(adjustedX, adjustedY, 75)
-        this.gfxCircle.alpha = 0.5
-        this.gfxCircle.endFill()
+        this.gfxCircle!.redraw(
+          { radius: 75 },
+          {
+            fill: currentColor,
+            fillAlpha: 0.5,
+          },
+        )
+
+        this.gfxCircle!.position.set(adjustedX, adjustedY)
       }
     }
-
-    this.gfx!.position.set(pos.x, pos.y)
-    this.gfx!.rotation = toRadians(this.transform.rotation)
-    this.gfx!.alpha = game().debug.value ? 0.5 : 0
   }
 }
