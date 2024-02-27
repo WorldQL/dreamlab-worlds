@@ -3106,90 +3106,93 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    entity: '@cvz/InventoryItem',
-    args: {
-      width: 190.0085501404667,
-      height: 190.0085501404667,
-      displayName: 'Basic Bow',
-      animationName: 'bow',
-      spriteSource:
-        'https://s3-assets.dreamlab.gg/uploaded-from-editor/bow-1702293278974.png',
-      damage: 1,
-      range: 1,
-      lore: "Once wielded by 'Sharp-Eye' Sam, the fastest archer in the West, this bow's arrows are said to whistle with the winds of the prairie and never miss a zombie's heart.",
-      bone: 'handRight',
-      anchorX: 0.5,
-      anchorY: 0.5,
-      rotation: 0,
-      projectileType: 'SINGLE_SHOT',
+    "entity": '@cvz/InventoryItem',
+    "args": {
+      "width": 190.0085501404667,
+      "height": 190.0085501404667,
+      "displayName": 'Basic Bow',
+      "animationName": 'bow',
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/bow-1702293278974.png"
+      },
+      "damage": 1,
+      "range": 1,
+      "lore": "Once wielded by 'Sharp-Eye' Sam, the fastest archer in the West, this bow's arrows are said to whistle with the winds of the prairie and never miss a zombie's heart.",
+      "bone": 'handRight',
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "rotation": 0,
+      "projectileType": 'SINGLE_SHOT',
     },
-    transform: {
-      position: {
+    "transform": {
+      "position": {
         x: 1345.507097305847,
         y: 203.76488737867965,
       },
-      rotation: 0,
-      zIndex: 9,
+      "rotation": 0,
+      "zIndex": 9,
     },
-    uid: 'hed17ymwbvrywm2ib5ei7pf4',
-    tags: [],
+    "uid": 'hed17ymwbvrywm2ib5ei7pf4',
+    "tags": [],
   },
   {
-    entity: '@cvz/InventoryItem',
-    args: {
-      width: 200,
-      height: 200,
-      displayName: 'Scatter Shot Shotgun',
-      animationName: 'shoot',
-      spriteSource:
-        'https://s3-assets.dreamlab.gg/uploaded-from-editor/hand_cannon-1702293310960.png',
-      damage: 1,
-      range: 1,
-      lore: "Forged in a lawless frontier town, this shotgun's scatter shot was the bane of undead hordes, turning any cowboy into a one-person army against the zombie outbreak.",
-      bone: 'handLeft',
-      anchorX: 0.29,
-      anchorY: 0.58,
-      rotation: 45,
-      projectileType: 'SCATTER_SHOT',
-    },
-    transform: {
-      position: {
-        x: 1663.69084673247,
-        y: 210.2222908436769,
+    "entity": "@cvz/InventoryItem",
+    "args": {
+      "width": 200,
+      "height": 200,
+      "displayName": "Scatter Shot Shotgun",
+      "animationName": "shoot",
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/hand_cannon-1702293310960.png"
       },
-      rotation: 0,
-      zIndex: 9,
+      "damage": 1,
+      "range": 1,
+      "lore": "Forged in a lawless frontier town, this shotgun's scatter shot was the bane of undead hordes, turning any cowboy into a one-person army against the zombie outbreak.",
+      "bone": "handLeft",
+      "anchorX": 0.29,
+      "anchorY": 0.58,
+      "rotation": 45,
+      "projectileType": "SCATTER_SHOT"
     },
-    uid: 'clxd8mnwzde5zw6l9lz3jx31',
-    tags: [],
+    "transform": {
+      "position": {
+        "x": 1663.69084673247,
+        "y": 210.2222908436769
+      },
+      "rotation": 0,
+      "zIndex": 9
+    },
+    "uid": "clxd8mnwzde5zw6l9lz3jx31",
+    "tags": []
   },
   {
-    entity: '@cvz/InventoryItem',
-    args: {
-      width: 200,
-      height: 200,
-      displayName: 'Burst Revolver',
-      animationName: 'shoot',
-      spriteSource:
-        'https://s3-assets.dreamlab.gg/uploaded-from-editor/classic_revolver-1702293335440.png',
-      damage: 1,
-      range: 1,
-      lore: "Crafted by the legendary gunsmith 'Bullseye' Betty, this revolver's rapid bursts made it a favorite among cowboys holding the line in the great zombie sieges of the Old West.",
-      bone: 'handLeft',
-      anchorX: 0.24,
-      anchorY: 0.6,
-      rotation: 60,
-      projectileType: 'BURST_SHOT',
-    },
-    transform: {
-      position: {
-        x: 1949.7272288613085,
-        y: 216.9024365178086,
+    "entity": "@cvz/InventoryItem",
+    "args": {
+      "width": 200,
+      "height": 200,
+      "displayName": "Burst Revolver",
+      "animationName": "shoot",
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/classic_revolver-1702293335440.png"
       },
-      rotation: 0,
-      zIndex: 9,
+      "damage": 1,
+      "range": 1,
+      "lore": "Crafted by the legendary gunsmith 'Bullseye' Betty, this revolver's rapid bursts made it a favorite among cowboys holding the line in the great zombie sieges of the Old West.",
+      "bone": "handLeft",
+      "anchorX": 0.24,
+      "anchorY": 0.6,
+      "rotation": 60,
+      "projectileType": "BURST_SHOT"
     },
-    uid: 'dyvqv4qv8z1i3oou0334gd4a',
-    tags: [],
-  },
+    "transform": {
+      "position": {
+        "x": 1949.7272288613085,
+        "y": 216.9024365178086
+      },
+      "rotation": 0,
+      "zIndex": 9
+    },
+    "uid": "dyvqv4qv8z1i3oou0334gd4a",
+    "tags": []
+  }
 ]

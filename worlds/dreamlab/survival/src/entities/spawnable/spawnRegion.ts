@@ -4,7 +4,7 @@ import {
   game,
   events as magicEvents,
 } from '@dreamlab.gg/core/dist/labs'
-import type { CircleGraphics} from '@dreamlab.gg/core/dist/utils';
+import type { CircleGraphics } from '@dreamlab.gg/core/dist/utils'
 import { drawCircle } from '@dreamlab.gg/core/dist/utils'
 import { Solid, SolidArgs } from '@dreamlab.gg/core/entities'
 import { Vec } from '@dreamlab.gg/core/math'
