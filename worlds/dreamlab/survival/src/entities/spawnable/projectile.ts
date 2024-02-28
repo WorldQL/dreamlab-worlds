@@ -1,17 +1,21 @@
-import type {
-  RenderTime,
-  SpawnableContext,
-  SpawnableEntity,
-  Time,
+import {
+  updateBodyWidthHeight
+  
+  
+  
+  
 } from '@dreamlab.gg/core'
-import { Solid, SolidArgs } from '@dreamlab.gg/core/dist/entities'
+import type {
+  PreviousArgs,RenderTime, SpawnableContext, SpawnableEntity, Time} from '@dreamlab.gg/core';
+import { NonSolid, NonSolidArgs } from '@dreamlab.gg/core/dist/entities'
 import type { EventHandler } from '@dreamlab.gg/core/dist/events'
+import { Vec } from '@dreamlab.gg/core/dist/math'
 import { z } from '@dreamlab.gg/core/dist/sdk'
-import { events, game } from '@dreamlab.gg/core/labs'
+import { camera, debug, events, game, physics } from '@dreamlab.gg/core/labs'
 import Matter from 'matter-js'
 
 type Args = typeof ArgsSchema
-const ArgsSchema = SolidArgs.extend({
+const ArgsSchema = NonSolidArgs.extend({
   direction: z.number(),
   damage: z.number().default(1),
 })
@@ -20,19 +24,29 @@ type OnCollisionStart = EventHandler<'onCollisionStart'>
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
 
 export { ArgsSchema as ProjectileArgs }
-export class Projectile<A extends Args = Args> extends Solid<A> {
+export class Projectile<A extends Args = Args> extends NonSolid<A> {
   protected onCollisionStart: OnCollisionStart | undefined
   protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
 
+  protected readonly body: Matter.Body
+
   public constructor(ctx: SpawnableContext<A>) {
     super(ctx)
-    this.body.density = 0.001
-    this.body.frictionAir = 0
-    this.body.friction = 1
-    this.body.restitution = 0
-    this.body.isStatic = false
 
-    this.body.label = 'projectile'
+    this.body = Matter.Bodies.rectangle(
+      this.transform.position.x,
+      this.transform.position.y,
+      this.args.width,
+      this.args.height,
+      {
+        label: 'projectile',
+        render: { visible: false },
+        density: 0.001,
+        frictionAir: 0,
+        friction: 1,
+        restitution: 0,
+      },
+    )
 
     const $game = game()
 
@@ -62,10 +76,16 @@ export class Projectile<A extends Args = Args> extends Solid<A> {
         }
       }),
     )
+
+    physics().register(this, this.body)
+    physics().linkTransform(this.body, this.transform)
   }
 
   public override teardown(): void {
     super.teardown()
+
+    physics().unregister(this, this.body)
+    physics().unlinkTransform(this.body, this.transform)
 
     events('client')?.removeListener(
       'onPlayerCollisionStart',
@@ -75,9 +95,16 @@ export class Projectile<A extends Args = Args> extends Solid<A> {
     events('common')?.removeListener('onCollisionStart', this.onCollisionStart)
   }
 
+  public override onArgsUpdate(
+    path: string,
+    previousArgs: PreviousArgs<typeof ArgsSchema>,
+  ): void {
+    super.onArgsUpdate(path, previousArgs)
+    updateBodyWidthHeight(path, this.body, this.args, previousArgs)
+  }
+
   public override onPhysicsStep(_: Time): void {
     Matter.Body.setAngle(this.body, this.transform.rotation)
-
     const speed = 50
     const velocity = {
       x: speed * Math.cos(this.transform.rotation) * this.args.direction,
@@ -86,14 +113,12 @@ export class Projectile<A extends Args = Args> extends Solid<A> {
     Matter.Body.setVelocity(this.body, velocity)
   }
 
-  public override onRenderFrame(time: RenderTime) {
-    super.onRenderFrame(time)
+  public override onRenderFrame(_time: RenderTime) {
+    const pos = Vec.add(this.body.position, camera().offset)
 
-    // const pos = Vec.add(this.body.position, camera().offset);
+    this.container!.rotation = this.body.angle
+    this.container!.position = pos
 
-    // this.container!.rotation = this.body.angle;
-    // this.container!.position = pos;
-
-    // if (this.gfx) this.gfx.alpha = debug() ? 0.5 : 0;
+    if (this.gfx) this.gfx.alpha = debug() ? 0.5 : 0
   }
 }
