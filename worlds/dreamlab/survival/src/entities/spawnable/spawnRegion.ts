@@ -1,4 +1,5 @@
 import type { RenderTime, SpawnableContext } from '@dreamlab.gg/core'
+import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import {
   camera,
   game,
@@ -7,10 +8,10 @@ import {
 import type { CircleGraphics} from '@dreamlab.gg/core/dist/utils';
 import { drawCircle } from '@dreamlab.gg/core/dist/utils'
 import { Solid, SolidArgs } from '@dreamlab.gg/core/entities'
-import { Vec } from '@dreamlab.gg/core/math'
 import type { SyncedValue } from '@dreamlab.gg/core/network'
 import { syncedValue } from '@dreamlab.gg/core/network'
 import { z } from '@dreamlab.gg/core/sdk'
+import type { MyEventHandler} from '../../events';
 import { events } from '../../events'
 
 type Args = typeof ArgsSchema
@@ -40,6 +41,15 @@ const ArgsSchema = SolidArgs.extend({
   endCooldown: z.number().default(15),
 })
 
+type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
+type OnPlayerCollisionEnd = EventHandler<'onPlayerCollisionEnd'>
+type OnRegionZombieSpawning = MyEventHandler<'onRegionZombieSpawning'>
+type OnRegionCooldownStart = MyEventHandler<'onRegionCooldownStart'>
+type OnRegionCooldownEnd = MyEventHandler<'onRegionCooldownEnd'>
+type OnRegionWaveStart = MyEventHandler<'onRegionWaveStart'>
+type OnRegionStart = MyEventHandler<'onRegionStart'>
+type OnRegionEnd = MyEventHandler<'onRegionEnd'>
+
 type zombiePosition = { x: number; y: number }[] | undefined
 interface RegionData {
   isCooldown: boolean
@@ -63,65 +73,98 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
     },
   )
 
+  protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
+  protected onPlayerCollisionEnd: OnPlayerCollisionEnd | undefined
+  protected onRegionZombieSpawning: OnRegionZombieSpawning | undefined
+  protected onRegionCooldownStart: OnRegionCooldownStart | undefined
+  protected onRegionCooldownEnd: OnRegionCooldownEnd | undefined
+  protected onRegionWaveStart: OnRegionWaveStart | undefined
+  protected onRegionStart: OnRegionStart | undefined
+  protected onRegionEnd: OnRegionEnd | undefined
+
   public constructor(ctx: SpawnableContext<A>) {
     super(ctx)
     this.body.isSensor = true
     this.body.label = 'spawnRegion'
 
-    magicEvents('client')?.on('onPlayerCollisionStart', ([_player, other]) => {
-      if (other.id === this.body.id) {
-        events.emit('onEnterRegion', this.uid)
-      }
-    })
+    magicEvents('client')?.addListener(
+      'onPlayerCollisionStart',
+      (this.onPlayerCollisionStart = ([_player, other]) => {
+        if (other.id === this.body.id) {
+          events.emit('onEnterRegion', this.uid)
+        }
+      }),
+    )
 
-    magicEvents('client')?.on('onPlayerCollisionEnd', ([_player, other]) => {
-      if (other.id === this.body.id) {
-        events.emit('onExitRegion', this.uid)
-      }
-    })
+    magicEvents('client')?.on(
+      'onPlayerCollisionEnd',
+      (this.onPlayerCollisionEnd = ([_player, other]) => {
+        if (other.id === this.body.id) {
+          events.emit('onExitRegion', this.uid)
+        }
+      }),
+    )
 
-    events.on('onRegionZombieSpawning', positions => {
-      this.regionData.value.positions = Array.isArray(positions)
-        ? positions
-        : undefined
+    events.addListener(
+      'onRegionZombieSpawning',
+      (this.onRegionZombieSpawning = positions => {
+        this.regionData.value.positions = Array.isArray(positions)
+          ? positions
+          : undefined
 
-      setTimeout(() => {
-        this.regionData.value.positions = undefined
-      }, 3_000)
-    })
-
-    events.on('onRegionCooldownStart', regionId => {
-      if (this.uid === regionId) {
-        this.regionData.value.isCooldown = true
-      }
-    })
-
-    events.on('onRegionCooldownEnd', regionId => {
-      if (this.uid === regionId) {
-        this.regionData.value.isCooldown = false
-      }
-    })
-
-    events.on('onRegionWaveStart', regionId => {
-      if (this.uid === regionId) {
-        this.regionData.value.waveStarted = true
         setTimeout(() => {
-          this.regionData.value.waveStarted = false
+          this.regionData.value.positions = undefined
         }, 3_000)
-      }
-    })
+      }),
+    )
 
-    events.on('onRegionStart', regionId => {
-      if (this.uid === regionId) {
-        this.regionData.value.regionActive = true
-      }
-    })
+    events.addListener(
+      'onRegionCooldownStart',
+      (this.onRegionCooldownStart = regionId => {
+        if (this.uid === regionId) {
+          this.regionData.value.isCooldown = true
+        }
+      }),
+    )
 
-    events.on('onRegionEnd', regionId => {
-      if (this.uid === regionId) {
-        this.regionData.value.regionActive = false
-      }
-    })
+    events.addListener(
+      'onRegionCooldownEnd',
+      (this.onRegionCooldownEnd = regionId => {
+        if (this.uid === regionId) {
+          this.regionData.value.isCooldown = false
+        }
+      }),
+    )
+
+    events.addListener(
+      'onRegionWaveStart',
+      (this.onRegionWaveStart = regionId => {
+        if (this.uid === regionId) {
+          this.regionData.value.waveStarted = true
+          setTimeout(() => {
+            this.regionData.value.waveStarted = false
+          }, 3_000)
+        }
+      }),
+    )
+
+    events.addListener(
+      'onRegionStart',
+      (this.onRegionStart = regionId => {
+        if (this.uid === regionId) {
+          this.regionData.value.regionActive = true
+        }
+      }),
+    )
+
+    events.addListener(
+      'onRegionEnd',
+      (this.onRegionEnd = regionId => {
+        if (this.uid === regionId) {
+          this.regionData.value.regionActive = false
+        }
+      }),
+    )
 
     const $game = game('client')
     if ($game) {
@@ -130,6 +173,27 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
 
       this.container?.addChild(this.gfxCircle)
     }
+  }
+
+  public override teardown(): void {
+    super.teardown()
+
+    magicEvents('client')?.removeListener(
+      'onPlayerCollisionStart',
+      this.onPlayerCollisionStart,
+    )
+
+    magicEvents('client')?.removeListener(
+      'onPlayerCollisionEnd',
+      this.onPlayerCollisionEnd,
+    )
+
+    events.removeListener('onRegionZombieSpawning', this.onRegionZombieSpawning)
+    events.removeListener('onRegionCooldownStart', this.onRegionCooldownStart)
+    events.removeListener('onRegionCooldownEnd', this.onRegionCooldownEnd)
+    events.removeListener('onRegionWaveStart', this.onRegionWaveStart)
+    events.removeListener('onRegionStart', this.onRegionStart)
+    events.removeListener('onRegionEnd', this.onRegionEnd)
   }
 
   public override onRenderFrame(time: RenderTime) {

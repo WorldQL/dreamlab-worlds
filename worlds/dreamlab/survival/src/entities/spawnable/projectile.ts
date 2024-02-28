@@ -5,9 +5,9 @@ import type {
   Time,
 } from '@dreamlab.gg/core'
 import { Solid, SolidArgs } from '@dreamlab.gg/core/dist/entities'
-import { Vec } from '@dreamlab.gg/core/dist/math'
+import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import { z } from '@dreamlab.gg/core/dist/sdk'
-import { camera, debug, events, game } from '@dreamlab.gg/core/labs'
+import { events, game } from '@dreamlab.gg/core/labs'
 import Matter from 'matter-js'
 
 type Args = typeof ArgsSchema
@@ -16,8 +16,14 @@ const ArgsSchema = SolidArgs.extend({
   damage: z.number().default(1),
 })
 
+type OnCollisionStart = EventHandler<'onCollisionStart'>
+type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
+
 export { ArgsSchema as ProjectileArgs }
 export class Projectile<A extends Args = Args> extends Solid<A> {
+  protected onCollisionStart: OnCollisionStart | undefined
+  protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
+
   public constructor(ctx: SpawnableContext<A>) {
     super(ctx)
     this.body.density = 0.001
@@ -30,26 +36,43 @@ export class Projectile<A extends Args = Args> extends Solid<A> {
 
     const $game = game()
 
-    events('client')?.on('onPlayerCollisionStart', ([_player, other]) => {
-      if (other.id === this.body.id) {
-        $game.destroy(this as SpawnableEntity)
-      }
-    })
-
-    events('common')?.on('onCollisionStart', ([a, b], raw) => {
-      if (a.uid === this.uid || b.uid === this.uid) {
-        const other = a.uid === this.uid ? b : a
-
-        const bodies = [raw.bodyA, raw.bodyB]
-
-        const isSensor = bodies.some(body => body.isSensor)
-        const isProjectile = other.definition.entity.includes('Projectile')
-
-        if (!isSensor && !isProjectile) {
+    events('client')?.addListener(
+      'onPlayerCollisionStart',
+      (this.onPlayerCollisionStart = ([_player, other]) => {
+        if (other.id === this.body.id) {
           $game.destroy(this as SpawnableEntity)
         }
-      }
-    })
+      }),
+    )
+
+    events('common')?.addListener(
+      'onCollisionStart',
+      (this.onCollisionStart = ([a, b], raw) => {
+        if (a.uid === this.uid || b.uid === this.uid) {
+          const other = a.uid === this.uid ? b : a
+
+          const bodies = [raw.bodyA, raw.bodyB]
+
+          const isSensor = bodies.some(body => body.isSensor)
+          const isProjectile = other.definition.entity.includes('Projectile')
+
+          if (!isSensor && !isProjectile) {
+            $game.destroy(this as SpawnableEntity)
+          }
+        }
+      }),
+    )
+  }
+
+  public override teardown(): void {
+    super.teardown()
+
+    events('client')?.removeListener(
+      'onPlayerCollisionStart',
+      this.onPlayerCollisionStart,
+    )
+
+    events('common')?.removeListener('onCollisionStart', this.onCollisionStart)
   }
 
   public override onPhysicsStep(_: Time): void {

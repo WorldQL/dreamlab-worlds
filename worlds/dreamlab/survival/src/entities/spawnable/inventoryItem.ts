@@ -1,4 +1,5 @@
 import type { RenderTime, SpawnableContext } from '@dreamlab.gg/core'
+import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import {
   camera,
   debug,
@@ -34,8 +35,14 @@ const ArgsSchema = SolidArgs.extend({
   projectileType: z.enum(projectileTypeValues).default('NONE'),
 })
 
+type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
+type OnPlayerCollisionEnd = EventHandler<'onPlayerCollisionEnd'>
+
 export { ArgsSchema as InventoryItemArgs }
 export class Item<A extends Args = Args> extends Solid<A> {
+  protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
+  protected onPlayerCollisionEnd: OnPlayerCollisionEnd | undefined
+
   private time = 0
   private floatHeight = 5
   private rotationSpeed = 0.006
@@ -49,41 +56,61 @@ export class Item<A extends Args = Args> extends Solid<A> {
 
     const $game = game()
 
-    magicEvent('client')?.on('onPlayerCollisionStart', ([player, other]) => {
-      if (this.body && other === this.body && $game.client) {
-        const baseGear = {
-          displayName: this.args.displayName,
-          textureURL: this.args.spriteSource?.url ?? '',
-          animationName: this.args.animationName,
-          anchor: { x: this.args.anchorX, y: this.args.anchorY },
-          rotation: this.args.rotation,
-          bone: this.args.bone,
-          speedMultiplier: this.args.speedMultiplier,
+    magicEvent('client')?.addListener(
+      'onPlayerCollisionStart',
+      (this.onPlayerCollisionStart = ([player, other]) => {
+        if (this.body && other === this.body && $game.client) {
+          const baseGear = {
+            displayName: this.args.displayName,
+            textureURL: this.args.spriteSource?.url ?? '',
+            animationName: this.args.animationName,
+            anchor: { x: this.args.anchorX, y: this.args.anchorY },
+            rotation: this.args.rotation,
+            bone: this.args.bone,
+            speedMultiplier: this.args.speedMultiplier,
+          }
+
+          const newItem = createGear(baseGear)
+
+          const inventoryItem: InventoryItem = {
+            baseGear: newItem,
+            lore: this.args.lore,
+            damage: this.args.damage,
+            range: this.args.range,
+            value: 100,
+            projectileType:
+              ProjectileTypes[
+                this.args.projectileType as keyof typeof ProjectileTypes
+              ],
+          }
+
+          events.emit('onPlayerNearItem', player, inventoryItem)
         }
+      }),
+    )
 
-        const newItem = createGear(baseGear)
-
-        const inventoryItem: InventoryItem = {
-          baseGear: newItem,
-          lore: this.args.lore,
-          damage: this.args.damage,
-          range: this.args.range,
-          value: 100,
-          projectileType:
-            ProjectileTypes[
-              this.args.projectileType as keyof typeof ProjectileTypes
-            ],
+    magicEvent('client')?.on(
+      'onPlayerCollisionEnd',
+      (this.onPlayerCollisionEnd = ([player, other]) => {
+        if (this.body && other === this.body && $game.client) {
+          events.emit('onPlayerNearItem', player, undefined)
         }
+      }),
+    )
+  }
 
-        events.emit('onPlayerNearItem', player, inventoryItem)
-      }
-    })
+  public override teardown(): void {
+    super.teardown()
 
-    magicEvent('client')?.on('onPlayerCollisionEnd', ([player, other]) => {
-      if (this.body && other === this.body && $game.client) {
-        events.emit('onPlayerNearItem', player, undefined)
-      }
-    })
+    magicEvent('client')?.removeListener(
+      'onPlayerCollisionStart',
+      this.onPlayerCollisionStart,
+    )
+
+    magicEvent('client')?.removeListener(
+      'onPlayerCollisionEnd',
+      this.onPlayerCollisionEnd,
+    )
   }
 
   public override onRenderFrame(_time: RenderTime) {

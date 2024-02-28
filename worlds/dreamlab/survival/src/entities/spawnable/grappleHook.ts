@@ -8,7 +8,7 @@ import Matter from 'matter-js'
 
 type Args = typeof ArgsSchema
 const ArgsSchema = SolidArgs.extend({
-  mustConnectWithBody: z.boolean().default(false),
+  mustConnectWithBody: z.boolean(),
 })
 
 export { ArgsSchema as GrappleHookArgs }
@@ -25,6 +25,8 @@ export class GrappleHook<A extends Args = Args> extends Solid<A> {
     }
     this.body.frictionAir = 0.2
     this.body.label = 'grappleHook'
+
+    if (!this.args.mustConnectWithBody) this.args.mustConnectWithBody = false
 
     const $game = game('client')
     if (!$game) return
