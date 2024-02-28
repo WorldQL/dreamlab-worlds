@@ -29,10 +29,13 @@ export class Projectile<A extends Args = Args> extends NonSolid<A> {
   protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
 
   protected readonly body: Matter.Body
+  protected readonly rotation: number
 
   public constructor(ctx: SpawnableContext<A>) {
     super(ctx)
 
+    // very weird bug - this.transform.rotation is 0 in onPhysicsTick but is the correct rotation here...
+    this.rotation = this.transform.rotation
     this.body = Matter.Bodies.rectangle(
       this.transform.position.x,
       this.transform.position.y,
@@ -104,11 +107,11 @@ export class Projectile<A extends Args = Args> extends NonSolid<A> {
   }
 
   public override onPhysicsStep(_: Time): void {
-    Matter.Body.setAngle(this.body, this.transform.rotation)
+    Matter.Body.setAngle(this.body, this.rotation)
     const speed = 50
     const velocity = {
-      x: speed * Math.cos(this.transform.rotation) * this.args.direction,
-      y: speed * Math.sin(this.transform.rotation),
+      x: speed * Math.cos(this.rotation) * this.args.direction,
+      y: speed * Math.sin(this.rotation),
     }
     Matter.Body.setVelocity(this.body, velocity)
   }
