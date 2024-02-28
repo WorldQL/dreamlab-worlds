@@ -35,14 +35,15 @@ export class ProjectileSpawner extends Entity {
     ) => {
       const xOffset = direction === 1 ? 165 : -165
       const additionalOffsetY = animation === 'shoot' ? -50 : 0
+
       return game().spawn({
         entity: '@cvz/Projectile',
         args: { width: 50, height: 10, direction },
         transform: {
-          position: {
-            x: position[0] + xOffset,
-            y: position[1] - yOffset + additionalOffsetY,
-          },
+          position: [
+            position[0] + xOffset,
+            position[1] - yOffset + additionalOffsetY,
+          ],
           zIndex: 100_000,
           rotation: angleOffset,
         },
@@ -58,7 +59,7 @@ export class ProjectileSpawner extends Entity {
       if (!netServer) throw new Error('missing network')
       const player = game()
         .entities.filter(isNetPlayer)
-        .find(netplayer => netplayer.entityId === peerID)
+        .find(netplayer => netplayer.connectionId === peerID)
       if (!player) throw new Error('missing netplayer')
       const { direction, animation, position, angle, yOffset } = data as {
         direction: number
@@ -87,7 +88,7 @@ export class ProjectileSpawner extends Entity {
 
         const sendProjectileMessage = (angle: number, yOffset?: number) =>
           void netClient?.sendCustomMessage(SPAWNED_CHANNEL, {
-            direction: player.facing === 'left' ? 1 : -1,
+            direction: player.facing === 'left' ? -1 : 1,
             animation: player.currentAnimation,
             position: [player.body.position.x, player.body.position.y],
             angle,

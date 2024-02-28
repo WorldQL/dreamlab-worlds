@@ -1,7 +1,13 @@
-import type { SpawnableContext, SpawnableEntity, Time } from '@dreamlab.gg/core'
+import type {
+  RenderTime,
+  SpawnableContext,
+  SpawnableEntity,
+  Time,
+} from '@dreamlab.gg/core'
 import { Solid, SolidArgs } from '@dreamlab.gg/core/dist/entities'
+import { Vec } from '@dreamlab.gg/core/dist/math'
 import { z } from '@dreamlab.gg/core/dist/sdk'
-import { events, game } from '@dreamlab.gg/core/labs'
+import { camera, debug, events, game } from '@dreamlab.gg/core/labs'
 import Matter from 'matter-js'
 
 type Args = typeof ArgsSchema
@@ -18,10 +24,10 @@ export class Projectile<A extends Args = Args> extends Solid<A> {
     this.body.frictionAir = 0
     this.body.friction = 1
     this.body.restitution = 0
+    this.body.isStatic = false
 
     this.body.label = 'projectile'
 
-    // might have to use client
     const $game = game()
 
     events('client')?.on('onPlayerCollisionStart', ([_player, other]) => {
@@ -47,13 +53,7 @@ export class Projectile<A extends Args = Args> extends Solid<A> {
   }
 
   public override onPhysicsStep(_: Time): void {
-    const $game = game('client')
-    if (!$game) {
-      return
-    }
-
-    Matter.Body.setAngle(this.body, 0)
-    Matter.Body.setAngularVelocity(this.body, 0)
+    Matter.Body.setAngle(this.body, this.transform.rotation)
 
     const speed = 50
     const velocity = {
@@ -61,5 +61,16 @@ export class Projectile<A extends Args = Args> extends Solid<A> {
       y: speed * Math.sin(this.transform.rotation),
     }
     Matter.Body.setVelocity(this.body, velocity)
+  }
+
+  public override onRenderFrame(time: RenderTime) {
+    super.onRenderFrame(time)
+
+    // const pos = Vec.add(this.body.position, camera().offset);
+
+    // this.container!.rotation = this.body.angle;
+    // this.container!.position = pos;
+
+    // if (this.gfx) this.gfx.alpha = debug() ? 0.5 : 0;
   }
 }
