@@ -167,7 +167,10 @@ export class RegionManager extends Entity {
         return game().spawn({
           entity: '@cvz/ZombieMob',
           args: randomZombieType as Record<string, unknown>,
-          transform: { position: [spawnPosition.x, spawnPosition.y] },
+          transform: {
+            position: [spawnPosition.x, spawnPosition.y],
+            zIndex: 5,
+          },
           tags: [
             'net/replicated',
             'net/server-authoritative',

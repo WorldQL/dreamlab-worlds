@@ -280,6 +280,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       const uniformScale = Math.max(scaleX, scaleY)
 
       this.sprite.scale.set(uniformScale, uniformScale)
+      this.sprite.zIndex = this.transform.zIndex
 
       this.container = new Container()
       this.container.sortableChildren = true
