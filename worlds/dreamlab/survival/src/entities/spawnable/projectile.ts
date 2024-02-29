@@ -122,6 +122,7 @@ export class Projectile<A extends Args = Args> extends NonSolid<A> {
     this.container!.rotation = this.body.angle
     this.container!.position = pos
 
-    if (this.gfx) this.gfx.alpha = debug() ? 0.5 : 0
+    // always show projectile until we add sprite for it
+    // if (this.gfx) this.gfx.alpha = debug() ? 0.5 : 0;
   }
 }
