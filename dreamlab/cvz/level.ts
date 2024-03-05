@@ -14,8 +14,8 @@ export const level: LooseSpawnableDefinition[] = [
         "y": 1
       },
       "parallax": {
-        "x": -0.2,
-        "y": -0.2
+        "x": 0.2,
+        "y": 0.2
       }
     },
     "transform": {
