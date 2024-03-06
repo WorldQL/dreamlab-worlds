@@ -1,4 +1,4 @@
-import type { LooseSpawnableDefinition } from '@dreamlab.gg/core';
+import type { LooseSpawnableDefinition } from '@dreamlab.gg/core'
 import { Entity } from '@dreamlab.gg/core'
 import {
   game,
@@ -6,7 +6,7 @@ import {
   physics,
 } from '@dreamlab.gg/core/dist/labs'
 import { onlyNetClient } from '@dreamlab.gg/core/dist/network'
-import type { Vector } from 'matter-js';
+import type { Vector } from 'matter-js'
 import Matter from 'matter-js'
 import InventoryManager from '../inventory/inventoryManager'
 

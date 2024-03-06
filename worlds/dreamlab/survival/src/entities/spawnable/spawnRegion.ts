@@ -5,13 +5,13 @@ import {
   game,
   events as magicEvents,
 } from '@dreamlab.gg/core/dist/labs'
-import type { CircleGraphics} from '@dreamlab.gg/core/dist/utils';
+import type { CircleGraphics } from '@dreamlab.gg/core/dist/utils'
 import { drawCircle } from '@dreamlab.gg/core/dist/utils'
 import { Solid, SolidArgs } from '@dreamlab.gg/core/entities'
 import type { SyncedValue } from '@dreamlab.gg/core/network'
 import { syncedValue } from '@dreamlab.gg/core/network'
 import { z } from '@dreamlab.gg/core/sdk'
-import type { MyEventHandler} from '../../events';
+import type { MyEventHandler } from '../../events'
 import { events } from '../../events'
 
 type Args = typeof ArgsSchema
@@ -62,7 +62,6 @@ export { ArgsSchema as SpawnRegionArgs }
 export class SpawnRegion<A extends Args = Args> extends Solid<A> {
   protected gfxCircle: CircleGraphics | undefined
   private regionData: SyncedValue<RegionData> = syncedValue(
-    game(),
     this.uid,
     'regionData',
     {
