@@ -105,7 +105,7 @@ export class ParticleSpawner extends Entity {
   }
 
   private muzzleFlashDefinition = {
-    entity: '@cvz/Particle',
+    entity: '@dreamlab/Particle',
     transform: {
       position: {
         x: 0,
@@ -187,7 +187,7 @@ export class ParticleSpawner extends Entity {
   } as LooseSpawnableDefinition
 
   private smokeDefinition = {
-    entity: '@cvz/Particle',
+    entity: '@dreamlab/Particle',
     transform: {
       position: {
         x: 0,
