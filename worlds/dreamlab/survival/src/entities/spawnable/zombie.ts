@@ -56,7 +56,6 @@ const ArgsSchema = z.object({
 
 type zombieAnimations = 'punch' | 'recoil' | 'walk'
 type OnPlayerAttack = EventHandler<'onPlayerAttack'>
-type OnCollisionStart = EventHandler<'onCollisionStart'>
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
 
 interface MobData {
@@ -81,7 +80,6 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
   protected readonly gfxHealthAmount: BoxGraphics | undefined
 
   protected onPlayerAttack: OnPlayerAttack | undefined
-  protected onCollisionStart: OnCollisionStart | undefined
   protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
   protected onHitServer: MessageListenerServer | undefined
 
@@ -92,19 +90,14 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
   private patrolDistance = 300
   private hitCooldown = 0.5 // Second(s)
   private zombieAnimations: Record<string, Texture<Resource>[]> = {}
-  private mobData: SyncedValue<MobData> = syncedValue(
-    game(),
-    this.uid,
-    'mobData',
-    {
-      health: this.args.maxHealth,
-      direction: 1,
-      hitCooldown: 0,
-      patrolDistance: 0,
-      currentAnimation: 'walk' as zombieAnimations,
-      directionCooldown: 0,
-    },
-  )
+  private mobData: SyncedValue<MobData> = syncedValue(this.uid, 'mobData', {
+    health: this.args.maxHealth,
+    direction: 1,
+    hitCooldown: 0,
+    patrolDistance: 0,
+    currentAnimation: 'walk' as zombieAnimations,
+    directionCooldown: 0,
+  })
 
   public constructor(
     ctx: SpawnableContext<A>,
@@ -176,25 +169,6 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       }
     }
 
-    // onCollisionStart Listener
-    this.onCollisionStart = ([a, b]) => {
-      if (a.uid === this.uid || b.uid === this.uid) {
-        const other = a.uid === this.uid ? b : a
-
-        if (other.definition.entity.includes('Projectile')) {
-          const damage = other.args.damage ?? 1
-          void this.netClient?.sendCustomMessage(this.HIT_CHANNEL, {
-            uid: this.uid,
-            damage,
-          })
-
-          if (this.mobData.value.health - damage <= 0) {
-            events.emit('onPlayerScore', this.args.maxHealth * 25)
-          }
-        }
-      }
-    }
-
     // onPlayerCollisionStart
     this.onPlayerCollisionStart = ([player, other]) => {
       if (this.body && other === this.body) {
@@ -259,7 +233,6 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       'onPlayerCollisionStart',
       this.onPlayerCollisionStart,
     )
-    magicEvents('common')?.on('onCollisionStart', this.onCollisionStart)
     magicEvents('common')?.on('onPlayerAttack', this.onPlayerAttack)
 
     // render animations, sprite, and graphics
@@ -390,10 +363,6 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
     this.sprite?.destroy()
 
     magicEvents().common.removeListener('onPlayerAttack', this.onPlayerAttack)
-    magicEvents().common.removeListener(
-      'onCollisionStart',
-      this.onCollisionStart,
-    )
     magicEvents().client?.removeListener(
       'onPlayerCollisionStart',
       this.onPlayerCollisionStart,

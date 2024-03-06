@@ -1,4 +1,4 @@
-import type { LooseSpawnableDefinition } from '@dreamlab.gg/core'
+import type { LooseSpawnableDefinition } from '@dreamlab.gg/core';
 import { Entity } from '@dreamlab.gg/core'
 import {
   game,
@@ -6,13 +6,13 @@ import {
   physics,
 } from '@dreamlab.gg/core/dist/labs'
 import { onlyNetClient } from '@dreamlab.gg/core/dist/network'
-import type { Vector } from 'matter-js'
+import type { Vector } from 'matter-js';
 import Matter from 'matter-js'
 import InventoryManager from '../inventory/inventoryManager'
 
 const ATTACK_COOLDOWN = 250
 
-export class ProjectileSpawner extends Entity {
+export class ParticleSpawner extends Entity {
   private lastSpawnedTime: number | null = null
   private attackPosition: Vector | undefined = undefined
   private direction = 0

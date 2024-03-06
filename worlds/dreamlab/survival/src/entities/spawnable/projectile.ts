@@ -1,12 +1,11 @@
-import {
-  updateBodyWidthHeight
-  
-  
-  
-  
-} from '@dreamlab.gg/core'
+import { updateBodyWidthHeight } from '@dreamlab.gg/core'
 import type {
-  PreviousArgs,RenderTime, SpawnableContext, SpawnableEntity, Time} from '@dreamlab.gg/core';
+  PreviousArgs,
+  RenderTime,
+  SpawnableContext,
+  SpawnableEntity,
+  Time,
+} from '@dreamlab.gg/core'
 import { NonSolid, NonSolidArgs } from '@dreamlab.gg/core/dist/entities'
 import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import { Vec } from '@dreamlab.gg/core/dist/math'

@@ -1,22 +1,12 @@
 import type { BaseGear, Gear } from '@dreamlab.gg/core/dist/managers'
 import { events } from '../events'
 
-export enum ProjectileTypes {
-  BURST_SHOT = 'BURST_SHOT',
-  DOUBLE_SCATTER_SHOT = 'DOUBLE_SCATTER_SHOT',
-  DOUBLE_SHOT = 'DOUBLE_SHOT',
-  NONE = 'NONE',
-  SCATTER_SHOT = 'SCATTER_SHOT',
-  SINGLE_SHOT = 'SINGLE_SHOT',
-}
-
 export interface InventoryItem {
   baseGear: Gear
   lore: string
   damage: number
   range: number
   value: number | undefined // gold value
-  projectileType: ProjectileTypes
 }
 
 export type InventoryData = (InventoryItem | undefined)[]

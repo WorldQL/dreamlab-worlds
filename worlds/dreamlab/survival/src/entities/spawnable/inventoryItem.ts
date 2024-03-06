@@ -11,12 +11,7 @@ import { createGear } from '@dreamlab.gg/core/managers'
 import { Vec } from '@dreamlab.gg/core/math'
 import { z } from '@dreamlab.gg/core/sdk'
 import { events } from '../../events'
-import { ProjectileTypes } from '../../inventory/inventoryManager'
 import type { InventoryItem } from '../../inventory/inventoryManager'
-
-const projectileTypeValues = Object.values(ProjectileTypes).filter(
-  value => typeof value === 'string',
-) as [string, ...string[]]
 
 type Args = typeof ArgsSchema
 const ArgsSchema = SolidArgs.extend({
@@ -32,7 +27,6 @@ const ArgsSchema = SolidArgs.extend({
   anchorY: z.number().default(0.5),
   rotation: z.number().default(0),
   speedMultiplier: z.number().optional().default(1),
-  projectileType: z.enum(projectileTypeValues).default('NONE'),
 })
 
 type OnPlayerCollisionStart = EventHandler<'onPlayerCollisionStart'>
@@ -78,10 +72,6 @@ export class Item<A extends Args = Args> extends Solid<A> {
             damage: this.args.damage,
             range: this.args.range,
             value: 100,
-            projectileType:
-              ProjectileTypes[
-                this.args.projectileType as keyof typeof ProjectileTypes
-              ],
           }
 
           events.emit('onPlayerNearItem', player, inventoryItem)
