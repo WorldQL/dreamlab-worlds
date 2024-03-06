@@ -11,7 +11,7 @@ import { NonSolid, NonSolidArgs } from '@dreamlab.gg/core/dist/entities'
 import type { EventHandler } from '@dreamlab.gg/core/dist/events'
 import { Vec } from '@dreamlab.gg/core/dist/math'
 import { z } from '@dreamlab.gg/core/dist/sdk'
-import { camera, debug, events, game, physics } from '@dreamlab.gg/core/labs'
+import { camera, events, game, physics } from '@dreamlab.gg/core/labs'
 import Matter from 'matter-js'
 
 type Args = typeof ArgsSchema

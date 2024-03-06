@@ -1,144 +1,362 @@
+import type { LooseSpawnableDefinition } from '@dreamlab.gg/core';
 import { Entity } from '@dreamlab.gg/core'
-import { isNetPlayer } from '@dreamlab.gg/core/dist/entities'
-import { game, events as magicEvents } from '@dreamlab.gg/core/dist/labs'
-import type { MessageListenerServer } from '@dreamlab.gg/core/dist/network'
-import { onlyNetClient, onlyNetServer } from '@dreamlab.gg/core/dist/network'
-import InventoryManager, {
-  ProjectileTypes,
-} from '../inventory/inventoryManager'
+import {
+  game,
+  events as magicEvents,
+  physics,
+} from '@dreamlab.gg/core/dist/labs'
+import { onlyNetClient } from '@dreamlab.gg/core/dist/network'
+import type { Vector } from 'matter-js';
+import Matter from 'matter-js'
+import InventoryManager from '../inventory/inventoryManager'
 
-const delay = async (ms: number | undefined) =>
-  new Promise(resolve => {
-    setTimeout(resolve, ms)
-  })
-
-const SPAWNED_CHANNEL = '@cvz/Projectile/Spawned'
 const ATTACK_COOLDOWN = 250
-const Y_OFFSET_DEFAULT = 75
-const SHOT_DELAY = 100
 
 export class ProjectileSpawner extends Entity {
   private lastSpawnedTime: number | null = null
+  private attackPosition: Vector | undefined = undefined
+  private direction = 0
+
+  private readonly bulletDefinition = (rotation: number) => {
+    return {
+      entity: '@dreamlab/Particle',
+      transform: {
+        position: {
+          x: 0,
+          y: 0,
+        },
+      },
+      args: {
+        width: 100,
+        height: 100,
+        direction: 1,
+        emitterConfig: {
+          lifetime: { min: 1, max: 1 },
+          frequency: 0.001,
+          spawnChance: 1,
+          particlesPerWave: 2,
+          emitterLifetime: 0.8,
+          maxParticles: 150,
+          addAtBack: false,
+          autoUpdate: false,
+          behaviors: [
+            {
+              type: 'alpha',
+              config: {
+                alpha: {
+                  list: [
+                    { value: 2, time: 0 },
+                    { value: 0.5, time: 1 },
+                  ],
+                },
+              },
+            },
+            {
+              type: 'scale',
+              config: {
+                scale: {
+                  list: [
+                    { value: 0.8, time: 0 },
+                    { value: 0.3, time: 1 },
+                  ],
+                },
+              },
+            },
+            {
+              type: 'color',
+              config: {
+                color: {
+                  list: [
+                    { value: 'ffffff', time: 0 },
+                    { value: 'ff4d4d', time: 1 },
+                  ],
+                },
+              },
+            },
+            {
+              type: 'rotationStatic',
+              config: {
+                min: rotation,
+                max: rotation,
+              },
+            },
+            {
+              type: 'moveSpeed',
+              config: {
+                speed: {
+                  list: [
+                    { value: 10_000, time: 0 },
+                    { value: 9_999, time: 1 },
+                  ],
+                },
+              },
+            },
+            {
+              type: 'textureSingle',
+              config: {
+                texture:
+                  'https://s3-assets.dreamlab.gg/uploaded-from-editor/Sparks-1709669482539.png',
+              },
+            },
+          ],
+        },
+      },
+    }
+  }
+
+  private muzzleFlashDefinition = {
+    entity: '@cvz/Particle',
+    transform: {
+      position: {
+        x: 0,
+        y: 0,
+      },
+    },
+    args: {
+      width: 200,
+      height: 200,
+      direction: 1,
+      emitterConfig: {
+        lifetime: { min: 0.1, max: 0.2 },
+        frequency: 0.001,
+        spawnChance: 1,
+        particlesPerWave: 5,
+        emitterLifetime: 0.1,
+        maxParticles: 20,
+        addAtBack: false,
+        autoUpdate: false,
+        behaviors: [
+          {
+            type: 'alpha',
+            config: {
+              alpha: {
+                list: [
+                  { value: 1, time: 0 },
+                  { value: 0, time: 1 },
+                ],
+              },
+            },
+          },
+          {
+            type: 'scale',
+            config: {
+              scale: {
+                list: [
+                  { value: 1.5, time: 0 },
+                  { value: 0.5, time: 1 },
+                ],
+              },
+            },
+          },
+          {
+            type: 'colorStatic',
+            config: {
+              color: 'ff4d4d',
+            },
+          },
+          {
+            type: 'moveSpeed',
+            config: {
+              speed: {
+                list: [
+                  { value: 1_000, time: 0 },
+                  { value: 500, time: 1 },
+                ],
+              },
+            },
+          },
+          {
+            type: 'rotation',
+            config: {
+              minStart: 0,
+              maxStart: 360,
+              minSpeed: 0,
+              maxSpeed: 0,
+            },
+          },
+          {
+            type: 'textureSingle',
+            config: {
+              texture:
+                'https://s3-assets.dreamlab.gg/uploaded-from-editor/Sparks-1709669482539.png',
+            },
+          },
+        ],
+      },
+    },
+  } as LooseSpawnableDefinition
+
+  private smokeDefinition = {
+    entity: '@cvz/Particle',
+    transform: {
+      position: {
+        x: 0,
+        y: 0,
+      },
+    },
+    args: {
+      width: 200,
+      height: 200,
+      direction: 1,
+      emitterConfig: {
+        lifetime: { min: 0.5, max: 1 },
+        frequency: 0.001,
+        spawnChance: 1,
+        particlesPerWave: 5,
+        emitterLifetime: 0.2,
+        maxParticles: 20,
+        addAtBack: false,
+        autoUpdate: false,
+        behaviors: [
+          {
+            type: 'alpha',
+            config: {
+              alpha: {
+                list: [
+                  { value: 0.8, time: 0 },
+                  { value: 0, time: 1 },
+                ],
+              },
+            },
+          },
+          {
+            type: 'scale',
+            config: {
+              scale: {
+                list: [
+                  { value: 0.5, time: 0 },
+                  { value: 2, time: 1 },
+                ],
+              },
+            },
+          },
+          {
+            type: 'color',
+            config: {
+              color: {
+                list: [
+                  { value: '888888', time: 0 },
+                  { value: '444444', time: 1 },
+                ],
+              },
+            },
+          },
+          {
+            type: 'moveSpeed',
+            config: {
+              speed: {
+                list: [
+                  { value: 300, time: 0 },
+                  { value: 50, time: 1 },
+                ],
+              },
+            },
+          },
+          {
+            type: 'rotation',
+            config: {
+              minStart: 0,
+              maxStart: 360,
+              minSpeed: 20,
+              maxSpeed: 50,
+            },
+          },
+          {
+            type: 'textureSingle',
+            config: {
+              texture:
+                'https://s3-assets.dreamlab.gg/uploaded-from-editor/Sparks-1709669482539.png',
+            },
+          },
+        ],
+      },
+    },
+  } as LooseSpawnableDefinition
 
   public constructor() {
     super()
 
     const netClient = onlyNetClient(game())
-    const netServer = onlyNetServer(game())
-
-    const spawnProjectile = async (
-      direction: number,
-      animation: string,
-      position: [number, number],
-      angleOffset: number,
-      yOffset = Y_OFFSET_DEFAULT,
-    ) => {
-      const xOffset = direction === 1 ? 165 : -165
-      const additionalOffsetY = animation === 'shoot' ? -50 : 0
-
-      return game().spawn({
-        entity: '@cvz/Projectile',
-        args: { width: 50, height: 10, direction },
-        transform: {
-          position: [
-            position[0] + xOffset,
-            position[1] - yOffset + additionalOffsetY,
-          ],
-          zIndex: 100_000,
-          rotation: angleOffset,
-        },
-        tags: [
-          'net/replicated',
-          'net/server-authoritative',
-          'editor/doNotSave',
-        ],
-      })
-    }
-
-    const onHitServer: MessageListenerServer = async ({ peerID }, _, data) => {
-      if (!netServer) throw new Error('missing network')
-      const player = game()
-        .entities.filter(isNetPlayer)
-        .find(netplayer => netplayer.connectionId === peerID)
-      if (!player) throw new Error('missing netplayer')
-      const { direction, animation, position, angle, yOffset } = data as {
-        direction: number
-        animation: string
-        position: [number, number]
-        angle: number
-        yOffset?: number
-      }
-      await spawnProjectile(direction, animation, position, angle, yOffset)
-    }
 
     magicEvents('common')?.on('onPlayerAttack', async (player, gear) => {
       if (
-        player.currentAnimation === 'bow' ||
+        player.currentAnimation !== 'bow' &&
+        player.currentAnimation !== 'shoot'
+      )
+        return
+      if (!gear || Date.now() - (this.lastSpawnedTime || 0) <= ATTACK_COOLDOWN)
+        return
+
+      this.lastSpawnedTime = Date.now()
+      const invItem =
+        InventoryManager.getInstance().getInventoryItemFromBaseGear(gear)
+
+      this.direction = player.facing === 'left' ? -1 : 1
+      const xOffset =
         player.currentAnimation === 'shoot'
-      ) {
-        if (
-          !gear ||
-          Date.now() - (this.lastSpawnedTime || 0) <= ATTACK_COOLDOWN
-        )
-          return
-        this.lastSpawnedTime = Date.now()
+          ? this.direction * 245
+          : this.direction * 165
+      const yOffset = player.currentAnimation === 'shoot' ? 125 : 75
 
-        const invItem =
-          InventoryManager.getInstance().getInventoryItemFromBaseGear(gear)
+      this.attackPosition = {
+        x: player.body.position.x + xOffset,
+        y: player.body.position.y - yOffset,
+      } as Vector
 
-        const sendProjectileMessage = (angle: number, yOffset?: number) =>
-          void netClient?.sendCustomMessage(SPAWNED_CHANNEL, {
-            direction: player.facing === 'left' ? -1 : 1,
-            animation: player.currentAnimation,
-            position: [player.body.position.x, player.body.position.y],
-            angle,
-            yOffset,
-          })
+      const newBullet = this.bulletDefinition(this.direction === 1 ? 0 : 180)
 
-        switch (invItem?.projectileType) {
-          case ProjectileTypes.SINGLE_SHOT:
-          case ProjectileTypes.DOUBLE_SHOT:
-          case ProjectileTypes.BURST_SHOT:
-            for (
-              let idx = 0;
-              idx <
-              (invItem.projectileType === ProjectileTypes.SINGLE_SHOT
-                ? 1
-                : invItem.projectileType === ProjectileTypes.DOUBLE_SHOT
-                ? 2
-                : 3);
-              idx++
-            ) {
-              sendProjectileMessage(0)
-              // eslint-disable-next-line no-await-in-loop
-              if (idx < 2) await delay(SHOT_DELAY)
-            }
+      newBullet.transform.position = this.attackPosition
+      game('client')?.spawn(newBullet)
 
-            break
-          case ProjectileTypes.SCATTER_SHOT:
-          case ProjectileTypes.DOUBLE_SCATTER_SHOT: {
-            const scatterShots =
-              invItem.projectileType === ProjectileTypes.SCATTER_SHOT ? 1 : 2
-            for (let idx = 0; idx < scatterShots; idx++) {
-              sendProjectileMessage(0.1, 70)
-              sendProjectileMessage(0)
-              sendProjectileMessage(-0.1, 80)
-              // eslint-disable-next-line no-await-in-loop
-              if (idx < 1) await delay(SHOT_DELAY)
-            }
+      this.muzzleFlashDefinition.transform.position = this.attackPosition
+      game('client')?.spawn(this.muzzleFlashDefinition)
 
-            break
+      this.smokeDefinition.transform.position = this.attackPosition
+      game('client')?.spawn(this.smokeDefinition)
+
+      const startPoint = Matter.Vector.create(
+        player.position.x,
+        player.position.y,
+      )
+      const endPoint = Matter.Vector.create(
+        startPoint.x + 4_000 * Math.cos(this.direction === 1 ? 0 : Math.PI),
+        startPoint.y + 4_000 * Math.sin(this.direction === 1 ? 0 : Math.PI),
+      )
+
+      const collisions = Matter.Query.ray(
+        game().physics.engine.world.bodies,
+        startPoint,
+        endPoint,
+        50,
+      ).filter(
+        collision =>
+          collision.parentB.label === 'solid' ||
+          collision.parentB.label === 'zombie',
+      )
+
+      collisions.sort((a, b) =>
+        this.direction === 1
+          ? a.parentB.position.x - b.parentB.position.x
+          : b.parentB.position.x - a.parentB.position.x,
+      )
+
+      for (const collision of collisions) {
+        if (collision.parentB.label === 'solid') break
+
+        if (collision.parentB.label === 'zombie') {
+          const targetZombie = collision.parentB
+          const entity = physics().getEntity(targetZombie)
+          if (entity) {
+            void netClient?.sendCustomMessage('@cvz/Hittable/hit', {
+              uid: entity.uid,
+              damage: invItem ? invItem.damage : 1,
+            })
           }
 
-          case undefined:
-            throw new Error('Not implemented yet: undefined case')
-          case ProjectileTypes.NONE:
-            break
+          break
         }
       }
     })
-
-    netServer?.addCustomMessageListener(SPAWNED_CHANNEL, onHitServer)
   }
 
   public override teardown(): void {
