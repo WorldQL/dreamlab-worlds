@@ -113,10 +113,10 @@ export class ParticleSpawner extends Entity {
       height: 200,
       direction: 1,
       emitterConfig: {
-        lifetime: { min: 0.1, max: 0.2 },
+        lifetime: { min: 0.05, max: 0.1 },
         frequency: 0.001,
         spawnChance: 1,
-        particlesPerWave: 5,
+        particlesPerWave: 10,
         emitterLifetime: 0.1,
         maxParticles: 20,
         addAtBack: false,
@@ -138,16 +138,22 @@ export class ParticleSpawner extends Entity {
             config: {
               scale: {
                 list: [
-                  { value: 1.5, time: 0 },
+                  { value: 2, time: 0 },
                   { value: 0.5, time: 1 }
                 ]
               }
             }
           },
           {
-            type: "colorStatic",
+            type: "color",
             config: {
-              color: "ff4d4d"
+              color: {
+                list: [
+                  { value: "ffffff", time: 0 },
+                  { value: "ffff00", time: 0.5 },
+                  { value: "ff8000", time: 1 }
+                ]
+              }
             }
           },
           {
@@ -155,8 +161,8 @@ export class ParticleSpawner extends Entity {
             config: {
               speed: {
                 list: [
-                  { value: 1_000, time: 0 },
-                  { value: 500, time: 1 }
+                  { value: 2000, time: 0 },
+                  { value: 0, time: 1 }
                 ]
               }
             }
