@@ -17,5 +17,7 @@ export const init: InitClient = async game => {
     player.characterId = "c_y9ydqx2pghxl04emgnxu6r5g"
   })
 
+  game.client.render.camera.zoomScale = 20
+
   await sharedInit(game)
 }
