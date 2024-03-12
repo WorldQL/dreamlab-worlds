@@ -7,6 +7,10 @@ import { SpawnRegion, SpawnRegionArgs } from "./entities/spawnable/spawnRegion.t
 import { Zombie, ZombieArgs } from "./entities/spawnable/zombie.ts"
 import { MessageTrigger, MessageTriggerArgs } from "./entities/spawnable/messageTrigger.ts"
 import { HealingItem, HealingItemArgs } from "./entities/spawnable/healingItem.ts"
+import {
+  EnvironmentParticle,
+  EnvironmentParticleArgs
+} from "./entities/spawnable/environmentParticle.ts"
 
 export const sharedInit: InitShared = async game => {
   game.register("@cvz/ZombieMob", Zombie, ZombieArgs)
@@ -15,6 +19,7 @@ export const sharedInit: InitShared = async game => {
   game.register("@cvz/InventoryItem", Item, InventoryItemArgs)
   game.register("@cvz/MessageTrigger", MessageTrigger, MessageTriggerArgs)
   game.register("@cvz/HealItem", HealingItem, HealingItemArgs)
+  game.register("@cvz/EnvironmentParticle", EnvironmentParticle, EnvironmentParticleArgs)
 
   game.instantiate(new ParticleSpawner())
   game.instantiate(new RegionManager())
