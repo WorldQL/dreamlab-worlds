@@ -77,12 +77,12 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
       height: 300,
       direction: 1,
       emitterConfig: {
-        lifetime: { min: 0.5, max: 1 },
+        lifetime: { min: 0.5, max: 0.8 },
         frequency: 0.001,
         spawnChance: 1,
         particlesPerWave: 10,
-        emitterLifetime: 1,
-        maxParticles: 50,
+        emitterLifetime: 0.8,
+        maxParticles: 10,
         addAtBack: false,
         autoUpdate: false,
         behaviors: [
@@ -135,12 +135,6 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
             config: {
               min: 0,
               max: 360
-            }
-          },
-          {
-            type: "shape",
-            config: {
-              type: "circle"
             }
           },
           {
