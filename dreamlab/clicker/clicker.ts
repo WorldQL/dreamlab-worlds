@@ -11,6 +11,7 @@ const ArgsSchema = z.object({
 
 export { ArgsSchema as ClickerArgs }
 export class Clicker extends SpawnableEntity<Args> {
+  private static LOAD_CHANNEL = "@clicker/Clicker/load"
   private static CLICK_CHANNEL = "@clicker/Clicker/click"
 
   private circle: CircleGraphics | undefined
@@ -19,9 +20,22 @@ export class Clicker extends SpawnableEntity<Args> {
   private uiContainer: HTMLDivElement | undefined
   private uiText: HTMLSpanElement | undefined
 
-  #points = 0
+  #points: number | undefined = undefined
   public get points(): number {
-    return this.#points
+    return this.#points ?? 0
+  }
+
+  private set points(value: number) {
+    const prev = this.#points
+    this.#points = value
+
+    if (this.uiText) this.uiText.innerHTML = `${this.#points} Points`
+
+    if (prev === undefined) return
+    const difference = this.#points - prev
+    if (difference !== 0) {
+      network("client")?.sendCustomMessage(Clicker.CLICK_CHANNEL, { difference })
+    }
   }
 
   public constructor(ctx: SpawnableContext<Args>) {
@@ -40,28 +54,46 @@ export class Clicker extends SpawnableEntity<Args> {
 
       this.uiText = document.createElement("span")
       this.uiText.style.font = "5rem sans-serif"
-      this.uiText.innerHTML = `${this.#points} Points`
 
       this.ui.append(this.uiContainer)
       this.uiContainer.append(this.uiText)
     }
 
-    network("server")?.addCustomMessageListener(Clicker.CLICK_CHANNEL, async peer => {
-      if (!$game.server) throw new Error("what")
-      const kv = $game.server.kv.player(peer.playerID)
+    const netClient = network("client")
+    const netServer = network("server")
 
-      const value = (await kv.get("points")) ?? "0"
-      const playerPoints = Number.parseInt(value, 10)
-      await kv.set("points", (playerPoints + 1).toString())
+    netServer?.addCustomMessageListener(
+      Clicker.LOAD_CHANNEL,
+      async ({ connectionId, playerId }) => {
+        if (!$game.server) throw new Error("what")
+        const kv = $game.server.kv.player(playerId)
+
+        const value = (await kv.get("points")) ?? "0"
+        const playerPoints = Number.parseInt(value, 10)
+        $game.server.network?.sendCustomMessage(connectionId, Clicker.LOAD_CHANNEL, {
+          points: playerPoints
+        })
+      }
+    )
+
+    netClient?.addCustomMessageListener(Clicker.LOAD_CHANNEL, (_, data) => {
+      if ("points" in data && typeof data.points === "number") this.points = data.points
     })
 
-    // TODO: Send KV value to player
-    // if ($game.server !== undefined) {
-    //   $game.events.common.addListener("onPlayerJoin", (player) => {
-    //     const points = $game.server!.kv.player(player.)
-    //     $game.server!.network?.sendCustomMessage(player.connectionId, Clicker.JOIN_CHANNEL, {points})
-    //   })
-    // }
+    // TODO: Perform this implicitly
+    // Requires the connectionId and playerId to be known for the `onPlayerJoin` event
+    netClient?.sendCustomMessage(Clicker.LOAD_CHANNEL, {})
+
+    netServer?.addCustomMessageListener(Clicker.CLICK_CHANNEL, async ({ playerId }, _, data) => {
+      if (!$game.server) throw new Error("what")
+      const kv = $game.server.kv.player(playerId)
+
+      if ("difference" in data && typeof data.difference === "number") {
+        const value = (await kv.get("points")) ?? "0"
+        const playerPoints = Number.parseInt(value, 10)
+        await kv.set("points", (playerPoints + data.difference).toString())
+      }
+    })
   }
 
   public teardown(): void {
@@ -82,9 +114,7 @@ export class Clicker extends SpawnableEntity<Args> {
   }
 
   public onClick(_position: Vector): void {
-    this.#points += 1
-    if (this.uiText) this.uiText.innerHTML = `${this.#points} Points`
-    network("client")?.sendCustomMessage(Clicker.CLICK_CHANNEL, {})
+    this.points += 1
   }
 
   public onRenderFrame(_time: RenderTime): void {
