@@ -1,36 +1,40 @@
-import type { Player } from "@dreamlab.gg/core/entities";
-import { EventEmitter } from "@dreamlab.gg/core/events";
-import type { InventoryItem } from "./inventory/inventoryManager.ts";
+import type { Player } from "@dreamlab.gg/core/entities"
+import { EventEmitter } from "@dreamlab.gg/core/events"
+import type { InventoryItem } from "./inventory/inventoryManager.ts"
 
 interface WorldEvents {
-  onPlayerScore: [number];
-  onPlayerDamage: [number];
-  onPlayerHeal: [number];
-  onPlayerNearItem: [Player, InventoryItem | undefined];
-  onInventoryUpdate: [];
-  onGoldUpdate: [];
+  onPlayerScore: [number]
+  onPlayerDamage: [number]
+  onPlayerHeal: [number]
+  onPlayerNearItem: [Player, InventoryItem | undefined]
+  onPlayerNearHealingItem: [number | undefined]
+  onInventoryUpdate: []
+  onGoldUpdate: []
 
-  onEnterRegion: [string];
-  onExitRegion: [string];
+  onEnterRegion: [string]
+  onExitRegion: [string]
 
-  onRegionStart: [string];
-  onRegionEnd: [string];
-  onRegionWaveStart: [string];
-  onRegionCooldownStart: [string];
-  onRegionCooldownEnd: [string];
-  onRegionZombieSpawning: [{ x: number; y: number }[]];
+  onRegionStart: [string]
+  onRegionEnd: [string]
+  onRegionWaveStart: [string]
+  onRegionCooldownStart: [string]
+  onRegionCooldownEnd: [string]
+  onRegionZombieSpawning: [{ x: number; y: number }[]]
+
+  onMessageTrigger: [string | undefined]
 }
 
-export const events = new EventEmitter<Events>();
+export const events = new EventEmitter<Events>()
 
-type Events = WorldEvents;
-export type Event<E extends {} = Events> = keyof E;
+type Events = WorldEvents
+export type Event<E extends {} = Events> = keyof E
 
-export type EventArgs<
-  T extends Event<E>,
-  E extends {} = Events
-> = T extends keyof E ? (E[T] extends unknown[] ? E[T] : never) : never;
+export type EventArgs<T extends Event<E>, E extends {} = Events> = T extends keyof E
+  ? E[T] extends unknown[]
+    ? E[T]
+    : never
+  : never
 
 export type MyEventHandler<T extends Event<E>, E extends {} = Events> = (
   ...args: EventArgs<T, E>
-) => void;
+) => void
