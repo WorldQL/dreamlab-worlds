@@ -138,7 +138,8 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       if (Math.abs(xDiff) <= range) {
         await this.netClient?.sendCustomMessage(this.HIT_CHANNEL, {
           uid: this.uid,
-          damage
+          damage,
+          direction: player.facing === "left" ? -1 : 1
         })
 
         if (this.mobData.value.health - damage <= 0) {
@@ -158,7 +159,8 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
           const damage = 2
           void this.netClient?.sendCustomMessage(this.HIT_CHANNEL, {
             uid: this.uid,
-            damage
+            damage,
+            direction: player.facing === "left" ? -1 : 1
           })
           const bounceForce = { x: 0, y: -4 }
           deferUntilPhysicsStep(() => {
@@ -178,14 +180,14 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       }
     }
 
-    this.onHitServer = async ({ peerID }, _, data) => {
+    this.onHitServer = async ({ connectionId }, _, data) => {
       if (!this.netServer) throw new Error("missing network")
 
       const { uid: dataUid, damage, direction } = data
       if (dataUid !== this.uid || typeof damage !== "number" || typeof direction !== "number")
         return
 
-      const player = game().entities.find(ev => isNetPlayer(ev) && ev.connectionId === peerID)
+      const player = game().entities.find(ev => isNetPlayer(ev) && ev.connectionId === connectionId)
       if (!player) throw new Error("missing netplayer")
       if (this.mobData.value.hitCooldown > 0) return
 
