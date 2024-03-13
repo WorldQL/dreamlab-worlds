@@ -73,6 +73,268 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
+    "entity": "@cvz/EnvironmentParticle",
+    "args": {
+      "width": 2475.85,
+      "height": 87.73,
+      "spriteSource": [
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/dirt_03-removebg-preview-1710266327592.png"
+        }
+      ],
+      "lifetime": {
+        "min": 2,
+        "max": 4
+      },
+      "frequency": 0.1,
+      "emitterLifetime": -1,
+      "spawnChance": 0.4,
+      "particlesPerWave": 1,
+      "maxParticles": 50,
+      "alpha": {
+        "start": 0.7,
+        "end": 0
+      },
+      "scale": {
+        "start": 0.05,
+        "end": 0.3
+      },
+      "rotation": {
+        "min": 0,
+        "max": 360
+      },
+      "color": {
+        "start": "#776649",
+        "mid": "#8A7756",
+        "end": "#B2996E"
+      },
+      "path": "sin(x/10) * 5",
+      "speedList": [
+        {
+          "value": 10,
+          "time": 0
+        },
+        {
+          "value": 100,
+          "time": 0.25
+        },
+        {
+          "value": 0,
+          "time": 1
+        }
+      ],
+      "minMult": 0.8
+    },
+    "transform": {
+      "position": {
+        "x": -2286.0319176388393,
+        "y": 663.4951304867377
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "jczevd2eoqih586hpsjpx3dk",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/EnvironmentParticle",
+    "args": {
+      "width": 3766.87,
+      "height": 94.3,
+      "spriteSource": [
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/dirt_03-removebg-preview-1710266327592.png"
+        }
+      ],
+      "lifetime": {
+        "min": 2,
+        "max": 4
+      },
+      "frequency": 0.1,
+      "emitterLifetime": -1,
+      "spawnChance": 0.4,
+      "particlesPerWave": 1,
+      "maxParticles": 50,
+      "alpha": {
+        "start": 0.7,
+        "end": 0
+      },
+      "scale": {
+        "start": 0.05,
+        "end": 0.3
+      },
+      "rotation": {
+        "min": 0,
+        "max": 360
+      },
+      "color": {
+        "start": "#776649",
+        "mid": "#8A7756",
+        "end": "#B2996E"
+      },
+      "path": "sin(x/10) * 5",
+      "speedList": [
+        {
+          "value": 10,
+          "time": 0
+        },
+        {
+          "value": 100,
+          "time": 0.25
+        },
+        {
+          "value": 0,
+          "time": 1
+        }
+      ],
+      "minMult": 0.8
+    },
+    "transform": {
+      "position": {
+        "x": 1237.5445995134498,
+        "y": 676.4720113346551
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "kg671xpyhr93v3uf1duuooju",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/EnvironmentParticle",
+    "args": {
+      "width": 313.82,
+      "height": 242.63,
+      "spriteSource": [
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/crosshair004-1710355270277.png"
+        },
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/crosshair001-1710355274840.png"
+        },
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/crosshair008-1710355280357.png"
+        }
+      ],
+      "lifetime": {
+        "min": 2,
+        "max": 4
+      },
+      "frequency": 0.1,
+      "emitterLifetime": -1,
+      "spawnChance": 0.6,
+      "particlesPerWave": 1,
+      "maxParticles": 100,
+      "alpha": {
+        "start": 0.7,
+        "end": 0
+      },
+      "scale": {
+        "start": 0.5,
+        "end": 0.25
+      },
+      "rotation": {
+        "min": 0,
+        "max": 360
+      },
+      "color": {
+        "start": "#5685d1",
+        "mid": "#5591f2",
+        "end": "#3680f7"
+      },
+      "path": "sin(x/10) * 10",
+      "speedList": [
+        {
+          "value": 10,
+          "time": 0
+        },
+        {
+          "value": 100,
+          "time": 0.25
+        },
+        {
+          "value": 0,
+          "time": 1
+        }
+      ],
+      "minMult": 0.8
+    },
+    "transform": {
+      "position": {
+        "x": -843.7951151102618,
+        "y": 263.2708102029273
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "fv2c5wqcpvftqrpjvilkf3m3",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/EnvironmentParticle",
+    "args": {
+      "width": 8272.48,
+      "height": 523.46,
+      "spriteSource": [
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/dirt_03-removebg-preview-1710266327592.png"
+        }
+      ],
+      "lifetime": {
+        "min": 2,
+        "max": 4
+      },
+      "frequency": 0.1,
+      "emitterLifetime": -1,
+      "spawnChance": 0.7,
+      "particlesPerWave": 5,
+      "maxParticles": 100,
+      "alpha": {
+        "start": 0.7,
+        "end": 0
+      },
+      "scale": {
+        "start": 0.05,
+        "end": 0.5
+      },
+      "rotation": {
+        "min": 0,
+        "max": 360
+      },
+      "color": {
+        "start": "#776649",
+        "mid": "#8A7756",
+        "end": "#B2996E"
+      },
+      "path": "sin(x/10) * 5",
+      "speedList": [
+        {
+          "value": 10,
+          "time": 0
+        },
+        {
+          "value": 100,
+          "time": 0.25
+        },
+        {
+          "value": 0,
+          "time": 1
+        }
+      ],
+      "minMult": 0.8
+    },
+    "transform": {
+      "position": {
+        "x": 7272.899006247908,
+        "y": 455.98800281191654
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "xicl8lcwt5zfewrmlx5la0kp",
+    "tags": []
+  },
+  {
     "entity": "@cvz/HealItem",
     "args": {
       "width": 269.78,
@@ -315,8 +577,8 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/BackgroundTrigger",
     "args": {
-      "width": 28881.511852279044,
-      "height": 3684.6319024790246,
+      "width": 28968.96,
+      "height": 8339.03,
       "onEnter": {
         "action": "set",
         "textureURL": "https://s3-assets.dreamlab.gg/uploaded-from-editor/sky2XY-1703001940523.png"
@@ -327,16 +589,14 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 759.8093749792733,
-        "y": 292.56148232688884
+        "x": 802.5314383430396,
+        "y": -2033.6375664335992
       },
       "rotation": 0,
       "zIndex": -100
     },
     "uid": "d6yo1be0iq3p41fwp9khe3qv",
-    "tags": [
-      "editor/locked"
-    ]
+    "tags": []
   },
   {
     "entity": "@dreamlab/Marker",
@@ -1812,8 +2072,8 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Nonsolid",
     "args": {
-      "width": 6480.862900786258,
-      "height": 4160.813370802238,
+      "width": 6496.25,
+      "height": 4614.52,
       "spriteSource": {
         "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/sandstormXY-1703001923602.png",
         "tile": true
@@ -1821,11 +2081,11 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": -16317.490768221965,
-        "y": -1300.7049180193007
+        "x": -16310.795802683664,
+        "y": -1074.8516034204195
       },
       "rotation": 0,
-      "zIndex": -1
+      "zIndex": -3
     },
     "uid": "muuyilyvv4skqlhj3omajdov",
     "tags": []
@@ -1846,7 +2106,7 @@ export const level: LooseSpawnableDefinition[] = [
         "y": -1202.4136661533503
       },
       "rotation": 0,
-      "zIndex": -1
+      "zIndex": -3
     },
     "uid": "dp5k2hi7yevkot2bqmq945ea",
     "tags": []
@@ -1874,8 +2134,8 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Nonsolid",
     "args": {
-      "width": 1291.884214853384,
-      "height": 8855.72755728318,
+      "width": 1509.04,
+      "height": 7312.71,
       "spriteSource": {
         "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/sandstormGradientLeft-1703001919439.png",
         "tile": true
@@ -1883,8 +2143,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 10923.020218390337,
-        "y": -771.6657438119956
+        "x": 11029.60148296367,
+        "y": -1545.1745224535862
       },
       "rotation": 0,
       "zIndex": -3
@@ -1911,27 +2171,6 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": -3
     },
     "uid": "nle4w6feddprus5a0x4616ex",
-    "tags": []
-  },
-  {
-    "entity": "@dreamlab/Nonsolid",
-    "args": {
-      "width": 37791.11657449307,
-      "height": 529.7841829387162,
-      "spriteSource": {
-        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/desert2-1703437385249.png",
-        "tile": true
-      }
-    },
-    "transform": {
-      "position": {
-        "x": -3118.5639543089837,
-        "y": 8064.106344724404
-      },
-      "rotation": 0,
-      "zIndex": -10
-    },
-    "uid": "wpgw81grjrvo8xrq0difd7mn",
     "tags": []
   },
   {
@@ -2031,26 +2270,6 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": -4
     },
     "uid": "rvebkrmhjf96o5432nzbfbwy",
-    "tags": []
-  },
-  {
-    "entity": "@dreamlab/Nonsolid",
-    "args": {
-      "width": 87.64027477856553,
-      "height": 87.64027477856553,
-      "spriteSource": {
-        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/bird-1703445269470.png"
-      }
-    },
-    "transform": {
-      "position": {
-        "x": 993.6364257972498,
-        "y": -2169.0039937463935
-      },
-      "rotation": 0,
-      "zIndex": 0
-    },
-    "uid": "p667rdat1kdd78j6xtobxsec",
     "tags": []
   },
   {
@@ -2229,7 +2448,7 @@ export const level: LooseSpawnableDefinition[] = [
         "y": 300.74876608849684
       },
       "rotation": 0,
-      "zIndex": -2
+      "zIndex": -4
     },
     "uid": "dmwn7dtvog7s8ma8o4qju0xj",
     "tags": []
@@ -2378,18 +2597,18 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Nonsolid",
     "args": {
-      "width": 143.06,
-      "height": 118.28,
+      "width": 119.76,
+      "height": 100.81,
       "spriteSource": {
         "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/grave6-1703001847085.png"
       }
     },
     "transform": {
       "position": {
-        "x": 1746.9531866055036,
-        "y": 386.0922446415533
+        "x": 1760.3639083723483,
+        "y": 394.7510870836558
       },
-      "rotation": 0,
+      "rotation": -4.7290668269820735,
       "zIndex": 0
     },
     "uid": "zpu5prw1ej0h6x3fhieh2bpr",
@@ -2446,10 +2665,10 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 2086.509955140487,
-        "y": 477.53886421268
+        "x": 2069.911726527156,
+        "y": 465.6829866317296
       },
-      "rotation": 0,
+      "rotation": -8.172993437237917,
       "zIndex": 0
     },
     "uid": "xbron2hnvqhuhmpvyyvib8er",
@@ -2536,6 +2755,149 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 76.88,
+      "height": 105.33,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/grave9-1703001857904.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 2346.7355611742223,
+        "y": 409.2335890053967
+      },
+      "rotation": 0,
+      "zIndex": 0
+    },
+    "uid": "ewdtzn7r9542ne3q6ge2h186",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 56.78,
+      "height": 62.69,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/grave9-1703001857904.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 518.1225331764188,
+        "y": 142.63487809496587
+      },
+      "rotation": 0,
+      "zIndex": 0
+    },
+    "uid": "b84rkopcu7rb4lwtgpbpou7x",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 37.93,
+      "height": 48.96,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/grave3-1703001839817.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 2052.2056327133287,
+        "y": 331.2466657064035
+      },
+      "rotation": 0,
+      "zIndex": 0
+    },
+    "uid": "eyym3kmxc26lr5odtzla5ai8",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 46.47,
+      "height": 75.13,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/grave10-1703001859643.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 1482.650859860087,
+        "y": 266.08638399593264
+      },
+      "rotation": 0,
+      "zIndex": 0
+    },
+    "uid": "ii192np1edvhlioecs4mgudm",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 6913.15,
+      "height": 6911.19,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/stoneXY-1703444958077.png",
+        "tile": true
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 15043.635209569102,
+        "y": 4904.988782225298
+      },
+      "rotation": 90,
+      "zIndex": 0
+    },
+    "uid": "paw9ce85ojgai88yol69b9ro",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 6507.84,
+      "height": 7328.79,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/sandstormXY-1703001923602.png",
+        "tile": true
+      }
+    },
+    "transform": {
+      "position": {
+        "x": -21876.44945513181,
+        "y": 4686.553833000272
+      },
+      "rotation": 0,
+      "zIndex": -1
+    },
+    "uid": "isabeyurbxjjg8dxgprya15h",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 1215.57,
+      "height": 7447.21,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/sandstormGradientRight-1703438789434.png",
+        "tile": true
+      }
+    },
+    "transform": {
+      "position": {
+        "x": -18034.874130340213,
+        "y": 4735.698585533756
+      },
+      "rotation": 0,
+      "zIndex": -3
+    },
+    "uid": "am8elbvgml2hbk8e55cxqu9i",
+    "tags": []
+  },
+  {
     "entity": "@dreamlab/Platform",
     "args": {
       "width": 2295.294420413703,
@@ -2543,7 +2905,7 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 5715.533437927633,
+        "x": 5712.217357882434,
         "y": 474.34556386499605
       },
       "rotation": 0,
@@ -3213,6 +3575,23 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "irphg0nllkckotszis7jt83u",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 993.34,
+      "height": 79.45
+    },
+    "transform": {
+      "position": {
+        "x": 7380.482812034366,
+        "y": -845.2469814582389
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "v0hhmv000ix4gceln1nqpbdw",
     "tags": []
   },
   {
