@@ -11,6 +11,7 @@ import {
   EnvironmentParticle,
   EnvironmentParticleArgs
 } from "./entities/spawnable/environmentParticle.ts"
+import { AnimatedNonSolid, AnimatedNonSolidArgs } from "./entities/spawnable/animatedNonsolid.ts"
 
 export const sharedInit: InitShared = async game => {
   game.register("@cvz/ZombieMob", Zombie, ZombieArgs)
@@ -20,6 +21,7 @@ export const sharedInit: InitShared = async game => {
   game.register("@cvz/MessageTrigger", MessageTrigger, MessageTriggerArgs)
   game.register("@cvz/HealItem", HealingItem, HealingItemArgs)
   game.register("@cvz/EnvironmentParticle", EnvironmentParticle, EnvironmentParticleArgs)
+  game.register("@cvz/AnimatedNonsolid", AnimatedNonSolid, AnimatedNonSolidArgs)
 
   game.instantiate(new ParticleSpawner())
   game.instantiate(new RegionManager())
