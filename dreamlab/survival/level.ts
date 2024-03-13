@@ -11,8 +11,13 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@cvz/EnvironmentParticle",
     "args": {
-      "width": 3518.49,
-      "height": 86.45,
+      "width": 2939.76,
+      "height": 128.15,
+      "spriteSource": [
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/dirt_03-removebg-preview-1710266327592.png"
+        }
+      ],
       "lifetime": {
         "min": 2,
         "max": 4
@@ -54,20 +59,17 @@ export const level: LooseSpawnableDefinition[] = [
           "time": 1
         }
       ],
-      "minMult": 0.8,
-      "spriteSource": {
-        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/dirt_03-removebg-preview-1710266327592.png"
-      }
+      "minMult": 0.8
     },
     "transform": {
       "position": {
-        "x": -10584.997873245042,
-        "y": 683.9263068324577
+        "x": -10253.231377072707,
+        "y": 676.4255796566591
       },
       "rotation": 0,
       "zIndex": 100
     },
-    "uid": "u83jaq9j75k2gec2p8dk08ku",
+    "uid": "h6iaft9kkk3l4bwvpdswre1w",
     "tags": []
   },
   {

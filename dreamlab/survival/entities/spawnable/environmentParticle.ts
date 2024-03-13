@@ -17,7 +17,7 @@ type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
   width: z.number().positive().min(1).default(100),
   height: z.number().positive().min(1).default(100),
-  spriteSource: SpriteSourceSchema.optional(),
+  spriteSource: z.array(SpriteSourceSchema).default([]),
   lifetime: z
     .object({
       min: z.number(),
@@ -115,6 +115,7 @@ export class EnvironmentParticle<A extends Args = Args> extends SpawnableEntity<
       const {
         width,
         height,
+        spriteSource,
         lifetime,
         frequency,
         emitterLifetime,
@@ -207,11 +208,11 @@ export class EnvironmentParticle<A extends Args = Args> extends SpawnableEntity<
         ]
       }
 
-      if (this.args.spriteSource?.url) {
+      if (spriteSource.length > 0) {
         emitterConfig.behaviors.push({
           type: "textureRandom",
           config: {
-            textures: [this.args.spriteSource.url]
+            textures: spriteSource.map(source => source.url)
           }
         })
       }
