@@ -78,6 +78,7 @@ export class ZombieSpawn<A extends Args = Args> extends NonSolid<A> {
   }
 
   private startCheckInterval() {
+    this.spawnZombies()
     this.checkInterval = setInterval(() => {
       const aliveZombies = this.spawnData.value.zombies.filter(uid =>
         game().entities.some(entity => isSpawnableEntity(entity) && entity.uid === uid)

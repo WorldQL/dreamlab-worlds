@@ -1,68 +1,75 @@
-import type { BaseGear, Gear } from "@dreamlab.gg/core/dist/managers";
-import { events } from "../events.ts";
+import type { BaseGear, Gear } from "@dreamlab.gg/core/dist/managers"
+import { events } from "../events.ts"
 
 export interface InventoryItem {
-  baseGear: Gear;
-  lore: string;
-  damage: number;
-  range: number;
-  value: number | undefined; // gold value
+  baseGear: Gear
+  lore: string
+  damage: number
+  range: number
+  value: number | undefined // gold value
 }
 
-export type InventoryData = (InventoryItem | undefined)[];
-const TOTAL_SLOTS = 36;
+export type InventoryData = (InventoryItem | undefined)[]
+const TOTAL_SLOTS = 36
 
 class InventoryManager {
-  private static instance: InventoryManager;
-  private inventoryData: InventoryData;
+  private static instance: InventoryManager
+  private inventoryData: InventoryData
+  private itemInHand: InventoryItem | undefined = undefined
 
   private constructor() {
-    this.inventoryData = Array.from({ length: TOTAL_SLOTS }).fill(
-      undefined
-    ) as InventoryData;
+    this.inventoryData = Array.from({ length: TOTAL_SLOTS }).fill(undefined) as InventoryData
   }
 
   public static getInstance(): InventoryManager {
     if (!InventoryManager.instance) {
-      InventoryManager.instance = new InventoryManager();
+      InventoryManager.instance = new InventoryManager()
     }
 
-    return InventoryManager.instance;
+    return InventoryManager.instance
   }
 
   public getInventoryData(): InventoryData {
-    return this.inventoryData;
+    return this.inventoryData
   }
 
   public setInventoryData(data: InventoryData): void {
-    this.inventoryData = data;
-    events.emit("onInventoryUpdate");
+    this.inventoryData = data
+    events.emit("onInventoryUpdate")
   }
 
   public addItemToInventory(newItem: InventoryItem): void {
-    const slotIndex = this.inventoryData.indexOf(undefined);
+    const slotIndex = this.inventoryData.indexOf(undefined)
     if (slotIndex !== -1) {
-      this.inventoryData[slotIndex] = newItem;
-      events.emit("onInventoryUpdate");
+      this.inventoryData[slotIndex] = newItem
+      events.emit("onInventoryUpdate")
     } else {
-      console.warn("No empty slot available to add the item.");
+      console.warn("No empty slot available to add the item.")
     }
   }
 
+  public getItemInHand() {
+    return this.itemInHand
+  }
+
+  public setItemInHand(item: InventoryItem | undefined) {
+    this.itemInHand = item
+  }
+
   public swapItems(sourceSlotIndex: number, targetSlotIndex: number): void {
-    const temp = this.inventoryData[sourceSlotIndex];
-    this.inventoryData[sourceSlotIndex] = this.inventoryData[targetSlotIndex];
-    this.inventoryData[targetSlotIndex] = temp;
-    events.emit("onInventoryUpdate");
+    const temp = this.inventoryData[sourceSlotIndex]
+    this.inventoryData[sourceSlotIndex] = this.inventoryData[targetSlotIndex]
+    this.inventoryData[targetSlotIndex] = temp
+    events.emit("onInventoryUpdate")
   }
 
   public getInventoryItemFromBaseGear(baseGear: BaseGear) {
     for (const item of this.inventoryData) {
-      if (item?.baseGear === baseGear) return item;
+      if (item?.baseGear === baseGear) return item
     }
 
-    return undefined;
+    return undefined
   }
 }
 
-export default InventoryManager;
+export default InventoryManager

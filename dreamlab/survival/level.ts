@@ -769,6 +769,37 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
+    "entity": "@cvz/InventoryItem",
+    "args": {
+      "width": 156.86,
+      "height": 170.12,
+      "displayName": "Portal Stone",
+      "animationName": "idle",
+      "cost": 0,
+      "damage": 0,
+      "range": 0,
+      "lore": "The Portal Stone, an ancient relic, offers instant teleportation with a touch. Legend says it's guarded by spirits, granting only the worthy access to its power.",
+      "bone": "handRight",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "rotation": 0,
+      "speedMultiplier": 1,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/portal-1710457677658.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 15989.299587076142,
+        "y": 445.7881654626086
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "z2qdmr7ah1v9j0939qk5wawj",
+    "tags": []
+  },
+  {
     "entity": "@cvz/Prompt",
     "args": {
       "width": 348.64,
@@ -915,14 +946,14 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@cvz/Prompt",
     "args": {
-      "width": 100,
-      "height": 100,
-      "message": "Press 'F' to enter home."
+      "width": 658.7,
+      "height": 716.13,
+      "message": "Amidst the howl of the storm, you stumble upon an abandoned home. A glint on the floor catches your eye, promising secrets or perhaps danger. What could it be?"
     },
     "transform": {
       "position": {
-        "x": 16007.720338215731,
-        "y": 384.93616433271274
+        "x": 14387.645897728915,
+        "y": 185.8952244589841
       },
       "rotation": 0,
       "zIndex": 100

@@ -1,20 +1,14 @@
-import { useInput, usePlayer } from "@dreamlab.gg/ui/react";
-import type { FC } from "https://esm.sh/react@18.2.0";
-import { useCallback, useEffect, useState } from "https://esm.sh/react@18.2.0";
-import { events } from "../events.ts";
-import type { InventoryClickEvent } from "./events/inventoryClickEvent.ts";
-import type {
-  InventoryDragEndEvent,
-  InventoryDragStartEvent,
-} from "./events/inventoryDragEvent.ts";
-import Inventory from "./inventory.tsx";
-import InventoryHotbar from "./inventoryHotbar.tsx";
-import InventoryManager from "./inventoryManager.ts";
-import { handleInventoryClick } from "./listeners/inventoryClick.ts";
-import {
-  handleInventoryDragEnd,
-  handleInventoryDragStart,
-} from "./listeners/inventoryDrag.ts";
+import { useInput, usePlayer } from "@dreamlab.gg/ui/react"
+import type { FC } from "https://esm.sh/react@18.2.0"
+import { useCallback, useEffect, useState } from "https://esm.sh/react@18.2.0"
+import { events } from "../events.ts"
+import type { InventoryClickEvent } from "./events/inventoryClickEvent.ts"
+import type { InventoryDragEndEvent, InventoryDragStartEvent } from "./events/inventoryDragEvent.ts"
+import Inventory from "./inventory.tsx"
+import InventoryHotbar from "./inventoryHotbar.tsx"
+import InventoryManager from "./inventoryManager.ts"
+import { handleInventoryClick } from "./listeners/inventoryClick.ts"
+import { handleInventoryDragEnd, handleInventoryDragStart } from "./listeners/inventoryDrag.ts"
 
 const isAttackAnimation = (currentAnimation: string) => {
   switch (currentAnimation) {
@@ -22,106 +16,108 @@ const isAttackAnimation = (currentAnimation: string) => {
     case "punch":
     case "bow":
     case "shoot":
-      return true;
+      return true
     default:
-      return false;
+      return false
   }
-};
+}
 
 export const InventoryApp: FC = () => {
-  const player = usePlayer();
+  const player = usePlayer()
   const [inventoryData, setInventoryData] = useState(
     InventoryManager.getInstance().getInventoryData()
-  );
+  )
 
-  const [activeSlot, setActiveSlot] = useState<number>(0);
-  const [isInventoryOpen, setIsInventoryOpen] = useState(false);
-  const [sourceSlot, setSourceSlot] = useState<number | null>(null);
+  const [activeSlot, setActiveSlot] = useState<number>(0)
+  const [isInventoryOpen, setIsInventoryOpen] = useState(false)
+  const [sourceSlot, setSourceSlot] = useState<number | null>(null)
 
   const commonEventProps = {
     inventoryData,
-    activeSlot,
-  };
+    activeSlot
+  }
 
   const onInventoryOpen = useCallback(
     (pressed: boolean) => {
-      if (!pressed) return;
-      setIsInventoryOpen((prev) => !prev);
+      if (!pressed) return
+      setIsInventoryOpen(prev => !prev)
     },
     [setIsInventoryOpen]
-  );
+  )
 
   const onInventoryDigits = useCallback(
     (digit: number, pressed: boolean) => {
-      if (!pressed || !player) return;
-      if (isAttackAnimation(player.currentAnimation)) return;
-      const idx = digit - 1;
-      setActiveSlot(idx);
-      player.gear = inventoryData[idx]?.baseGear;
+      if (!pressed || !player) return
+      if (isAttackAnimation(player.currentAnimation)) return
+      const idx = digit - 1
+      setActiveSlot(idx)
+      player.gear = inventoryData[idx]?.baseGear
+      InventoryManager.getInstance().setItemInHand(inventoryData[idx])
     },
     [player, inventoryData, setActiveSlot]
-  );
+  )
 
   useEffect(() => {
     const updateInventory = () => {
-      const invData = InventoryManager.getInstance().getInventoryData();
-      setInventoryData([...invData]);
-      if (player) player.gear = invData[activeSlot]?.baseGear;
-    };
+      const invData = InventoryManager.getInstance().getInventoryData()
+      setInventoryData([...invData])
+      if (player) {
+        player.gear = invData[activeSlot]?.baseGear
+        InventoryManager.getInstance().setItemInHand(invData[activeSlot])
+      }
+    }
 
-    events.addListener("onInventoryUpdate", updateInventory);
+    events.addListener("onInventoryUpdate", updateInventory)
 
     return () => {
-      events.removeListener("onInventoryUpdate", updateInventory);
-    };
-  }, [activeSlot, inventoryData, player]);
+      events.removeListener("onInventoryUpdate", updateInventory)
+    }
+  }, [activeSlot, inventoryData, player])
 
-  useInput("@inventory/open", onInventoryOpen);
+  useInput("@inventory/open", onInventoryOpen)
   for (let index = 0; index <= 9; index++) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    useInput(`@inventory/digit${index}`, (va: boolean) =>
-      onInventoryDigits(index, va)
-    );
+    useInput(`@inventory/digit${index}`, (va: boolean) => onInventoryDigits(index, va))
   }
 
   const handleClick = (slotIndex: number) => {
     const event: InventoryClickEvent = {
       ...commonEventProps,
-      cursorSlot: slotIndex,
-    };
-    handleInventoryClick(event);
-  };
+      cursorSlot: slotIndex
+    }
+    handleInventoryClick(event)
+  }
 
   const handleDragStartEvent = (slotIndex: number) => {
     const event: InventoryDragStartEvent = {
       ...commonEventProps,
       cursorSlot: slotIndex,
-      setSourceSlot,
-    };
-    handleInventoryDragStart(event);
-  };
+      setSourceSlot
+    }
+    handleInventoryDragStart(event)
+  }
 
   const handleDragEndEvent = (slotIndex: number) => {
-    if (sourceSlot === null || !player) return;
+    if (sourceSlot === null || !player) return
     if (sourceSlot === slotIndex) {
-      setSourceSlot(null);
-      return;
+      setSourceSlot(null)
+      return
     }
 
-    InventoryManager.getInstance().swapItems(sourceSlot, slotIndex);
-    setInventoryData([...InventoryManager.getInstance().getInventoryData()]);
+    InventoryManager.getInstance().swapItems(sourceSlot, slotIndex)
+    setInventoryData([...InventoryManager.getInstance().getInventoryData()])
 
     const event: InventoryDragEndEvent = {
       ...commonEventProps,
       player,
       cursorSlot: slotIndex,
       sourceSlot,
-      targetSlot: slotIndex,
-    };
-    handleInventoryDragEnd(event);
+      targetSlot: slotIndex
+    }
+    handleInventoryDragEnd(event)
 
-    setSourceSlot(null);
-  };
+    setSourceSlot(null)
+  }
 
   return (
     <>
@@ -129,10 +125,7 @@ export const InventoryApp: FC = () => {
         <div>Loading...</div>
       ) : (
         <>
-          <InventoryHotbar
-            activeSlot={activeSlot}
-            inventoryData={inventoryData}
-          />
+          <InventoryHotbar activeSlot={activeSlot} inventoryData={inventoryData} />
           {isInventoryOpen && (
             <Inventory
               data={inventoryData}
@@ -144,5 +137,5 @@ export const InventoryApp: FC = () => {
         </>
       )}
     </>
-  );
-};
+  )
+}
