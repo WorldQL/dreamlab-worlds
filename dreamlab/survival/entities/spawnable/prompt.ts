@@ -13,8 +13,8 @@ const ArgsSchema = SolidArgs.extend({
 type OnPlayerCollisionStart = EventHandler<"onPlayerCollisionStart">
 type OnPlayerCollisionEnd = EventHandler<"onPlayerCollisionEnd">
 
-export { ArgsSchema as MessageTriggerArgs }
-export class MessageTrigger<A extends Args = Args> extends Solid<A> {
+export { ArgsSchema as PromptArgs }
+export class Prompt<A extends Args = Args> extends Solid<A> {
   protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
   protected onPlayerCollisionEnd: OnPlayerCollisionEnd | undefined
 
@@ -31,7 +31,7 @@ export class MessageTrigger<A extends Args = Args> extends Solid<A> {
       "onPlayerCollisionStart",
       (this.onPlayerCollisionStart = ([_player, other]) => {
         if (this.body && other === this.body && $game.client) {
-          events.emit("onMessageTrigger", this.args.message)
+          events.emit("onPromptTrigger", this.args.message)
         }
       })
     )
@@ -40,7 +40,7 @@ export class MessageTrigger<A extends Args = Args> extends Solid<A> {
       "onPlayerCollisionEnd",
       (this.onPlayerCollisionEnd = ([_player, other]) => {
         if (this.body && other === this.body && $game.client) {
-          events.emit("onMessageTrigger", undefined)
+          events.emit("onPromptTrigger", undefined)
         }
       })
     )

@@ -54,8 +54,8 @@ interface RegionData {
   positions: zombiePosition
 }
 
-export { ArgsSchema as SpawnRegionArgs }
-export class SpawnRegion<A extends Args = Args> extends Solid<A> {
+export { ArgsSchema as ZombieRegionArgs }
+export class ZombieRegion<A extends Args = Args> extends Solid<A> {
   protected gfxCircle: CircleGraphics | undefined
   private regionData: SyncedValue<RegionData> = syncedValue(this.uid, "regionData", {
     isCooldown: false as boolean,
@@ -161,7 +161,7 @@ export class SpawnRegion<A extends Args = Args> extends Solid<A> {
   public constructor(ctx: SpawnableContext<A>) {
     super(ctx)
     this.body.isSensor = true
-    this.body.label = "spawnRegion"
+    this.body.label = "zombieRegion"
 
     magicEvents("client")?.addListener(
       "onPlayerCollisionStart",

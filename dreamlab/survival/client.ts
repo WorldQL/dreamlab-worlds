@@ -2,7 +2,7 @@ import { deferUntilPlayer } from "@dreamlab.gg/core/dist/utils"
 import type { InitClient } from "@dreamlab.gg/core/sdk"
 import { preloadAssets } from "./assetLoader.ts"
 import { sharedInit } from "./shared.ts"
-import { initializeUI } from "./ui/startScreen.tsx"
+import { initializeUI } from "./ui/scene/playScene.tsx"
 
 export const init: InitClient = async game => {
   await preloadAssets()

@@ -1,8 +1,8 @@
 import type { FC } from "https://esm.sh/react@18.2.0"
 import { useEffect, useState } from "https://esm.sh/react@18.2.0"
-import { events } from "../events.ts"
+import { events } from "../../events.ts"
 
-export const MessageScreen: FC = () => {
+export const PromptOverlay: FC = () => {
   const [currentMessage, setCurrentMessage] = useState<string | undefined>(undefined)
 
   useEffect(() => {
@@ -10,10 +10,10 @@ export const MessageScreen: FC = () => {
       setCurrentMessage(message)
     }
 
-    events.addListener("onMessageTrigger", msgListener)
+    events.addListener("onPromptTrigger", msgListener)
 
     return () => {
-      events.removeListener("onMessageTrigger", msgListener)
+      events.removeListener("onPromptTrigger", msgListener)
     }
   }, [])
 

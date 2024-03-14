@@ -36,6 +36,7 @@ const ArgsSchema = z.object({
   height: z.number().positive().min(1).default(200),
   spriteSource: SpriteSourceSchema.optional(),
   maxHealth: z.number().positive().min(1).default(10),
+  health: z.number().positive().min(1).default(10),
   speed: z.number().positive().min(1).default(1),
   knockback: z.number().positive().min(0).default(2)
 })
@@ -143,7 +144,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
         })
 
         if (this.mobData.value.health - damage <= 0) {
-          events.emit("onPlayerScore", this.args.maxHealth * 25)
+          events.emit("onPlayerKill", this.body.position)
         }
       }
     }
@@ -162,6 +163,9 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
             damage,
             direction: player.facing === "left" ? -1 : 1
           })
+          if (this.mobData.value.health - damage <= 0) {
+            events.emit("onPlayerKill", this.body.position)
+          }
           const bounceForce = { x: 0, y: -4 }
           deferUntilPhysicsStep(() => {
             Matter.Body.applyForce(player.body, player.body.position, bounceForce)
@@ -198,6 +202,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       })
 
       this.mobData.value.health -= damage
+      this.args.health = this.mobData.value.health
       if (this.mobData.value.health <= 0) game().destroy(this as unknown as SpawnableEntity)
     }
 
@@ -401,9 +406,10 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       this.mobData.value.patrolDistance += Math.abs(this.args.speed / 2)
     }
 
-    if (!closestPlayer || minDistance > 5_000) {
-      game().destroy(this as SpawnableEntity)
-    }
+    // TODO: should we re-enable this? might break zombie spawns (not the zombie regions)
+    // if (!closestPlayer || minDistance > 5_000) {
+    //   game().destroy(this as SpawnableEntity)
+    // }
   }
 
   public override onRenderFrame(_: RenderTime): void {

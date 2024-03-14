@@ -335,10 +335,330 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    "entity": "@cvz/HealItem",
+    "entity": "@cvz/EnvironmentParticle",
     "args": {
-      "width": 269.78,
-      "height": 267.26,
+      "width": 4101.41,
+      "height": 1545.88,
+      "spriteSource": [
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/dirt_03-removebg-preview-1710266327592.png"
+        }
+      ],
+      "lifetime": {
+        "min": 2,
+        "max": 4
+      },
+      "frequency": 0.1,
+      "emitterLifetime": -1,
+      "spawnChance": 0.7,
+      "particlesPerWave": 5,
+      "maxParticles": 100,
+      "alpha": {
+        "start": 0.7,
+        "end": 0
+      },
+      "scale": {
+        "start": 0.05,
+        "end": 0.5
+      },
+      "rotation": {
+        "min": 0,
+        "max": 360
+      },
+      "color": {
+        "start": "#d6cbcf",
+        "mid": "#ccb9a6",
+        "end": "#d6cbcf"
+      },
+      "path": "sin(x/10) * 5",
+      "speedList": [
+        {
+          "value": 10,
+          "time": 0
+        },
+        {
+          "value": 100,
+          "time": 0.25
+        },
+        {
+          "value": 0,
+          "time": 1
+        }
+      ],
+      "minMult": 0.8
+    },
+    "transform": {
+      "position": {
+        "x": 6964.027619353974,
+        "y": -592.0702039291665
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "b54onfildje7eatonemuxrep",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/EnvironmentParticle",
+    "args": {
+      "width": 609.46,
+      "height": 1088.29,
+      "spriteSource": [
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/CartoonSmoke-1709659408952.png"
+        }
+      ],
+      "lifetime": {
+        "min": 2,
+        "max": 4
+      },
+      "frequency": 0.1,
+      "emitterLifetime": -1,
+      "spawnChance": 0.6,
+      "particlesPerWave": 3,
+      "maxParticles": 100,
+      "alpha": {
+        "start": 0.7,
+        "end": 0
+      },
+      "scale": {
+        "start": 0.25,
+        "end": 2
+      },
+      "rotation": {
+        "min": 0,
+        "max": 360
+      },
+      "color": {
+        "start": "#F8DEA0",
+        "mid": "#F8DEA0",
+        "end": "#ffffff"
+      },
+      "path": "sin(x/10) * 10",
+      "speedList": [
+        {
+          "value": 10,
+          "time": 0
+        },
+        {
+          "value": 100,
+          "time": 0.25
+        },
+        {
+          "value": 0,
+          "time": 1
+        }
+      ],
+      "minMult": 0.8
+    },
+    "transform": {
+      "position": {
+        "x": 8039.336028470756,
+        "y": -1143.1021608541798
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "gjv6x7rpz1jyvw71dijlkdpx",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/EnvironmentParticle",
+    "args": {
+      "width": 1685.26,
+      "height": 447.3,
+      "spriteSource": [
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/CartoonSmoke-1709659408952.png"
+        }
+      ],
+      "lifetime": {
+        "min": 2,
+        "max": 4
+      },
+      "frequency": 0.1,
+      "emitterLifetime": -1,
+      "spawnChance": 0.4,
+      "particlesPerWave": 1,
+      "maxParticles": 50,
+      "alpha": {
+        "start": 0.7,
+        "end": 0
+      },
+      "scale": {
+        "start": 0.25,
+        "end": 0.5
+      },
+      "rotation": {
+        "min": 0,
+        "max": 360
+      },
+      "color": {
+        "start": "#F8DEA0",
+        "mid": "#F8DEA0",
+        "end": "#ffffff"
+      },
+      "path": "sin(x/10) * 10",
+      "speedList": [
+        {
+          "value": 10,
+          "time": 0
+        },
+        {
+          "value": 100,
+          "time": 0.25
+        },
+        {
+          "value": 0,
+          "time": 1
+        }
+      ],
+      "minMult": 0.8
+    },
+    "transform": {
+      "position": {
+        "x": 4395.967466786023,
+        "y": -1724.6050162323575
+      },
+      "rotation": -0.6289127254589228,
+      "zIndex": 100
+    },
+    "uid": "pcj6o89pdxvbty2mq89iysfs",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/EnvironmentParticle",
+    "args": {
+      "width": 1894.19,
+      "height": 367.63,
+      "spriteSource": [
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/CartoonSmoke-1709659408952.png"
+        }
+      ],
+      "lifetime": {
+        "min": 2,
+        "max": 4
+      },
+      "frequency": 0.1,
+      "emitterLifetime": -1,
+      "spawnChance": 0.4,
+      "particlesPerWave": 1,
+      "maxParticles": 50,
+      "alpha": {
+        "start": 0.7,
+        "end": 0
+      },
+      "scale": {
+        "start": 0.25,
+        "end": 0.5
+      },
+      "rotation": {
+        "min": 0,
+        "max": 360
+      },
+      "color": {
+        "start": "#F8DEA0",
+        "mid": "#F8DEA0",
+        "end": "#ffffff"
+      },
+      "path": "sin(x/10) * 10",
+      "speedList": [
+        {
+          "value": 10,
+          "time": 0
+        },
+        {
+          "value": 100,
+          "time": 0.25
+        },
+        {
+          "value": 0,
+          "time": 1
+        }
+      ],
+      "minMult": 0.8
+    },
+    "transform": {
+      "position": {
+        "x": 9284.120889370517,
+        "y": -1568.4306132178324
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "w2j3lmqdmlzarju8ud962w1j",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/EnvironmentParticle",
+    "args": {
+      "width": 668.7,
+      "height": 2694.96,
+      "spriteSource": [
+        {
+          "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/CartoonSmoke-1709659408952.png"
+        }
+      ],
+      "lifetime": {
+        "min": 2,
+        "max": 4
+      },
+      "frequency": 0.1,
+      "emitterLifetime": -1,
+      "spawnChance": 0.6,
+      "particlesPerWave": 3,
+      "maxParticles": 100,
+      "alpha": {
+        "start": 0.7,
+        "end": 0
+      },
+      "scale": {
+        "start": 0.25,
+        "end": 2
+      },
+      "rotation": {
+        "min": 0,
+        "max": 360
+      },
+      "color": {
+        "start": "#F8DEA0",
+        "mid": "#F8DEA0",
+        "end": "#ffffff"
+      },
+      "path": "sin(x/10) * 10",
+      "speedList": [
+        {
+          "value": 10,
+          "time": 0
+        },
+        {
+          "value": 100,
+          "time": 0.25
+        },
+        {
+          "value": 0,
+          "time": 1
+        }
+      ],
+      "minMult": 0.8
+    },
+    "transform": {
+      "position": {
+        "x": 4426.843690652855,
+        "y": -3226.604252276938
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "hagpegwkzon8lipqityeb0nr",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/HealthItem",
+    "args": {
+      "width": 231.62,
+      "height": 202.53,
       "spriteSource": {
         "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/artboard_4_4x-removebg-preview-1710280303298.png"
       },
@@ -346,8 +666,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": -3663.8178713982934,
-        "y": 296.6220983902956
+        "x": -3668.301189861763,
+        "y": 300.4126470048757
       },
       "rotation": 0,
       "zIndex": 100
@@ -365,7 +685,7 @@ export const level: LooseSpawnableDefinition[] = [
       },
       "displayName": "Sam's Golden Bow",
       "animationName": "bow",
-      "cost": 100,
+      "cost": 300,
       "damage": 5,
       "range": 1,
       "lore": "Once wielded by 'Sharp-Eye' Sam, the fastest archer in the West, this bow's arrows are said to whistle with the winds of the prairie and never miss a zombie's heart.",
@@ -427,7 +747,7 @@ export const level: LooseSpawnableDefinition[] = [
       },
       "displayName": "Burst Revolver",
       "animationName": "shoot",
-      "cost": 100,
+      "cost": 200,
       "damage": 1,
       "range": 1,
       "lore": "Crafted by the legendary gunsmith 'Bullseye' Betty, this revolver's rapid bursts made it a favorite among cowboys holding the line in the great zombie sieges of the Old West.",
@@ -449,7 +769,7 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    "entity": "@cvz/MessageTrigger",
+    "entity": "@cvz/Prompt",
     "args": {
       "width": 348.64,
       "height": 484.2,
@@ -467,7 +787,7 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    "entity": "@cvz/MessageTrigger",
+    "entity": "@cvz/Prompt",
     "args": {
       "width": 593.1,
       "height": 507.87,
@@ -485,7 +805,7 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    "entity": "@cvz/MessageTrigger",
+    "entity": "@cvz/Prompt",
     "args": {
       "width": 371.06,
       "height": 480.96,
@@ -503,7 +823,7 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    "entity": "@cvz/MessageTrigger",
+    "entity": "@cvz/Prompt",
     "args": {
       "width": 217.09,
       "height": 387.62,
@@ -521,7 +841,7 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    "entity": "@cvz/MessageTrigger",
+    "entity": "@cvz/Prompt",
     "args": {
       "width": 244.88,
       "height": 351.41,
@@ -539,7 +859,7 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    "entity": "@cvz/MessageTrigger",
+    "entity": "@cvz/Prompt",
     "args": {
       "width": 239.39,
       "height": 276.4,
@@ -557,7 +877,7 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    "entity": "@cvz/MessageTrigger",
+    "entity": "@cvz/Prompt",
     "args": {
       "width": 199.1,
       "height": 189.07,
@@ -575,6 +895,24 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
+    "entity": "@cvz/Prompt",
+    "args": {
+      "width": 207.24,
+      "height": 319.47,
+      "message": "Help!"
+    },
+    "transform": {
+      "position": {
+        "x": 8073.9139954519615,
+        "y": -4948.02273885301
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "jhhlyz2376tqb88fmu5e3git",
+    "tags": []
+  },
+  {
     "entity": "@dreamlab/BackgroundTrigger",
     "args": {
       "width": 28968.96,
@@ -589,13 +927,51 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 802.5314383430396,
-        "y": -2033.6375664335992
+        "x": -457.2446729203866,
+        "y": -1842.6820295684063
       },
       "rotation": 0,
       "zIndex": -100
     },
     "uid": "d6yo1be0iq3p41fwp9khe3qv",
+    "tags": [
+      "editor/locked"
+    ]
+  },
+  {
+    "entity": "@dreamlab/ForceField",
+    "args": {
+      "width": 611.06,
+      "height": 1108.95,
+      "force": 20
+    },
+    "transform": {
+      "position": {
+        "x": 8040.312232198253,
+        "y": -1138.484284723187
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "n7533evx2zyyn2iipjm9hc2l",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/ForceField",
+    "args": {
+      "width": 663.56,
+      "height": 2697.66,
+      "force": 20
+    },
+    "transform": {
+      "position": {
+        "x": 4434.047727003101,
+        "y": -3228.888229078016
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "m0atdrd8ye7sqyy8jgh37exo",
     "tags": []
   },
   {
@@ -674,26 +1050,6 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": -3
     },
     "uid": "h216rerpcxjas8udy35z0otr",
-    "tags": []
-  },
-  {
-    "entity": "@dreamlab/Nonsolid",
-    "args": {
-      "width": 2373.3922019152997,
-      "height": 1587.8343715646763,
-      "spriteSource": {
-        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/house3-1703001875315.png"
-      }
-    },
-    "transform": {
-      "position": {
-        "x": 8705.54671679699,
-        "y": -206.92065882037392
-      },
-      "rotation": 0,
-      "zIndex": -6
-    },
-    "uid": "myl4nnpbn750hy90u15y35za",
     "tags": []
   },
   {
@@ -2134,8 +2490,8 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Nonsolid",
     "args": {
-      "width": 1509.04,
-      "height": 7312.71,
+      "width": 1549.14,
+      "height": 14615.78,
       "spriteSource": {
         "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/sandstormGradientLeft-1703001919439.png",
         "tile": true
@@ -2143,8 +2499,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 11029.60148296367,
-        "y": -1545.1745224535862
+        "x": 11047.649525559453,
+        "y": -5194.709522453587
       },
       "rotation": 0,
       "zIndex": -3
@@ -2155,8 +2511,8 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Nonsolid",
     "args": {
-      "width": 3520.511483367567,
-      "height": 8851.32242740075,
+      "width": 7583.16,
+      "height": 16155.57,
       "spriteSource": {
         "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/sandstormXY-1703001923602.png",
         "tile": true
@@ -2164,8 +2520,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 13326.715383304123,
-        "y": -774.6010248559858
+        "x": 15355.03893207961,
+        "y": -4423.724811155612
       },
       "rotation": 0,
       "zIndex": -3
@@ -2737,26 +3093,6 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Nonsolid",
     "args": {
-      "width": 1092.87,
-      "height": 928.32,
-      "spriteSource": {
-        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/platform45-1703375406684.png"
-      }
-    },
-    "transform": {
-      "position": {
-        "x": 7366.394615841022,
-        "y": -825.4182657395365
-      },
-      "rotation": 0,
-      "zIndex": 0
-    },
-    "uid": "wwbdmbp3bkew3odofgtsac0i",
-    "tags": []
-  },
-  {
-    "entity": "@dreamlab/Nonsolid",
-    "args": {
       "width": 76.88,
       "height": 105.33,
       "spriteSource": {
@@ -2871,7 +3207,7 @@ export const level: LooseSpawnableDefinition[] = [
         "y": 4686.553833000272
       },
       "rotation": 0,
-      "zIndex": -1
+      "zIndex": -4
     },
     "uid": "isabeyurbxjjg8dxgprya15h",
     "tags": []
@@ -2895,6 +3231,387 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": -3
     },
     "uid": "am8elbvgml2hbk8e55cxqu9i",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 206.52,
+      "height": 245.44,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 6598.216824948565,
+        "y": -1182.0087685199255
+      },
+      "rotation": -15.940075234586725,
+      "zIndex": 0
+    },
+    "uid": "nxzzw71wlwstqp63y0ylluna",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 185.73,
+      "height": 239.87,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 6352.725553313182,
+        "y": -1188.2912645902081
+      },
+      "rotation": 31.567721117074175,
+      "zIndex": 0
+    },
+    "uid": "ubp7srryuyjv4apc7inx2q23",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 721.56,
+      "height": 474.76,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/martkeStall2-1703001892985.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 5649.554640597487,
+        "y": -1361.9287056669261
+      },
+      "rotation": 125.66357328622628,
+      "zIndex": 0
+    },
+    "uid": "sry365yi40z96rak49g7r9ev",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 1675.19,
+      "height": 434.27,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/platform35-1703375427203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 4402.473462715853,
+        "y": -1718.6935447713183
+      },
+      "rotation": 0,
+      "zIndex": 0
+    },
+    "uid": "hpctedqwlzpsebaumvltglnw",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 677.38,
+      "height": 164.72,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/counter-1703001788599.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 7219.959980175399,
+        "y": -790.9061767011815
+      },
+      "rotation": 173.39709415902317,
+      "zIndex": 0
+    },
+    "uid": "vumnve1pu9zhc7w2fu71mmjv",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 2373.3922019152997,
+      "height": 1587.8343715646763,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/house3-1703001875315.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 8705.54671679699,
+        "y": -206.92065882037392
+      },
+      "rotation": 0,
+      "zIndex": -6
+    },
+    "uid": "myl4nnpbn750hy90u15y35za",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 4247.77,
+      "height": 430.94,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/groundX-1703001868400.png",
+        "tile": true
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 7114.5974403726495,
+        "y": -4600.177801917709
+      },
+      "rotation": 0,
+      "zIndex": 0
+    },
+    "uid": "sreuecu2djyyjbvpg47vnwgl",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 1502.94,
+      "height": 1243.43,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/marketStall1-1703001885700.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 8681.97765299536,
+        "y": -4893.8311670983885
+      },
+      "rotation": 0,
+      "zIndex": 0
+    },
+    "uid": "rpak6v3t9f4mi78ze2xk6vje",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 9238.607880647258,
+        "y": -4746.226885146808
+      },
+      "rotation": 29.623748751174208,
+      "zIndex": 0
+    },
+    "uid": "nkcz5zhl3k24b5452pvtvvvn",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 9256.100972008293,
+        "y": -4621.294409164361
+      },
+      "rotation": 10.304846468766112,
+      "zIndex": 1
+    },
+    "uid": "p5wylnf64vy3nfglq9cnei29",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 9221.032417367542,
+        "y": -4466.992768745046
+      },
+      "rotation": -73.14160123226216,
+      "zIndex": 0
+    },
+    "uid": "v046mm54tszia2nrq11xpik9",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 9410.402612427608,
+        "y": -4649.349252876962
+      },
+      "rotation": -17.24145939894003,
+      "zIndex": 0
+    },
+    "uid": "p8nxqkrma6ur7rgb9zynf56i",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 9326.238081289799,
+        "y": -4547.650444418778
+      },
+      "rotation": 29.623748751174208,
+      "zIndex": 0
+    },
+    "uid": "g7fhqkysml0e6o3xem9jwagv",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 9561.197397382848,
+        "y": -4452.965346888744
+      },
+      "rotation": 191.30993247402023,
+      "zIndex": 0
+    },
+    "uid": "td05n1icx8xjqpjg2deh3gzh",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 9736.540170586615,
+        "y": -4684.417807517716
+      },
+      "rotation": 213.69006752598008,
+      "zIndex": 0
+    },
+    "uid": "waet719fj7gm0ygug7b3bjhr",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 9852.2664009011,
+        "y": -4481.020190601346
+      },
+      "rotation": -11.63363399894022,
+      "zIndex": 0
+    },
+    "uid": "qgvm9gp31nzb2ng0ag6rkff6",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 10020.595463176716,
+        "y": -4694.938373909942
+      },
+      "rotation": 147.26477372789256,
+      "zIndex": 0
+    },
+    "uid": "k875by9dom1r0yhsil43hj5v",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 9582.093036163871,
+        "y": -5146.836748805446
+      },
+      "rotation": -20.556045219582867,
+      "zIndex": 0
+    },
+    "uid": "fgcznmxee4doelci6fu7jgyl",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 164.27,
+      "height": 307.04,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/shopkeeper2-1703001938327.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 8075.751706646388,
+        "y": -4945.6042933663875
+      },
+      "rotation": 0,
+      "zIndex": 0
+    },
+    "uid": "w59cyevy5uncladflokilvor",
     "tags": []
   },
   {
@@ -3578,23 +4295,6 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    "entity": "@dreamlab/Platform",
-    "args": {
-      "width": 993.34,
-      "height": 79.45
-    },
-    "transform": {
-      "position": {
-        "x": 7380.482812034366,
-        "y": -845.2469814582389
-      },
-      "rotation": 0,
-      "zIndex": 100
-    },
-    "uid": "v0hhmv000ix4gceln1nqpbdw",
-    "tags": []
-  },
-  {
     "entity": "@dreamlab/Solid",
     "args": {
       "width": 21718.933082313393,
@@ -3665,13 +4365,13 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Solid",
     "args": {
-      "width": 190.49537662323928,
-      "height": 1128.1788200806322
+      "width": 468.67,
+      "height": 2360.06
     },
     "transform": {
       "position": {
-        "x": 11664.113474913042,
-        "y": 14.262340883805166
+        "x": 11802.199851872369,
+        "y": -600.6782490758785
       },
       "rotation": 0,
       "zIndex": 100
@@ -3864,6 +4564,278 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "xcm33x9eftvzhockx7f2vc75",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 654.08,
+      "height": 95.31
+    },
+    "transform": {
+      "position": {
+        "x": 7209.995477892587,
+        "y": -818.2907048132463
+      },
+      "rotation": -7.8346090388632765,
+      "zIndex": 100
+    },
+    "uid": "fmisgvphsdqz68hrmpuc4dt6",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 162.4,
+      "height": 220.33
+    },
+    "transform": {
+      "position": {
+        "x": 6599.669020696274,
+        "y": -1183.1975688391162
+      },
+      "rotation": -16.543970117659416,
+      "zIndex": 100
+    },
+    "uid": "k2kfconjaek7nkbm8oavan3y",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 154.17,
+      "height": 240.52
+    },
+    "transform": {
+      "position": {
+        "x": 6352.481077402794,
+        "y": -1187.6314122667684
+      },
+      "rotation": 30.698183532584647,
+      "zIndex": 100
+    },
+    "uid": "nayjid1ew65a6lbg8hamp90k",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 442.82,
+      "height": 585.02
+    },
+    "transform": {
+      "position": {
+        "x": 5642.012775295923,
+        "y": -1362.3345056002765
+      },
+      "rotation": 35.57854188697579,
+      "zIndex": 100
+    },
+    "uid": "gejj731oau6w039wm5hqt1g5",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 156.01,
+      "height": 101.3
+    },
+    "transform": {
+      "position": {
+        "x": 5934.221166124112,
+        "y": -1524.0403568910276
+      },
+      "rotation": 35.61848983925686,
+      "zIndex": 100
+    },
+    "uid": "j4vyp3aaa409ptr7jlbakke2",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 1874.39,
+      "height": 124.09
+    },
+    "transform": {
+      "position": {
+        "x": 9293.057312660385,
+        "y": -1618.9697281709805
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "t0z3qdj27tp13nrhxo1ci185",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 412.09,
+      "height": 406.48
+    },
+    "transform": {
+      "position": {
+        "x": 10022.169254256412,
+        "y": -1881.3706315916193
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "p6g76pk0ks89e5rd45ibqul3",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 1614,
+      "height": 63.12
+    },
+    "transform": {
+      "position": {
+        "x": 4385.2683806755795,
+        "y": -1830.756403718955
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "lpa28q7to84n8sq9vkd0r14d",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 4268.8,
+      "height": 186.01
+    },
+    "transform": {
+      "position": {
+        "x": 7131.634363535058,
+        "y": -4659.220478292442
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "o1rfaf8fhzk1puskibju8ln7",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 119.24,
+      "height": 154.86
+    },
+    "transform": {
+      "position": {
+        "x": 9232.815896917105,
+        "y": -4746.501042156636
+      },
+      "rotation": 31.817445186860173,
+      "zIndex": 100
+    },
+    "uid": "zkfvy5iuy0b3ff3c5jr26gj9",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 125.09,
+      "height": 150.39
+    },
+    "transform": {
+      "position": {
+        "x": 9577.378168410618,
+        "y": -5146.4460344511745
+      },
+      "rotation": -19.203979424483823,
+      "zIndex": 100
+    },
+    "uid": "wbzs2af1x915ttfkz1u568z1",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 119.24,
+      "height": 154.86
+    },
+    "transform": {
+      "position": {
+        "x": 9737.12009466117,
+        "y": -4686.818712927096
+      },
+      "rotation": 31.817445186860173,
+      "zIndex": 100
+    },
+    "uid": "t0d57bccebn29yw18665kc2p",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 119.24,
+      "height": 154.86
+    },
+    "transform": {
+      "position": {
+        "x": 10017.721029623484,
+        "y": -4696.439316411519
+      },
+      "rotation": -35.21759296819323,
+      "zIndex": 100
+    },
+    "uid": "kafsn7hogi8wjk8gqiavlprq",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 119.24,
+      "height": 154.86
+    },
+    "transform": {
+      "position": {
+        "x": 9560.742364113428,
+        "y": -4455.924229300963
+      },
+      "rotation": 9.188836077358562,
+      "zIndex": 100
+    },
+    "uid": "ygqttxpq79vz3b0f14ugbv5f",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 119.24,
+      "height": 154.86
+    },
+    "transform": {
+      "position": {
+        "x": 9847.757034732027,
+        "y": -4479.975738012019
+      },
+      "rotation": -14.036243467927056,
+      "zIndex": 100
+    },
+    "uid": "wdjjmkw5gf5oj3ygygzjh18o",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 119.24,
+      "height": 154.86
+    },
+    "transform": {
+      "position": {
+        "x": 9406.812708362673,
+        "y": -4648.336298989407
+      },
+      "rotation": -17.571258778322164,
+      "zIndex": 100
+    },
+    "uid": "cobnzcf9o6p7sjug7pj1iecc",
     "tags": []
   }
 ]

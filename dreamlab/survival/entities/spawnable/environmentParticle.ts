@@ -78,7 +78,7 @@ export class EnvironmentParticle<A extends Args = Args> extends SpawnableEntity<
   protected readonly container: Container | undefined
   protected readonly gfx: BoxGraphics | undefined
 
-  public constructor(ctx: SpawnableContext<A>, { stroke = "green" }: { stroke?: string } = {}) {
+  public constructor(ctx: SpawnableContext<A>, { stroke = "purple" }: { stroke?: string } = {}) {
     super(ctx)
 
     const $game = game("client")

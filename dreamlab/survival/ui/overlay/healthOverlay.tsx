@@ -3,14 +3,14 @@ import type { Game } from "@dreamlab.gg/core"
 import { usePlayer } from "@dreamlab.gg/ui/dist/react"
 import type { FC } from "https://esm.sh/react@18.2.0"
 import { useEffect, useState } from "https://esm.sh/react@18.2.0"
-import { events } from "../events.ts"
-import PlayerManager from "../playerDataManager.ts"
+import { events } from "../../events.ts"
+import PlayerManager from "../../playerManager.ts"
 
 interface HealingScreenProps {
   game: Game<false>
 }
 
-export const HealingScreen: FC<HealingScreenProps> = ({ game }) => {
+export const HealthOverlay: FC<HealingScreenProps> = ({ game }) => {
   const player = usePlayer()
   const [prompt, setPrompt] = useState("")
   const [nearHealingItem, setNearHealingItem] = useState(false)
@@ -40,11 +40,11 @@ export const HealingScreen: FC<HealingScreenProps> = ({ game }) => {
     }
 
     events.addListener("onPlayerNearHealingItem", healingItemListener)
-    game.client.inputs.addListener("@survival/pickup", healKeyListener)
+    game.client.inputs.addListener("@cvz/pickup", healKeyListener)
 
     return () => {
       events.removeListener("onPlayerNearHealingItem", healingItemListener)
-      game.client.inputs.removeListener("@survival/pickup", healKeyListener)
+      game.client.inputs.removeListener("@cvz/pickup", healKeyListener)
     }
   }, [game.client.inputs, player, playerManager, nearHealingItem, healAmount])
 

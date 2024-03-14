@@ -5,6 +5,7 @@ import { onlyNetClient } from "@dreamlab.gg/core/dist/network"
 import type { Vector } from "matter-js"
 import Matter from "matter-js"
 import InventoryManager from "../inventory/inventoryManager.ts"
+import { events } from "../events.ts"
 
 const ATTACK_COOLDOWN = 250
 
@@ -339,6 +340,9 @@ export class ParticleSpawner extends Entity {
               damage: invItem ? invItem.damage : 1,
               direction: this.direction
             })
+            if (entity.args.health - (invItem ? invItem.damage : 1) <= 0) {
+              events.emit("onPlayerKill", entity.transform.position)
+            }
           }
 
           break

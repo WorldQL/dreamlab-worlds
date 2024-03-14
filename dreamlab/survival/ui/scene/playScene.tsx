@@ -4,19 +4,20 @@ import type { InputCode } from "@dreamlab.gg/core/dist/input"
 import { renderUI, useGame, usePlayer } from "@dreamlab.gg/ui/react"
 import type { CSSProperties, FC } from "https://esm.sh/react@18.2.0"
 import { useState } from "https://esm.sh/react@18.2.0"
-import { InventoryApp } from "../inventory/inventoryApp.tsx"
-import { GameScreen } from "./gameScreen.tsx"
-import { ItemScreen } from "./itemPopup.tsx"
-import { styles } from "./styles.ts"
-import { MessageScreen } from "./message.tsx"
-import { HealingScreen } from "./healScreen.tsx"
+import { InventoryApp } from "../../inventory/inventoryApp.tsx"
+import { GameScreen } from "../gameplayHUD.tsx"
+import { ItemOverlay } from "../overlay/itemOverlay.tsx"
+import { styles } from "../styles.ts"
+import { PromptOverlay } from "../overlay/promptOverlay.tsx"
+import { HealthOverlay } from "../overlay/healthOverlay.tsx"
+import { QuestOverlay } from "../overlay/questOverlay.tsx"
 
-export interface StartScreenProps {
+export interface StartSceneProps {
   game: Game<false>
   player: Player
 }
 
-const StartScreen: FC = () => {
+const PlayScene: FC = () => {
   const game = useGame()
   const player = usePlayer()
 
@@ -97,16 +98,18 @@ export const initializeUI = (game: Game<false>) => {
     }
   }
 
-  registerInput("@survival/pickup", "Item Pickup", "KeyF")
+  registerInput("@cvz/pickup", "Item Pickup", "KeyF")
+  registerInput("@cvz/dash", "Dash", "ShiftLeft")
 
   renderUI(
     game,
     <>
-      <StartScreen />
+      <PlayScene />
       <InventoryApp />
-      <ItemScreen game={game} item={undefined} />
-      <HealingScreen game={game} />
-      <MessageScreen />
+      <ItemOverlay game={game} item={undefined} />
+      <HealthOverlay game={game} />
+      <PromptOverlay />
+      <QuestOverlay />
     </>
   )
 }

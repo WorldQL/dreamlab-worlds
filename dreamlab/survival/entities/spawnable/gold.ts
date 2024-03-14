@@ -8,17 +8,14 @@ import { events } from "../../events.ts"
 
 type Args = typeof ArgsSchema
 const ArgsSchema = SolidArgs.extend({
-  healAmount: z.number().default(1)
+  amount: z.number().default(1)
 })
 
 type OnPlayerCollisionStart = EventHandler<"onPlayerCollisionStart">
-type OnPlayerCollisionEnd = EventHandler<"onPlayerCollisionEnd">
 
-export { ArgsSchema as HealingItemArgs }
-
-export class HealingItem<A extends Args = Args> extends Solid<A> {
+export { ArgsSchema as GoldArgs }
+export class Gold<A extends Args = Args> extends Solid<A> {
   protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
-  protected onPlayerCollisionEnd: OnPlayerCollisionEnd | undefined
   private time = 0
   private floatHeight = 5
   private rotationSpeed = 0.006
@@ -27,32 +24,30 @@ export class HealingItem<A extends Args = Args> extends Solid<A> {
     super(ctx)
     this.body.isSensor = true
     this.body.isStatic = true
-    this.body.label = "healingItem"
+    this.body.label = "gold"
 
     const $game = game()
     magicEvent("client")?.addListener(
       "onPlayerCollisionStart",
       (this.onPlayerCollisionStart = ([_player, other]) => {
         if (this.body && other === this.body && $game.client) {
-          events.emit("onPlayerNearHealingItem", this.args.healAmount)
+          events.emit("onGoldPickup", this.args.amount)
+          game().destroy(this)
         }
       })
     )
 
-    magicEvent("client")?.on(
-      "onPlayerCollisionEnd",
-      (this.onPlayerCollisionEnd = ([_player, other]) => {
-        if (this.body && other === this.body && $game.client) {
-          events.emit("onPlayerNearHealingItem", undefined)
-        }
-      })
-    )
+    if ($game.client) {
+      if (!this.args.spriteSource) {
+        const url = "https://s3-assets.dreamlab.gg/uploaded-from-editor/goldcoin-1710371567135.png"
+        this.args.spriteSource = { url }
+      }
+    }
   }
 
   public override teardown(): void {
     super.teardown()
     magicEvent("client")?.removeListener("onPlayerCollisionStart", this.onPlayerCollisionStart)
-    magicEvent("client")?.removeListener("onPlayerCollisionEnd", this.onPlayerCollisionEnd)
   }
 
   public override onRenderFrame(_time: RenderTime) {

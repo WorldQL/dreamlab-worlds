@@ -1,15 +1,18 @@
 import type { Player } from "@dreamlab.gg/core/entities"
 import { EventEmitter } from "@dreamlab.gg/core/events"
 import type { InventoryItem } from "./inventory/inventoryManager.ts"
+import { Quest } from "./playerManager.ts"
 
 interface WorldEvents {
-  onPlayerScore: [number]
+  onPlayerKill: [{ x: number; y: number }]
   onPlayerDamage: [number]
   onPlayerHeal: [number]
   onPlayerNearItem: [Player, InventoryItem | undefined]
   onPlayerNearHealingItem: [number | undefined]
   onInventoryUpdate: []
+
   onGoldUpdate: []
+  onGoldPickup: [number]
 
   onEnterRegion: [string]
   onExitRegion: [string]
@@ -21,7 +24,11 @@ interface WorldEvents {
   onRegionCooldownEnd: [string]
   onRegionZombieSpawning: [{ x: number; y: number }[]]
 
-  onMessageTrigger: [string | undefined]
+  onPromptTrigger: [string | undefined]
+
+  onQuestTrigger: [string | undefined, string | undefined, number | undefined]
+  onQuestAccepted: [Quest]
+  onQuestCompleted: [Quest]
 }
 
 export const events = new EventEmitter<Events>()

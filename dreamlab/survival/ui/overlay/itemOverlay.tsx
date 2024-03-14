@@ -3,18 +3,18 @@ import type { Player } from "@dreamlab.gg/core/dist/entities"
 import { usePlayer } from "@dreamlab.gg/ui/dist/react"
 import type { FC } from "https://esm.sh/react@18.2.0"
 import { useEffect, useRef, useState } from "https://esm.sh/react@18.2.0"
-import { events } from "../events.ts"
-import type { InventoryItem } from "../inventory/inventoryManager.ts"
-import InventoryManager from "../inventory/inventoryManager.ts"
-import PlayerManager from "../playerDataManager.ts"
-import { styles } from "./styles.ts"
+import { events } from "../../events.ts"
+import type { InventoryItem } from "../../inventory/inventoryManager.ts"
+import InventoryManager from "../../inventory/inventoryManager.ts"
+import PlayerManager from "../../playerManager.ts"
+import { styles } from "../styles.ts"
 
 interface ItemPopupProps {
   game: Game<false>
   item: InventoryItem | undefined
 }
 
-export const ItemScreen: FC<ItemPopupProps> = ({ game, item }) => {
+export const ItemOverlay: FC<ItemPopupProps> = ({ game, item }) => {
   const player = usePlayer()
   const [purchaseComplete, setPurchaseComplete] = useState(false)
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
@@ -62,6 +62,7 @@ export const ItemScreen: FC<ItemPopupProps> = ({ game, item }) => {
             playerManager.removeGold(itemToPickup.value)
             inventoryManager.addItemToInventory(itemToPickup)
             setPrompt("Item Purchased!")
+            playerManager.updateQuestProgress("gatherPart", itemToPickup.value.displayName)
           } else {
             setPrompt("Not enough 🪙.")
           }
@@ -70,16 +71,17 @@ export const ItemScreen: FC<ItemPopupProps> = ({ game, item }) => {
         } else {
           if (!purchaseComplete) inventoryManager.addItemToInventory(itemToPickup)
           setPrompt("Item Purchased!")
+          playerManager.updateQuestProgress("gatherPart", itemToPickup.value.displayName)
         }
       }
     }
 
     events.addListener("onPlayerNearItem", itemListener)
-    game.client.inputs.addListener("@survival/pickup", itemConfirmListener)
+    game.client.inputs.addListener("@cvz/pickup", itemConfirmListener)
 
     return () => {
       events.removeListener("onPlayerNearItem", itemListener)
-      game.client.inputs.removeListener("@survival/pickup", itemConfirmListener)
+      game.client.inputs.removeListener("@cvz/pickup", itemConfirmListener)
     }
   }, [
     game.client.inputs,

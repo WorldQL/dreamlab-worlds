@@ -112,11 +112,11 @@ export const styles: { [key: string]: CSSProperties } = {
     textShadow: "0 0 5px #000, 0 0 10px #000, 0 0 15px #000",
     transition: "opacity 0.3s ease"
   },
-  scoreContainer: {
+  killsContainer: {
     display: "flex",
     alignItems: "center"
   },
-  score: {
+  kills: {
     fontSize: "28px",
     marginRight: "10px",
     fontWeight: "bold"
@@ -234,5 +234,30 @@ export const styles: { [key: string]: CSSProperties } = {
     fontSize: "14px",
     fontWeight: "bold",
     zIndex: 1_000
+  },
+  questContainer: {
+    position: "absolute",
+    top: "10%",
+    right: "50px",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    padding: "10px",
+    borderRadius: "5px",
+    color: "white",
+    fontFamily: "Arial, sans-serif",
+    fontSize: "14px",
+    maxWidth: "200px"
+  },
+  questTitle: {
+    fontSize: "18px",
+    marginBottom: "10px"
+  },
+  quest: {
+    marginBottom: "5px"
+  },
+  questName: {
+    marginRight: "5px"
+  },
+  questStatus: {
+    fontSize: "12px"
   }
 }
