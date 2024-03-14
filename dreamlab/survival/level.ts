@@ -959,8 +959,8 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@cvz/ZombieRegion",
     "args": {
-      "width": 4267.16,
-      "height": 1045.47,
+      "width": 4287.01,
+      "height": 959.06,
       "zombieTypes": [
         {
           "width": 100,
@@ -977,8 +977,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 5315.320175368677,
-        "y": 13.591278104438402
+        "x": 5306.3932857582595,
+        "y": -30.61372189556164
       },
       "rotation": 0,
       "zIndex": 100
@@ -992,7 +992,6 @@ export const level: LooseSpawnableDefinition[] = [
       "width": 100,
       "height": 100,
       "cooldown": 60,
-      "zombiesPerSpawn": 1,
       "zombieTypes": [
         {
           "width": 100,
@@ -1020,12 +1019,11 @@ export const level: LooseSpawnableDefinition[] = [
       "width": 100,
       "height": 100,
       "cooldown": 60,
-      "zombiesPerSpawn": 2,
       "zombieTypes": [
         {
           "width": 100,
           "height": 200,
-          "maxHealth": 5,
+          "maxHealth": 10,
           "speed": 3,
           "knockback": 1.1
         }
@@ -1033,8 +1031,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 6599.572592866521,
-        "y": -5299.955064889818
+        "x": 5777.402920252495,
+        "y": -5209.7816169256985
       },
       "rotation": 0,
       "zIndex": 100
@@ -1043,10 +1041,37 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.1
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 7012.22573828728,
+        "y": -5209.78
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "iloe22q7ys6ymwnslen794ig",
+    "tags": []
+  },
+  {
     "entity": "@dreamlab/BackgroundTrigger",
     "args": {
-      "width": 28968.96,
-      "height": 8339.03,
+      "width": 29050.61,
+      "height": 11633.31,
       "onEnter": {
         "action": "set",
         "textureURL": "https://s3-assets.dreamlab.gg/uploaded-from-editor/sky2XY-1703001940523.png"
@@ -1057,8 +1082,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": -457.2446729203866,
-        "y": -1842.6820295684063
+        "x": -417.420651899336,
+        "y": -3488.822029568406
       },
       "rotation": 0,
       "zIndex": -100
@@ -1120,7 +1145,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "uid": "jl8bkg0ulq5c8uansxeefjua",
     "tags": [
-      "spawnpoint"
+      "spawnpoint",
+      "editor/locked"
     ]
   },
   {
@@ -1139,7 +1165,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "uid": "oo23g00ygy4t5rjdnr8jjaor",
     "tags": [
-      "spawnpoint"
+      "spawnpoint",
+      "editor/locked"
     ]
   },
   {
@@ -3765,20 +3792,23 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
-    "entity": "@dreamlab/Platform",
+    "entity": "@dreamlab/Nonsolid",
     "args": {
-      "width": 2295.294420413703,
-      "height": 50.246984077163006
+      "width": 439.34,
+      "height": 426.06,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/boxes-1703001772268.png"
+      }
     },
     "transform": {
       "position": {
-        "x": 5712.217357882434,
-        "y": 474.34556386499605
+        "x": 4495.034819971655,
+        "y": 352.0425301551626
       },
       "rotation": 0,
-      "zIndex": 111
+      "zIndex": -5
     },
-    "uid": "wf2mci66nkb3phiksafpgd8g",
+    "uid": "of0af58jdt6s4pp8a21wc60g",
     "tags": []
   },
   {
@@ -4374,6 +4404,159 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "irphg0nllkckotszis7jt83u",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 329.11,
+      "height": 42.03
+    },
+    "transform": {
+      "position": {
+        "x": -4918.7401318959655,
+        "y": 221.70007619071816
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "i9hconjdegqn2td60r3nlcqd",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 761.97,
+      "height": 37.54
+    },
+    "transform": {
+      "position": {
+        "x": -5477.7327474705435,
+        "y": -129.83522016073354
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "rbu5h4qs8bepc5tpalgaabux",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 953.6,
+      "height": 38.54
+    },
+    "transform": {
+      "position": {
+        "x": -6726.347818152877,
+        "y": 15.446324512478913
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "dqjtrod7d55fzxfm0n0kh6vm",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 599.24,
+      "height": 43.03
+    },
+    "transform": {
+      "position": {
+        "x": -8063.050447194091,
+        "y": 365.32423873321613
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "cg3xwbm5jdo1pq5v2smelw2l",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 309.92,
+      "height": 40.79
+    },
+    "transform": {
+      "position": {
+        "x": -7341.994194413377,
+        "y": 364.20423873321624
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "vs8iwj4ae10f9tiniygymn6i",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 1568.13,
+      "height": 43.03
+    },
+    "transform": {
+      "position": {
+        "x": -7964.3698140662445,
+        "y": -415.1677235172135
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "aa34ie323krtiynmpv4mey0z",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 1030.44,
+      "height": 74.43
+    },
+    "transform": {
+      "position": {
+        "x": -6730.125281084431,
+        "y": -576.6483701200409
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "exq4jq9o9xcmubgachosf62k",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 820.28,
+      "height": 116.04
+    },
+    "transform": {
+      "position": {
+        "x": -3847.740247059812,
+        "y": 162.8503882710305
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "o4e8ow651hkacauxsa154ew8",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 266.31,
+      "height": 81.28
+    },
+    "transform": {
+      "position": {
+        "x": 4471.900367790666,
+        "y": 219.48255710512348
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "qsom9zkviertbwqyyt6n0ant",
     "tags": []
   },
   {

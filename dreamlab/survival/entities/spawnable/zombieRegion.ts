@@ -4,8 +4,13 @@ import { camera, debug, game, events as magicEvents } from "@dreamlab.gg/core/di
 import type { CircleGraphics } from "@dreamlab.gg/core/dist/utils"
 import { drawCircle } from "@dreamlab.gg/core/dist/utils"
 import { Solid, SolidArgs } from "@dreamlab.gg/core/entities"
-import type { SyncedValue } from "@dreamlab.gg/core/network"
-import { syncedValue } from "@dreamlab.gg/core/network"
+import type {
+  MessageListenerClient,
+  NetClient,
+  NetServer,
+  SyncedValue
+} from "@dreamlab.gg/core/network"
+import { onlyNetClient, onlyNetServer, syncedValue } from "@dreamlab.gg/core/network"
 import { z } from "@dreamlab.gg/core/sdk"
 import type { MyEventHandler } from "../../events.ts"
 import { events } from "../../events.ts"
@@ -64,6 +69,10 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
     positions: undefined as zombiePosition
   })
 
+  private onHitClient: MessageListenerClient | undefined
+  protected netServer: NetServer | undefined
+  protected netClient: NetClient | undefined
+
   private readonly zombieSpawnParticleDefinition = {
     entity: "@dreamlab/Particle",
     transform: {
@@ -77,12 +86,12 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
       height: 300,
       direction: 1,
       emitterConfig: {
-        lifetime: { min: 0.5, max: 0.8 },
+        lifetime: { min: 0.5, max: 3 },
         frequency: 0.001,
         spawnChance: 1,
         particlesPerWave: 10,
-        emitterLifetime: 0.8,
-        maxParticles: 10,
+        emitterLifetime: 3,
+        maxParticles: 250,
         addAtBack: false,
         autoUpdate: false,
         behaviors: [
@@ -103,7 +112,7 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
               scale: {
                 list: [
                   { value: 0.05, time: 0 },
-                  { value: 0.25, time: 1 }
+                  { value: 0.15, time: 1 }
                 ]
               }
             }
@@ -124,7 +133,7 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
             config: {
               speed: {
                 list: [
-                  { value: 500, time: 0 },
+                  { value: 250, time: 0 },
                   { value: 50, time: 1 }
                 ]
               }
@@ -163,6 +172,23 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
     this.body.isSensor = true
     this.body.label = "zombieRegion"
 
+    this.netServer = onlyNetServer(game())
+    this.netClient = onlyNetClient(game())
+
+    this.onHitClient = (_, data) => {
+      const { position } = data
+      if (
+        typeof position !== "object" ||
+        position === null ||
+        !("x" in position) ||
+        !("y" in position)
+      )
+        return
+
+      this.zombieSpawnParticleDefinition.transform.position = position
+      game("client")?.spawn(this.zombieSpawnParticleDefinition)
+    }
+
     magicEvents("client")?.addListener(
       "onPlayerCollisionStart",
       (this.onPlayerCollisionStart = ([_player, other]) => {
@@ -183,8 +209,16 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
 
     events.addListener(
       "onRegionZombieSpawning",
-      (this.onRegionZombieSpawning = positions => {
+      (this.onRegionZombieSpawning = async positions => {
         this.regionData.value.positions = Array.isArray(positions) ? positions : undefined
+
+        if (this.netServer && positions) {
+          for (const position of positions) {
+            await this.netServer.broadcastCustomMessage("@cvz/zombie/spawning", {
+              position
+            })
+          }
+        }
 
         setTimeout(() => {
           this.regionData.value.positions = undefined
@@ -240,6 +274,8 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
       })
     )
 
+    this.netClient?.addCustomMessageListener("@cvz/zombie/spawning", this.onHitClient)
+
     const $game = game("client")
     if ($game) {
       for (let i = 0; i < this.args.zombiesPerWave; i++) {
@@ -255,7 +291,6 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
     super.teardown()
 
     magicEvents("client")?.removeListener("onPlayerCollisionStart", this.onPlayerCollisionStart)
-
     magicEvents("client")?.removeListener("onPlayerCollisionEnd", this.onPlayerCollisionEnd)
 
     events.removeListener("onRegionZombieSpawning", this.onRegionZombieSpawning)
@@ -270,6 +305,9 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
       circle.destroy()
     })
     this.gfxCircles = []
+
+    if (this.onHitClient)
+      this.netClient?.removeCustomMessageListener("@cvz/zombie/spawning", this.onHitClient)
   }
 
   public override onRenderFrame(time: RenderTime) {
@@ -329,10 +367,6 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
 
           circle.position.set(adjustedX, adjustedY)
         }
-
-        // TODO: spawn this somewhere else
-        // this.zombieSpawnParticleDefinition.transform.position = { x, y }
-        // game("client")?.spawn(this.zombieSpawnParticleDefinition)
       })
     }
 
