@@ -226,9 +226,7 @@ export class RegionManager extends Entity {
             b.position.y >= region.position.y - region.height / 2 &&
             b.position.y <= region.position.y + region.height / 2
         )
-        console.log(zombies.length)
-        const maxZombiesAllowed = region.zombiesPerWave * region.waves
-        console.log(maxZombiesAllowed)
+        const maxZombiesAllowed = (region.zombiesPerWave * region.waves) / 2
         if (zombies.length < maxZombiesAllowed) {
           await manageRegionWaves(region)
           events.emit("onRegionStart", region.uid)
