@@ -317,5 +317,36 @@ export const styles: { [key: string]: CSSProperties } = {
     fontWeight: "bold",
     textShadow: "2px 2px 4px rgba(0, 0, 0, 0.6)",
     fontFamily: "'Courier New', Courier, monospace"
+  },
+  dashCooldownContainer: {
+    position: "absolute",
+    bottom: "20px",
+    left: "30%",
+    display: "flex",
+    alignItems: "center",
+    backgroundColor: "rgba(139, 69, 19, 0.8)",
+    borderRadius: "10px",
+    padding: "5px",
+    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.5)"
+  },
+  dashCooldownIcon: {
+    fontSize: "32px",
+    color: "#FFD700",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.8)"
+  },
+  dashCooldownTimer: {
+    fontSize: "24px",
+    fontWeight: "bold",
+    color: "white",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.8)",
+    fontFamily: "'Courier New', Courier, monospace"
+  },
+  dashCooldownReady: {
+    fontSize: "24px",
+    fontWeight: "bold",
+    marginRight: "4px",
+    color: "#FFFFFF",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.8)",
+    fontFamily: "'Courier New', Courier, monospace"
   }
 }

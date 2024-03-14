@@ -5,7 +5,7 @@ import { renderUI, useGame, usePlayer } from "@dreamlab.gg/ui/react"
 import type { CSSProperties, FC } from "https://esm.sh/react@18.2.0"
 import { useState } from "https://esm.sh/react@18.2.0"
 import { InventoryApp } from "../../inventory/inventoryApp.tsx"
-import { GameScreen } from "../gameplayHUD.tsx"
+import { GameHUD } from "../gameplayHUD.tsx"
 import { ItemOverlay } from "../overlay/itemOverlay.tsx"
 import { styles } from "../styles.ts"
 import { PromptOverlay } from "../overlay/promptOverlay.tsx"
@@ -48,7 +48,7 @@ const PlayScene: FC = () => {
   }
 
   if (player && gameStarted) {
-    return <GameScreen game={game} player={player} />
+    return <GameHUD game={game} player={player} />
   }
 
   return (
@@ -99,7 +99,6 @@ export const initializeUI = (game: Game<false>) => {
   }
 
   registerInput("@cvz/pickup", "Item Pickup", "KeyF")
-  registerInput("@cvz/dash", "Dash", "ShiftLeft")
 
   renderUI(
     game,

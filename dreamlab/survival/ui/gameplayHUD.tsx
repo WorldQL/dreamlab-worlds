@@ -6,7 +6,7 @@ import { DeathScene } from "./scene/deathScene.tsx"
 import type { StartSceneProps } from "./scene/playScene.tsx"
 import { styles } from "./styles.ts"
 
-export const GameScreen: FC<StartSceneProps> = ({ game, player }) => {
+export const GameHUD: FC<StartSceneProps> = ({ game, player }) => {
   const playerManager = PlayerManager.getInstance()
   const [playerData, setPlayerData] = useState({
     kills: playerManager.getKills(),
@@ -16,6 +16,8 @@ export const GameScreen: FC<StartSceneProps> = ({ game, player }) => {
   })
   const [showDamage, setShowDamage] = useState(false)
   const [showQuestCompleted, setShowQuestCompleted] = useState(false)
+  const [dashCooldown, setDashCooldown] = useState(0)
+  const [dashTimer, setDashTimer] = useState(0)
 
   const handlePlayerUpdate = useCallback(() => {
     setPlayerData({
@@ -50,6 +52,18 @@ export const GameScreen: FC<StartSceneProps> = ({ game, player }) => {
   }, [])
 
   useEffect(() => {
+    const handleDashCooldownStart = (duration: number) => {
+      setDashCooldown(duration)
+      setDashTimer(duration)
+    }
+
+    const handleDashCooldownEnd = () => {
+      setDashCooldown(0)
+      setDashTimer(0)
+    }
+
+    events.addListener("onDashCooldownStart", handleDashCooldownStart)
+    events.addListener("onDashCooldownEnd", handleDashCooldownEnd)
     events.addListener("onPlayerKill", handlePlayerUpdate)
     events.addListener("onPlayerDamage", handleDamage)
     events.addListener("onPlayerHeal", handleHeal)
@@ -64,8 +78,26 @@ export const GameScreen: FC<StartSceneProps> = ({ game, player }) => {
       events.removeListener("onGoldUpdate", handlePlayerUpdate)
       events.removeListener("onQuestAccepted", handlePlayerUpdate)
       events.removeListener("onQuestCompleted", handleQuestCompleted)
+      events.removeListener("onDashCooldownStart", handleDashCooldownStart)
+      events.removeListener("onDashCooldownEnd", handleDashCooldownEnd)
     }
   }, [handlePlayerUpdate, handleDamage, handleHeal])
+
+  useEffect(() => {
+    let timerId: number | undefined
+
+    if (dashCooldown > 0) {
+      timerId = window.setInterval(() => {
+        setDashTimer((prevTimer: number) => Math.max(prevTimer - 100, 0))
+      }, 100)
+    }
+
+    return () => {
+      if (timerId) {
+        window.clearInterval(timerId)
+      }
+    }
+  }, [dashCooldown])
 
   const handleStartOver = useCallback(async () => {
     playerManager.setHealth(playerManager.getMaxHealth())
@@ -86,6 +118,14 @@ export const GameScreen: FC<StartSceneProps> = ({ game, player }) => {
         <DeathScene game={game} onStartOver={handleStartOver} kills={playerData.kills} />
       ) : (
         <>
+          <div style={styles.dashCooldownContainer}>
+            <span style={styles.dashCooldownIcon}>⚡</span>
+            {dashCooldown > 0 ? (
+              <span style={styles.dashCooldownTimer}>{(dashTimer / 1000).toFixed(1)}s</span>
+            ) : (
+              <span style={styles.dashCooldownReady}>Ready</span>
+            )}
+          </div>
           <div style={styles.healthContainer}>
             {Array.from({ length: playerManager.getMaxHealth() }).map((_, index) => (
               <span

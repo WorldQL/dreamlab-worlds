@@ -959,8 +959,8 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@cvz/ZombieRegion",
     "args": {
-      "width": 4287.01,
-      "height": 959.06,
+      "width": 4299.01,
+      "height": 1093.47,
       "zombieTypes": [
         {
           "width": 100,
@@ -977,8 +977,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 5306.3932857582595,
-        "y": -30.61372189556164
+        "x": 5301.395684174644,
+        "y": 35.5912781044384
       },
       "rotation": 0,
       "zIndex": 100
@@ -1065,6 +1065,33 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "iloe22q7ys6ymwnslen794ig",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 1436.1564156670954,
+        "y": 299.6107413823593
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "vlge4kmm4xs4cuom8yc3mbpy",
     "tags": []
   },
   {

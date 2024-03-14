@@ -26,6 +26,9 @@ interface WorldEvents {
 
   onPromptTrigger: [string | undefined]
 
+  onDashCooldownStart: [number]
+  onDashCooldownEnd: []
+
   onQuestTrigger: [
     string | undefined,
     string | undefined,
