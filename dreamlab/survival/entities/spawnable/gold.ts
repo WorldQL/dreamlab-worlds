@@ -14,6 +14,7 @@ const ArgsSchema = SolidArgs.extend({
 type OnPlayerCollisionStart = EventHandler<"onPlayerCollisionStart">
 
 export { ArgsSchema as GoldArgs }
+
 export class Gold<A extends Args = Args> extends Solid<A> {
   protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
   private time = 0
@@ -27,22 +28,90 @@ export class Gold<A extends Args = Args> extends Solid<A> {
     this.body.label = "gold"
 
     const $game = game()
+
     magicEvent("client")?.addListener(
       "onPlayerCollisionStart",
       (this.onPlayerCollisionStart = ([_player, other]) => {
         if (this.body && other === this.body && $game.client) {
           events.emit("onGoldPickup", this.args.amount)
+
+          game("client")?.spawn({
+            entity: "@dreamlab/Particle",
+            transform: {
+              position: this.transform.position
+            },
+            args: {
+              width: 100,
+              height: 100,
+              direction: 1,
+              emitterConfig: {
+                lifetime: { min: 0.5, max: 1 },
+                frequency: 0.001,
+                spawnChance: 1,
+                particlesPerWave: 5,
+                emitterLifetime: 0.5,
+                maxParticles: 10,
+                addAtBack: false,
+                autoUpdate: false,
+                behaviors: [
+                  {
+                    type: "alpha",
+                    config: {
+                      alpha: {
+                        list: [
+                          { value: 1, time: 0 },
+                          { value: 0, time: 1 }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    type: "scale",
+                    config: {
+                      scale: {
+                        list: [
+                          { value: 0.1, time: 0 },
+                          { value: 0.25, time: 1 }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    type: "moveSpeed",
+                    config: {
+                      speed: {
+                        list: [
+                          { value: 1000, time: 0 },
+                          { value: 200, time: 1 }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    type: "rotation",
+                    config: {
+                      minStart: 0,
+                      maxStart: 360,
+                      minSpeed: 200,
+                      maxSpeed: 400
+                    }
+                  },
+                  {
+                    type: "textureSingle",
+                    config: {
+                      texture:
+                        "https://s3-assets.dreamlab.gg/uploaded-from-editor/goldcoin-1710371567135.png"
+                    }
+                  }
+                ]
+              }
+            }
+          })
+
           game().destroy(this)
         }
       })
     )
-
-    if ($game.client) {
-      if (!this.args.spriteSource) {
-        const url = "https://s3-assets.dreamlab.gg/uploaded-from-editor/goldcoin-1710371567135.png"
-        this.args.spriteSource = { url }
-      }
-    }
   }
 
   public override teardown(): void {

@@ -39,7 +39,10 @@ export class GameManager extends Entity {
           args: {
             width: 150,
             height: 150,
-            amount: Math.floor(Math.random() * MAX_GOLD_PER_KILL)
+            amount: Math.floor(Math.random() * MAX_GOLD_PER_KILL),
+            spriteSource: {
+              url: "https://s3-assets.dreamlab.gg/uploaded-from-editor/goldcoin-1710371567135.png"
+            }
           }
         })
       })
