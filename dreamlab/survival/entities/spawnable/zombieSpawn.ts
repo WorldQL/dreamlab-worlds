@@ -8,7 +8,6 @@ import { game } from "@dreamlab.gg/core/dist/labs"
 type Args = typeof ArgsSchema
 const ArgsSchema = NonSolidArgs.extend({
   cooldown: z.number().positive().default(60),
-  zombiesPerSpawn: z.number().default(1),
   zombieTypes: z
     .array(
       z.object({
@@ -59,25 +58,23 @@ export class ZombieSpawn<A extends Args = Args> extends NonSolid<A> {
   }
 
   private spawnZombies() {
-    for (let i = 0; i < this.args.zombiesPerSpawn; i++) {
-      const randomZombieTypeIndex = Math.floor(
-        Math.random() * this.spawnData.value.zombieTypes.length
-      )
-      const randomZombieType = this.spawnData.value.zombieTypes[randomZombieTypeIndex]
+    const randomZombieTypeIndex = Math.floor(
+      Math.random() * this.spawnData.value.zombieTypes.length
+    )
+    const randomZombieType = this.spawnData.value.zombieTypes[randomZombieTypeIndex]
 
-      const zombie = game("server")?.spawn({
-        entity: "@cvz/ZombieMob",
-        args: randomZombieType as Record<string, unknown>,
-        transform: {
-          position: [this.transform.position.x, this.transform.position.y],
-          zIndex: 5
-        },
-        tags: ["net/replicated", "net/server-authoritative", "editor/doNotSave"]
-      }) as Zombie
+    const zombie = game("server")?.spawn({
+      entity: "@cvz/ZombieMob",
+      args: randomZombieType as Record<string, unknown>,
+      transform: {
+        position: [this.transform.position.x, this.transform.position.y],
+        zIndex: 5
+      },
+      tags: ["net/replicated", "net/server-authoritative", "editor/doNotSave"]
+    }) as Zombie
 
-      if (zombie) {
-        this.spawnData.value.zombies.push(zombie.uid)
-      }
+    if (zombie) {
+      this.spawnData.value.zombies.push(zombie.uid)
     }
   }
 
