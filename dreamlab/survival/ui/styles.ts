@@ -286,5 +286,36 @@ export const styles: { [key: string]: CSSProperties } = {
     fontSize: "12px",
     color: "#8B0000",
     fontWeight: "bold"
+  },
+  questCompletedOverlay: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    backgroundColor: "rgba(139, 69, 19, 0.9)",
+    padding: "30px",
+    borderRadius: "10px",
+    textAlign: "center",
+    zIndex: 1000,
+    border: "4px solid #D2691E",
+    boxShadow: "0 0 20px rgba(0, 0, 0, 0.5)",
+    backgroundImage: "url('path/to/western-background.jpg')",
+    backgroundSize: "cover",
+    backgroundPosition: "center"
+  },
+  questCompletedText: {
+    color: "#FFD700",
+    fontSize: "48px",
+    fontWeight: "bold",
+    textShadow: "3px 3px 6px rgba(0, 0, 0, 0.8)",
+    fontFamily: "'Rye', cursive",
+    marginBottom: "20px"
+  },
+  questCompletedSubtext: {
+    color: "#FFF8DC",
+    fontSize: "24px",
+    fontWeight: "bold",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.6)",
+    fontFamily: "'Courier New', Courier, monospace"
   }
 }

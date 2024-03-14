@@ -48,7 +48,7 @@ export const ItemOverlay: FC<ItemPopupProps> = ({ game, item }) => {
           !purchaseComplete
         ) {
           setPrompt(
-            `Confirm purchase of ${itemToPickup.baseGear?.displayName} for ${itemToPickup.value}🪙? Press F again to confirm.`
+            `Confirm purchase of ${itemToPickup.baseGear.displayName} for ${itemToPickup.value}🪙? Press F again to confirm.`
           )
           setAwaitingConfirmation(true)
         } else if (
@@ -62,7 +62,7 @@ export const ItemOverlay: FC<ItemPopupProps> = ({ game, item }) => {
             playerManager.removeGold(itemToPickup.value)
             inventoryManager.addItemToInventory(itemToPickup)
             setPrompt("Item Purchased!")
-            playerManager.updateQuestProgress("gatherPart", itemToPickup.value.displayName)
+            playerManager.updateQuestProgress("gatherPart", itemToPickup.baseGear.displayName)
           } else {
             setPrompt("Not enough 🪙.")
           }
@@ -71,7 +71,7 @@ export const ItemOverlay: FC<ItemPopupProps> = ({ game, item }) => {
         } else {
           if (!purchaseComplete) inventoryManager.addItemToInventory(itemToPickup)
           setPrompt("Item Purchased!")
-          playerManager.updateQuestProgress("gatherPart", itemToPickup.value.displayName)
+          playerManager.updateQuestProgress("gatherPart", itemToPickup.baseGear.displayName)
         }
       }
     }

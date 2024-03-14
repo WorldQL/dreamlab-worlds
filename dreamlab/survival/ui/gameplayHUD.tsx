@@ -15,6 +15,7 @@ export const GameScreen: FC<StartSceneProps> = ({ game, player }) => {
     quests: playerManager.getQuests()
   })
   const [showDamage, setShowDamage] = useState(false)
+  const [showQuestCompleted, setShowQuestCompleted] = useState(false)
 
   const handlePlayerUpdate = useCallback(() => {
     setPlayerData({
@@ -43,13 +44,18 @@ export const GameScreen: FC<StartSceneProps> = ({ game, player }) => {
     [playerManager, handlePlayerUpdate]
   )
 
+  const handleQuestCompleted = useCallback(() => {
+    setShowQuestCompleted(true)
+    setTimeout(() => setShowQuestCompleted(false), 3000)
+  }, [])
+
   useEffect(() => {
     events.addListener("onPlayerKill", handlePlayerUpdate)
     events.addListener("onPlayerDamage", handleDamage)
     events.addListener("onPlayerHeal", handleHeal)
     events.addListener("onGoldUpdate", handlePlayerUpdate)
     events.addListener("onQuestAccepted", handlePlayerUpdate)
-    events.addListener("onQuestCompleted", handlePlayerUpdate)
+    events.addListener("onQuestCompleted", handleQuestCompleted)
 
     return () => {
       events.removeListener("onPlayerKill", handlePlayerUpdate)
@@ -57,7 +63,7 @@ export const GameScreen: FC<StartSceneProps> = ({ game, player }) => {
       events.removeListener("onPlayerHeal", handleHeal)
       events.removeListener("onGoldUpdate", handlePlayerUpdate)
       events.removeListener("onQuestAccepted", handlePlayerUpdate)
-      events.removeListener("onQuestCompleted", handlePlayerUpdate)
+      events.removeListener("onQuestCompleted", handleQuestCompleted)
     }
   }, [handlePlayerUpdate, handleDamage, handleHeal])
 
@@ -70,6 +76,12 @@ export const GameScreen: FC<StartSceneProps> = ({ game, player }) => {
   return (
     <>
       {showDamage && <div style={{ ...styles.damageOverlay, opacity: showDamage ? 1 : 0 }} />}
+      {showQuestCompleted && (
+        <div style={styles.questCompletedOverlay}>
+          <h2 style={styles.questCompletedText}>Quest Completed!</h2>
+          <p style={styles.questCompletedSubtext}>Yeehaw, partner!</p>
+        </div>
+      )}
       {playerData.health <= 0 ? (
         <DeathScene game={game} onStartOver={handleStartOver} kills={playerData.kills} />
       ) : (
