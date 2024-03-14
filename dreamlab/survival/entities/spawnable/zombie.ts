@@ -124,7 +124,8 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       const mobPositionY = this.body.position.y
       const mobPositionX = this.body.position.x
       const xDiff = playerPositionX - mobPositionX
-      const yDiff = playerPositionY - mobPositionY
+      const yDiffFactor = 0.5
+      const yDiff = (playerPositionY - mobPositionY) * yDiffFactor
 
       let damage = 1
       let range = this.args.width / 2 + 120

@@ -934,7 +934,7 @@ export const level: LooseSpawnableDefinition[] = [
     "transform": {
       "position": {
         "x": 5315.320175368677,
-        "y": 52.86071235460781
+        "y": 13.591278104438402
       },
       "rotation": 0,
       "zIndex": 100
@@ -3754,23 +3754,6 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Platform",
     "args": {
-      "width": 138.3657017222431,
-      "height": 25.943569072920468
-    },
-    "transform": {
-      "position": {
-        "x": 4325.363190722178,
-        "y": 253.5210580771704
-      },
-      "rotation": 0,
-      "zIndex": 107
-    },
-    "uid": "v168citrbja2uqtpvyqg1hbg",
-    "tags": []
-  },
-  {
-    "entity": "@dreamlab/Platform",
-    "args": {
       "width": 39.4046523810639,
       "height": 62.943109879558534
     },
@@ -3800,57 +3783,6 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 109
     },
     "uid": "mc5zi49veaf1vds8sl3knro2",
-    "tags": []
-  },
-  {
-    "entity": "@dreamlab/Platform",
-    "args": {
-      "width": 122.2586555810076,
-      "height": 27.04287284719771
-    },
-    "transform": {
-      "position": {
-        "x": 3267.7607631761075,
-        "y": 413.42280075242616
-      },
-      "rotation": 0,
-      "zIndex": 106
-    },
-    "uid": "vmpaivytp6ku9zoi3mjobajj",
-    "tags": []
-  },
-  {
-    "entity": "@dreamlab/Platform",
-    "args": {
-      "width": 97.679998528939,
-      "height": 37.00846212770273
-    },
-    "transform": {
-      "position": {
-        "x": 6981.603771527682,
-        "y": 414.4190230355021
-      },
-      "rotation": 0,
-      "zIndex": 113
-    },
-    "uid": "gxtkbfzru1lyws3h6kjh9vix",
-    "tags": []
-  },
-  {
-    "entity": "@dreamlab/Platform",
-    "args": {
-      "width": 175.39585870888914,
-      "height": 57.003654080389765
-    },
-    "transform": {
-      "position": {
-        "x": 7126.856346584808,
-        "y": 442.1592671970712
-      },
-      "rotation": 0,
-      "zIndex": 114
-    },
-    "uid": "icfzuhl7x7cfxq0xrzcy90vb",
     "tags": []
   },
   {
