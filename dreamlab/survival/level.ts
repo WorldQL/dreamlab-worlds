@@ -937,7 +937,13 @@ export const level: LooseSpawnableDefinition[] = [
       "height": 172.05,
       "questTitle": "Kill 10 Zombies",
       "questDescription": "Kill twice as many zombies as town kid.",
-      "goldReward": 200
+      "goldReward": 200,
+      "reachGold": false,
+      "reachKills": true,
+      "gatherPart": false,
+      "goldAmount": 0,
+      "killCount": 10,
+      "partName": ""
     },
     "transform": {
       "position": {

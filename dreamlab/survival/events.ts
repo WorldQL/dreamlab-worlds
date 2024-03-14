@@ -1,7 +1,7 @@
 import type { Player } from "@dreamlab.gg/core/entities"
 import { EventEmitter } from "@dreamlab.gg/core/events"
 import type { InventoryItem } from "./inventory/inventoryManager.ts"
-import { Quest } from "./playerManager.ts"
+import { Quest, QuestGoal, QuestType } from "./playerManager.ts"
 
 interface WorldEvents {
   onPlayerKill: [{ x: number; y: number }]
@@ -26,7 +26,13 @@ interface WorldEvents {
 
   onPromptTrigger: [string | undefined]
 
-  onQuestTrigger: [string | undefined, string | undefined, number | undefined]
+  onQuestTrigger: [
+    string | undefined,
+    string | undefined,
+    number | undefined,
+    QuestType | undefined,
+    QuestGoal | undefined
+  ]
   onQuestAccepted: [Quest]
   onQuestCompleted: [Quest]
 }

@@ -9,13 +9,20 @@ type Args = typeof ArgsSchema
 const ArgsSchema = SolidArgs.extend({
   questTitle: z.string().default("Default Quest"),
   questDescription: z.string().default("Default Quest Description"),
-  goldReward: z.number().default(0)
+  goldReward: z.number().default(0),
+  reachGold: z.boolean().default(false),
+  reachKills: z.boolean().default(false),
+  gatherPart: z.boolean().default(false),
+  goldAmount: z.number().default(0),
+  killCount: z.number().default(0),
+  partName: z.string().default("")
 })
 
 type OnPlayerCollisionStart = EventHandler<"onPlayerCollisionStart">
 type OnPlayerCollisionEnd = EventHandler<"onPlayerCollisionEnd">
 
 export { ArgsSchema as QuestArgs }
+
 export class Quest<A extends Args = Args> extends Solid<A> {
   protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
   protected onPlayerCollisionEnd: OnPlayerCollisionEnd | undefined
@@ -27,16 +34,36 @@ export class Quest<A extends Args = Args> extends Solid<A> {
     this.body.label = "questTrigger"
 
     const $game = game()
-
     magicEvent("client")?.addListener(
       "onPlayerCollisionStart",
       (this.onPlayerCollisionStart = ([_player, other]) => {
         if (this.body && other === this.body && $game.client) {
+          let questType: "reachGold" | "reachKills" | "gatherPart"
+          let questGoal:
+            | { type: "reachGold"; amount: number }
+            | { type: "reachKills"; amount: number }
+            | { type: "gatherPart"; partName: string }
+
+          if (this.args.reachGold) {
+            questType = "reachGold"
+            questGoal = { type: "reachGold", amount: this.args.goldAmount }
+          } else if (this.args.reachKills) {
+            questType = "reachKills"
+            questGoal = { type: "reachKills", amount: this.args.killCount }
+          } else if (this.args.gatherPart) {
+            questType = "gatherPart"
+            questGoal = { type: "gatherPart", partName: this.args.partName }
+          } else {
+            throw new Error("Invalid quest type")
+          }
+
           events.emit(
             "onQuestTrigger",
             this.args.questTitle,
             this.args.questDescription,
-            this.args.goldReward
+            this.args.goldReward,
+            questType,
+            questGoal
           )
         }
       })
@@ -46,7 +73,7 @@ export class Quest<A extends Args = Args> extends Solid<A> {
       "onPlayerCollisionEnd",
       (this.onPlayerCollisionEnd = ([_player, other]) => {
         if (this.body && other === this.body && $game.client) {
-          events.emit("onQuestTrigger", undefined, undefined, undefined)
+          events.emit("onQuestTrigger", undefined, undefined, undefined, undefined, undefined)
         }
       })
     )

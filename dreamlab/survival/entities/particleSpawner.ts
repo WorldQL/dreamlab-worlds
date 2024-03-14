@@ -340,7 +340,8 @@ export class ParticleSpawner extends Entity {
               damage: invItem ? invItem.damage : 1,
               direction: this.direction
             })
-            if (entity.args.health - (invItem ? invItem.damage : 1) <= 0) {
+            entity.args.health -= invItem ? invItem.damage : 1
+            if (entity.args.health <= 0) {
               events.emit("onPlayerKill", entity.transform.position)
             }
           }

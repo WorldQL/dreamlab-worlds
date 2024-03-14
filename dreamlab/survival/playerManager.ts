@@ -4,19 +4,22 @@ const MAX_HEALTH = 10
 const INITIAL_KILLS = 0
 const INITIAL_GOLD = 500
 
+export type QuestType = "reachGold" | "reachKills" | "gatherPart"
+
+export type QuestGoal =
+  | { type: "reachGold"; amount: number }
+  | { type: "reachKills"; amount: number }
+  | { type: "gatherPart"; partName: string }
+
 export class Quest {
   constructor(
     public title: string,
     public description: string,
     public goal: QuestGoal,
+    public goldReward: number,
     public completed: boolean = false
   ) {}
 }
-
-export type QuestGoal =
-  | { type: "reachGold"; amount: number }
-  | { type: "reachKills"; count: number }
-  | { type: "gatherPart"; partName: string }
 
 class PlayerManager {
   private static instance: PlayerManager
@@ -30,18 +33,33 @@ class PlayerManager {
     this.kills = INITIAL_KILLS
     this.gold = INITIAL_GOLD
     this.quests = [
-      new Quest("Find Wagon Wheel", "Find and collect the wagon wheel.", {
-        type: "gatherPart",
-        partName: "Wagon-Wheel"
-      }),
-      new Quest("Find Wagon Cover", "Find and collect a wagon cover.", {
-        type: "gatherPart",
-        partName: "Wagon-Cover"
-      }),
-      new Quest("Find Wagon Bed", "Find and collect wagon bed parts.", {
-        type: "gatherPart",
-        partName: "Wagon-Bed"
-      })
+      new Quest(
+        "Find Wagon Wheel",
+        "Find and collect the wagon wheel.",
+        {
+          type: "gatherPart",
+          partName: "Wagon-Wheel"
+        },
+        1000
+      ),
+      new Quest(
+        "Find Wagon Cover",
+        "Find and collect a wagon cover.",
+        {
+          type: "gatherPart",
+          partName: "Wagon-Cover"
+        },
+        1000
+      ),
+      new Quest(
+        "Find Wagon Bed",
+        "Find and collect wagon bed parts.",
+        {
+          type: "gatherPart",
+          partName: "Wagon-Bed"
+        },
+        1000
+      )
     ]
   }
 
@@ -84,7 +102,7 @@ class PlayerManager {
 
   public addKills(amount: number): void {
     this.kills += amount
-    this.updateQuestProgress("kill", this.kills)
+    this.updateQuestProgress("reachKills", this.kills)
   }
 
   public removeKills(amount: number): void {
@@ -135,6 +153,7 @@ class PlayerManager {
   public acceptQuest(quest: Quest): void {
     if (!this.hasAcceptedQuest(quest.title)) {
       this.addQuest(quest)
+      events.emit("onQuestAccepted", quest)
     }
   }
 
@@ -149,6 +168,7 @@ class PlayerManager {
           quest.completed = progress === goal.partName
         }
         if (quest.completed) {
+          this.addGold(quest.goldReward)
           events.emit("onQuestCompleted", quest)
         }
         break

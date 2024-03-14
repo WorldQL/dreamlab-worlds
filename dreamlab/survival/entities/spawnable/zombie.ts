@@ -207,7 +207,6 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       })
 
       this.mobData.value.health -= damage
-      this.args.health = this.mobData.value.health
       if (this.mobData.value.health <= 0) game().destroy(this as unknown as SpawnableEntity)
     }
 

@@ -2,20 +2,38 @@ import type { FC } from "https://esm.sh/react@18.2.0"
 import { useEffect, useState } from "https://esm.sh/react@18.2.0"
 import { events } from "../../events.ts"
 import { game } from "@dreamlab.gg/core/dist/labs"
-import PlayerManager from "../../playerManager.ts"
+import PlayerManager, { Quest, QuestType, QuestGoal } from "../../playerManager.ts"
 
 export const QuestOverlay: FC = () => {
-  const [currentQuest, setCurrentQuest] = useState<
-    { title: string; description: string } | undefined
-  >(undefined)
+  const [currentQuest, setCurrentQuest] = useState<Quest | undefined>(undefined)
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
 
   const playerManager = PlayerManager.getInstance()
 
   useEffect(() => {
-    const questListener = (title: string | undefined, description: string | undefined) => {
-      if (title && description && !playerManager.hasAcceptedQuest(title)) {
-        setCurrentQuest({ title, description })
+    const questListener = (
+      title: string | undefined,
+      description: string | undefined,
+      goldReward: number | undefined,
+      questType: QuestType | undefined,
+      questGoal: QuestGoal | undefined
+    ) => {
+      if (
+        title &&
+        description &&
+        questType &&
+        questGoal &&
+        goldReward !== undefined &&
+        !playerManager.hasAcceptedQuest(title)
+      ) {
+        const quest: Quest = {
+          title,
+          description,
+          goal: questGoal,
+          goldReward,
+          completed: false
+        }
+        setCurrentQuest(quest)
         setAwaitingConfirmation(true)
       } else {
         setCurrentQuest(undefined)
@@ -30,7 +48,6 @@ export const QuestOverlay: FC = () => {
 
       if (!playerManager.hasAcceptedQuest(currentQuest.title)) {
         playerManager.acceptQuest(currentQuest)
-        events.emit("onQuestAccepted", currentQuest)
       }
       setCurrentQuest(undefined)
       setAwaitingConfirmation(false)
@@ -46,6 +63,17 @@ export const QuestOverlay: FC = () => {
   }, [awaitingConfirmation, currentQuest])
 
   if (!currentQuest) return null
+
+  const getQuestGoalText = (goal: QuestGoal) => {
+    switch (goal.type) {
+      case "reachGold":
+        return `Collect ${goal.amount} gold`
+      case "reachKills":
+        return `Kill ${goal.amount} enemies`
+      case "gatherPart":
+        return `Gather ${goal.partName}`
+    }
+  }
 
   return (
     <div
@@ -69,6 +97,9 @@ export const QuestOverlay: FC = () => {
     >
       <h2 style={{ margin: "0 0 10px" }}>{currentQuest.title}</h2>
       <p style={{ margin: 0, lineHeight: 1.5 }}>{currentQuest.description}</p>
+      <p style={{ margin: "10px 0", fontWeight: "bold" }}>
+        Goal: {getQuestGoalText(currentQuest.goal)}
+      </p>
       {awaitingConfirmation && !playerManager.hasAcceptedQuest(currentQuest.title) && (
         <p style={{ margin: "10px 0 0", fontWeight: "bold" }}>Press F to accept the quest</p>
       )}
