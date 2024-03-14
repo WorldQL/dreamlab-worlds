@@ -90,9 +90,12 @@ export const styles: { [key: string]: CSSProperties } = {
     fontStyle: "italic"
   },
   gameScreenLabel: {
-    fontSize: "28px",
+    fontSize: "24px",
     marginRight: "10px",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#FFD700",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.8)",
+    fontFamily: "'Courier New', Courier, monospace"
   },
   healthContainer: {
     position: "absolute",
@@ -114,15 +117,26 @@ export const styles: { [key: string]: CSSProperties } = {
   },
   killsContainer: {
     display: "flex",
-    alignItems: "center"
+    alignItems: "center",
+    backgroundColor: "rgba(139, 69, 19, 0.8)",
+    borderRadius: "10px",
+    marginRight: "15px",
+    padding: "10px",
+    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.5)"
   },
   kills: {
-    fontSize: "28px",
-    marginRight: "10px",
-    fontWeight: "bold"
+    fontSize: "24px",
+    marginRight: "20px",
+    fontWeight: "bold",
+    color: "white",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.8)",
+    fontFamily: "'Courier New', Courier, monospace"
   },
   zombieIcon: {
-    fontSize: "28px"
+    fontSize: "28px",
+    marginRight: "5px",
+    color: "#8B0000",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.8)"
   },
   gameOverOverlay: {
     position: "absolute",
@@ -150,12 +164,13 @@ export const styles: { [key: string]: CSSProperties } = {
   },
   gameScreenContainer: {
     position: "absolute",
-    top: "10%",
-    width: "100%",
+    bottom: "20px",
+    left: "72%",
+    transform: "translateX(-50%)",
     display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     pointerEvents: "none",
     background: "transparent"
   },
@@ -237,27 +252,39 @@ export const styles: { [key: string]: CSSProperties } = {
   },
   questContainer: {
     position: "absolute",
-    top: "10%",
-    right: "50px",
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    top: "20px",
+    right: "20px",
+    backgroundColor: "rgba(139, 69, 19, 0.8)",
     padding: "10px",
-    borderRadius: "5px",
+    borderRadius: "10px",
     color: "white",
-    fontFamily: "Arial, sans-serif",
+    fontFamily: "'Courier New', Courier, monospace",
     fontSize: "14px",
-    maxWidth: "200px"
+    maxWidth: "200px",
+    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.5)",
+    border: "2px solid #8B4513"
   },
   questTitle: {
-    fontSize: "18px",
-    marginBottom: "10px"
+    fontSize: "20px",
+    marginBottom: "10px",
+    color: "#FFD700",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.8)",
+    textDecoration: "underline"
   },
   quest: {
-    marginBottom: "5px"
+    marginBottom: "10px",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    padding: "5px",
+    borderRadius: "5px"
   },
   questName: {
-    marginRight: "5px"
+    marginRight: "5px",
+    color: "#F5DEB3",
+    fontWeight: "bold"
   },
   questStatus: {
-    fontSize: "12px"
+    fontSize: "12px",
+    color: "#8B0000",
+    fontWeight: "bold"
   }
 }

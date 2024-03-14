@@ -96,15 +96,15 @@ export const GameScreen: FC<StartSceneProps> = ({ game, player }) => {
               <span style={styles.gameScreenLabel}>🪙</span>
               <span style={styles.kills}>{playerData.gold}</span>
             </div>
-            <div style={styles.questContainer}>
-              <h3 style={styles.questTitle}>Quests</h3>
-              {playerManager.getQuests().map((quest, index) => (
-                <div key={`quest-${index}`} style={styles.quest}>
-                  <span style={styles.questName}>{quest.title}</span>
-                  <span style={styles.questStatus}>{quest.completed ? "✔️" : "❌"}</span>
-                </div>
-              ))}
-            </div>
+          </div>
+          <div style={styles.questContainer}>
+            <h3 style={styles.questTitle}>Quests</h3>
+            {playerManager.getQuests().map((quest, index) => (
+              <div key={`quest-${index}`} style={styles.quest}>
+                <span style={styles.questName}>{quest.title}</span>
+                <span style={styles.questStatus}>{quest.completed ? "✔️" : "❌"}</span>
+              </div>
+            ))}
           </div>
         </>
       )}

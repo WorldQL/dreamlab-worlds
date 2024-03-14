@@ -827,7 +827,7 @@ export const level: LooseSpawnableDefinition[] = [
     "args": {
       "width": 217.09,
       "height": 387.62,
-      "message": "Hey there! Did you hear? A big storm just rolled in right over the saloon!"
+      "message": "Yesterday I killed 5 zombies! I bet that's more than you can kill haha!"
     },
     "transform": {
       "position": {
@@ -910,6 +910,44 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "jhhlyz2376tqb88fmu5e3git",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/Prompt",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "message": "Press 'F' to enter home."
+    },
+    "transform": {
+      "position": {
+        "x": 16007.720338215731,
+        "y": 384.93616433271274
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "tebp6uouygm92qmlm0famgid",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/Quest",
+    "args": {
+      "width": 215.98,
+      "height": 172.05,
+      "questTitle": "Kill 10 Zombies",
+      "questDescription": "Kill twice as many zombies as town kid.",
+      "goldReward": 200
+    },
+    "transform": {
+      "position": {
+        "x": -5113.406188440769,
+        "y": 484.06543608030677
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "xhqyzrxjyunm049n1g4t5kc3",
     "tags": []
   },
   {
@@ -2585,7 +2623,7 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 11047.649525559453,
+        "x": 11043.262365242195,
         "y": -5194.709522453587
       },
       "rotation": 0,
@@ -2597,8 +2635,8 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Nonsolid",
     "args": {
-      "width": 7583.16,
-      "height": 16155.57,
+      "width": 10212.46,
+      "height": 16149.4,
       "spriteSource": {
         "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/sandstormXY-1703001923602.png",
         "tile": true
@@ -2606,8 +2644,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 15355.03893207961,
-        "y": -4423.724811155612
+        "x": 16657.508235390018,
+        "y": -4417.639811155613
       },
       "rotation": 0,
       "zIndex": -3
@@ -3698,6 +3736,26 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 0
     },
     "uid": "w59cyevy5uncladflokilvor",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 1872.41,
+      "height": 1360.46,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/house3-1703001875315.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 15556.664428325083,
+        "y": -108.4587882677979
+      },
+      "rotation": 0,
+      "zIndex": 0
+    },
+    "uid": "ikc0vcvzd32c6p4fpgvw5h42",
     "tags": []
   },
   {
@@ -4854,6 +4912,23 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "cobnzcf9o6p7sjug7pj1iecc",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 299.02,
+      "height": 13074.84
+    },
+    "transform": {
+      "position": {
+        "x": 17692.526728866877,
+        "y": -5946.6472027708805
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "wqpjjsmbgih5qu3hcfqgg5i9",
     "tags": []
   }
 ]
