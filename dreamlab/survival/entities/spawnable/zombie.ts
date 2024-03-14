@@ -120,8 +120,11 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
       }
 
       const playerPositionX = player.body.position.x
+      const playerPositionY = player.body.position.y
+      const mobPositionY = this.body.position.y
       const mobPositionX = this.body.position.x
       const xDiff = playerPositionX - mobPositionX
+      const yDiff = playerPositionY - mobPositionY
 
       let damage = 1
       let range = this.args.width / 2 + 120
@@ -136,7 +139,8 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
         }
       }
 
-      if (Math.abs(xDiff) <= range) {
+      const distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff)
+      if (distance <= range) {
         await this.netClient?.sendCustomMessage(this.HIT_CHANNEL, {
           uid: this.uid,
           damage,

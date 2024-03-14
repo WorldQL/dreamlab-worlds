@@ -913,6 +913,92 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
+    "entity": "@cvz/ZombieRegion",
+    "args": {
+      "width": 4267.16,
+      "height": 1045.47,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ],
+      "zombiesPerWave": 2,
+      "waves": 3,
+      "waveInterval": 25,
+      "endCooldown": 15
+    },
+    "transform": {
+      "position": {
+        "x": 5315.320175368677,
+        "y": 52.86071235460781
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "o00bu8jp15k76jxcjanm45x9",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombiesPerSpawn": 1,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 9301.475141714358,
+        "y": -2019.4236580310107
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "vmplk4xqvvd1ey611xxqmtck",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombiesPerSpawn": 2,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 5,
+          "speed": 3,
+          "knockback": 1.1
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 6599.572592866521,
+        "y": -5299.955064889818
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "aq147w4mnic8rbs9pys1ekhx",
+    "tags": []
+  },
+  {
     "entity": "@dreamlab/BackgroundTrigger",
     "args": {
       "width": 28968.96,

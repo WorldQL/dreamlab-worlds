@@ -56,7 +56,7 @@ interface RegionData {
 
 export { ArgsSchema as ZombieRegionArgs }
 export class ZombieRegion<A extends Args = Args> extends Solid<A> {
-  protected gfxCircle: CircleGraphics | undefined
+  protected gfxCircles: CircleGraphics[] = []
   private regionData: SyncedValue<RegionData> = syncedValue(this.uid, "regionData", {
     isCooldown: false as boolean,
     waveStarted: false as boolean,
@@ -242,10 +242,12 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
 
     const $game = game("client")
     if ($game) {
-      this.gfxCircle = drawCircle({ radius: 75 })
-      this.gfxCircle.zIndex = -1
-
-      this.container?.addChild(this.gfxCircle)
+      for (let i = 0; i < this.args.zombiesPerWave; i++) {
+        const circle = drawCircle({ radius: 75 })
+        circle.zIndex = -1
+        this.gfxCircles.push(circle)
+        this.container?.addChild(circle)
+      }
     }
   }
 
@@ -262,13 +264,19 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
     events.removeListener("onRegionWaveStart", this.onRegionWaveStart)
     events.removeListener("onRegionStart", this.onRegionStart)
     events.removeListener("onRegionEnd", this.onRegionEnd)
+
+    this.gfxCircles.forEach(circle => {
+      this.container?.removeChild(circle)
+      circle.destroy()
+    })
+    this.gfxCircles = []
   }
 
   public override onRenderFrame(time: RenderTime) {
     super.onRenderFrame(time)
 
     this.gfx!.clear()
-    this.gfxCircle!.clear()
+    this.gfxCircles.forEach(circle => circle.clear())
 
     let fillAlpha = 0
     let fillColor = 0x0
@@ -305,25 +313,31 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
     const currentColor = pulseColors[timeBasedIndex]
 
     if (this.regionData.value.positions) {
-      for (const { x, y } of Object.values(this.regionData.value.positions)) {
+      this.regionData.value.positions.forEach(({ x, y }, index) => {
         const adjustedX = x + camera().offset.x - this.container!.position.x
         const adjustedY = y + camera().offset.y - this.container!.position.y
 
-        this.gfxCircle!.redraw(
-          { radius: 75 },
-          {
-            fill: currentColor,
-            fillAlpha: 0.5
-          }
-        )
+        const circle = this.gfxCircles[index]
+        if (circle) {
+          circle.redraw(
+            { radius: 75 },
+            {
+              fill: currentColor,
+              fillAlpha: 0.5
+            }
+          )
 
-        this.gfxCircle!.position.set(adjustedX, adjustedY)
+          circle.position.set(adjustedX, adjustedY)
+        }
 
-        this.zombieSpawnParticleDefinition.transform.position = { x, y }
-        game("client")?.spawn(this.zombieSpawnParticleDefinition)
-      }
+        // TODO: spawn this somewhere else
+        // this.zombieSpawnParticleDefinition.transform.position = { x, y }
+        // game("client")?.spawn(this.zombieSpawnParticleDefinition)
+      })
     }
 
-    if (this.gfxCircle) this.gfxCircle.alpha = debug() ? 1 : 0
+    this.gfxCircles.forEach(circle => {
+      circle.alpha = debug() ? 1 : 0
+    })
   }
 }

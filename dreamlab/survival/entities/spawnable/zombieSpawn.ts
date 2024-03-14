@@ -31,7 +31,7 @@ const ArgsSchema = NonSolidArgs.extend({
 })
 
 interface SpawnData {
-  zombies: Zombie[]
+  zombies: string[]
   zombieTypes: {
     width: number
     height: number
@@ -54,8 +54,8 @@ export class ZombieSpawn<A extends Args = Args> extends NonSolid<A> {
 
   public constructor(ctx: SpawnableContext<A>) {
     super(ctx, { stroke: "green" })
-    // this.spawnZombies()
-    // this.startCheckInterval()
+    this.spawnZombies()
+    this.startCheckInterval()
   }
 
   private spawnZombies() {
@@ -76,15 +76,15 @@ export class ZombieSpawn<A extends Args = Args> extends NonSolid<A> {
       }) as Zombie
 
       if (zombie) {
-        this.spawnData.value.zombies.push(zombie)
+        this.spawnData.value.zombies.push(zombie.uid)
       }
     }
   }
 
   private startCheckInterval() {
     this.checkInterval = setInterval(() => {
-      const aliveZombies = this.spawnData.value.zombies.filter(zombie =>
-        game().entities.flatMap(z => isSpawnableEntity(z) && z.uid == zombie.uid)
+      const aliveZombies = this.spawnData.value.zombies.filter(uid =>
+        game().entities.some(entity => isSpawnableEntity(entity) && entity.uid === uid)
       )
 
       if (aliveZombies.length === 0) {
@@ -92,7 +92,7 @@ export class ZombieSpawn<A extends Args = Args> extends NonSolid<A> {
           this.spawnZombies()
           this.spawnData.value.cooldownTimer = this.args.cooldown
         } else {
-          this.spawnData.value.cooldownTimer -= 1
+          this.spawnData.value.cooldownTimer -= 10
         }
       }
 
