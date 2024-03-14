@@ -54,8 +54,8 @@ export class ZombieSpawn<A extends Args = Args> extends NonSolid<A> {
 
   public constructor(ctx: SpawnableContext<A>) {
     super(ctx, { stroke: "green" })
-    this.spawnZombies()
-    this.startCheckInterval()
+    // this.spawnZombies()
+    // this.startCheckInterval()
   }
 
   private spawnZombies() {

@@ -32,5 +32,5 @@ export const sharedInit: InitShared = async game => {
 
   game.instantiate(new ParticleSpawner())
   game.instantiate(new RegionManager())
-  // game.instantiate(new GameManager())
+  game.instantiate(new GameManager())
 }

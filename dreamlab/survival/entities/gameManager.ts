@@ -1,7 +1,7 @@
 import { Entity } from "@dreamlab.gg/core"
 import { game } from "@dreamlab.gg/core/dist/labs"
-import { MyEventHandler, events } from "../events"
-import PlayerManager from "../playerManager"
+import { MyEventHandler, events } from "../events.ts"
+import PlayerManager from "../playerManager.ts"
 
 type OnPlayerKill = MyEventHandler<"onPlayerKill">
 type OnGoldPickup = MyEventHandler<"onGoldPickup">
