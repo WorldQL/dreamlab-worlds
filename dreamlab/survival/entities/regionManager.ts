@@ -218,8 +218,21 @@ export class RegionManager extends Entity {
           return
         }
 
-        await manageRegionWaves(region)
-        events.emit("onRegionStart", region.uid)
+        const zombies = Matter.Composite.allBodies(game().physics.engine.world).filter(
+          b =>
+            b.label === "zombie" &&
+            b.position.x >= region.position.x - region.width / 2 &&
+            b.position.x <= region.position.x + region.width / 2 &&
+            b.position.y >= region.position.y - region.height / 2 &&
+            b.position.y <= region.position.y + region.height / 2
+        )
+        console.log(zombies.length)
+        const maxZombiesAllowed = region.zombiesPerWave * region.waves
+        console.log(maxZombiesAllowed)
+        if (zombies.length < maxZombiesAllowed) {
+          await manageRegionWaves(region)
+          events.emit("onRegionStart", region.uid)
+        }
       }
     }
 
