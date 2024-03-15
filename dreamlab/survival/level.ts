@@ -773,6 +773,9 @@ export const level: LooseSpawnableDefinition[] = [
     "args": {
       "width": 156.86,
       "height": 170.12,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/portal-1710457677658.png"
+      },
       "displayName": "Portal Stone",
       "animationName": "idle",
       "cost": 0,
@@ -783,10 +786,7 @@ export const level: LooseSpawnableDefinition[] = [
       "anchorX": 0.5,
       "anchorY": 0.5,
       "rotation": 0,
-      "speedMultiplier": 1,
-      "spriteSource": {
-        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/portal-1710457677658.png"
-      }
+      "speedMultiplier": 1
     },
     "transform": {
       "position": {
@@ -797,6 +797,37 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "z2qdmr7ah1v9j0939qk5wawj",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/InventoryItem",
+    "args": {
+      "width": 171.91,
+      "height": 153.6,
+      "displayName": "Wagon-Wheel",
+      "animationName": "idle",
+      "cost": 0,
+      "damage": 0,
+      "range": 0,
+      "lore": "A Wagon Part.",
+      "bone": "handRight",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "rotation": 0,
+      "speedMultiplier": 1,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/wagon-wheel-1710466316708.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 11191.254868080596,
+        "y": -4611.717196842814
+      },
+      "rotation": 25.97439396243178,
+      "zIndex": 100
+    },
+    "uid": "ic020a89fv8ld0zdnovns3yr",
     "tags": []
   },
   {
@@ -930,7 +961,7 @@ export const level: LooseSpawnableDefinition[] = [
     "args": {
       "width": 207.24,
       "height": 319.47,
-      "message": "Help!"
+      "message": "My wagon tipped and all my barrels tumbled over the edge!"
     },
     "transform": {
       "position": {
@@ -3780,8 +3811,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 10020.595463176716,
-        "y": -4694.938373909942
+        "x": 10085.066969852125,
+        "y": -4867.494465305887
       },
       "rotation": 147.26477372789256,
       "zIndex": 0
@@ -3800,8 +3831,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 9582.093036163871,
-        "y": -5146.836748805446
+        "x": 9684.488958530696,
+        "y": -4105.81153807606
       },
       "rotation": -20.556045219582867,
       "zIndex": 0
@@ -3867,6 +3898,46 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": -5
     },
     "uid": "of0af58jdt6s4pp8a21wc60g",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 10481.341582028079,
+        "y": -4541.359555610123
+      },
+      "rotation": 147.26477372789256,
+      "zIndex": 0
+    },
+    "uid": "rfmdeoputl7sz0z20pxx3zc6",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 132.4,
+      "height": 161.73,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/barrel-1703001768203.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 11139.358073566398,
+        "y": -4451.475863644407
+      },
+      "rotation": 199.74683660542613,
+      "zIndex": 0
+    },
+    "uid": "h29i2zl4912ezuh3nwwydwey",
     "tags": []
   },
   {
@@ -5067,8 +5138,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 9577.378168410618,
-        "y": -5146.4460344511745
+        "x": 9679.774090777442,
+        "y": -4097.835940583504
       },
       "rotation": -19.203979424483823,
       "zIndex": 100
@@ -5101,8 +5172,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 10017.721029623484,
-        "y": -4696.439316411519
+        "x": 10084.088757083464,
+        "y": -4865.202966238323
       },
       "rotation": -35.21759296819323,
       "zIndex": 100
@@ -5176,6 +5247,40 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "wqpjjsmbgih5qu3hcfqgg5i9",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 119.24,
+      "height": 154.86
+    },
+    "transform": {
+      "position": {
+        "x": 10481.341582028079,
+        "y": -4541.359555610122
+      },
+      "rotation": -35.21759296819323,
+      "zIndex": 100
+    },
+    "uid": "lf8daykv0a5kz7ohc2inop0v",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 119.24,
+      "height": 154.86
+    },
+    "transform": {
+      "position": {
+        "x": 11141.053992359022,
+        "y": -4449.779944851782
+      },
+      "rotation": 21.104838584930015,
+      "zIndex": 100
+    },
+    "uid": "jr6qfquehpmy88fpyrykd3pv",
     "tags": []
   }
 ]
