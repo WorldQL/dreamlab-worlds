@@ -29,7 +29,7 @@ export const HealthOverlay: FC<HealingScreenProps> = ({ game }) => {
         return
       }
 
-      playerManager.addHealth(healAmount)
+      events.emit("onPlayerHeal", healAmount)
       setNearHealingItem(false)
       setHealAmount(undefined)
       setPrompt(`+${healAmount} Health`)
