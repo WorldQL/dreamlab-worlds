@@ -84,6 +84,8 @@ export class ZombieSpawn<A extends Args = Args> extends NonSolid<A> {
         game().entities.some(entity => isSpawnableEntity(entity) && entity.uid === uid)
       )
 
+      this.spawnData.value.zombies = aliveZombies
+
       if (aliveZombies.length === 0) {
         if (this.spawnData.value.cooldownTimer <= 0) {
           this.spawnZombies()
@@ -92,8 +94,6 @@ export class ZombieSpawn<A extends Args = Args> extends NonSolid<A> {
           this.spawnData.value.cooldownTimer -= 10
         }
       }
-
-      this.spawnData.value.zombies = aliveZombies
     }, 10000)
   }
 
