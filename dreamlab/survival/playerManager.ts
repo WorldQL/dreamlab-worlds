@@ -145,18 +145,18 @@ class PlayerManager {
     for (const quest of this.quests) {
       if (quest.goal.type === questType) {
         if (quest.completed) return
-        if (questType === "reachGold" || questType === "reachKills") {
+        else if (questType === "reachGold" || questType === "reachKills") {
           const goal = quest.goal as { type: "reachGold" | "reachKills"; amount: number }
           quest.completed = (questType === "reachGold" ? this.gold : this.kills) >= goal.amount
         } else if (questType === "gatherPart") {
           const goal = quest.goal as { type: "gatherPart"; partName: string }
           quest.completed = progress === goal.partName
         }
+
         if (quest.completed) {
           this.addGold(quest.goldReward)
           events.emit("onQuestCompleted", quest)
         }
-        break
       }
     }
   }
