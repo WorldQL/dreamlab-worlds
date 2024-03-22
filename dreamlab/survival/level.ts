@@ -831,6 +831,37 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
+    "entity": "@cvz/InventoryItem",
+    "args": {
+      "width": 255.73,
+      "height": 129.1,
+      "displayName": "Wagon-Bed",
+      "animationName": "idle",
+      "cost": 0,
+      "damage": 0,
+      "range": 0,
+      "lore": "A missing wagon part!",
+      "bone": "handRight",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "rotation": 0,
+      "speedMultiplier": 1,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/wagon-bed-1711133598364.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": -1295.360083880133,
+        "y": 5291.530754060534
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "dug05iq3uxvxqgo5ghoj7ayh",
+    "tags": []
+  },
+  {
     "entity": "@cvz/Prompt",
     "args": {
       "width": 348.64,
@@ -1049,6 +1080,96 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
+    "entity": "@cvz/ZombieRegion",
+    "args": {
+      "width": 6940.32,
+      "height": 1131.61,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ],
+      "zombiesPerWave": 2,
+      "waves": 3,
+      "waveInterval": 25,
+      "endCooldown": 15
+    },
+    "transform": {
+      "position": {
+        "x": -846.2000135170906,
+        "y": 7766.405362362426
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "deagcj7b7mzcapat0c3zu9q0",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieRegion",
+    "args": {
+      "width": 3319.15,
+      "height": 638.91,
+      "zombieTypes": [
+        {
+          "width": 150,
+          "height": 400,
+          "maxHealth": 20,
+          "speed": 2,
+          "knockback": 1.25
+        }
+      ],
+      "zombiesPerWave": 2,
+      "waves": 3,
+      "waveInterval": 25,
+      "endCooldown": 15
+    },
+    "transform": {
+      "position": {
+        "x": -2791.727878710736,
+        "y": 5104.4839899570525
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "glt59rw6wz2y6u6pwbrhtf2s",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieRegion",
+    "args": {
+      "width": 3947.14,
+      "height": 664.8,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ],
+      "zombiesPerWave": 2,
+      "waves": 3,
+      "waveInterval": 25,
+      "endCooldown": 15
+    },
+    "transform": {
+      "position": {
+        "x": -10567.269187488324,
+        "y": 6876.980481681922
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "ii4pilc60q5qvmrv1nikn0l6",
+    "tags": []
+  },
+  {
     "entity": "@cvz/ZombieSpawn",
     "args": {
       "width": 100,
@@ -1154,6 +1275,438 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "vlge4kmm4xs4cuom8yc3mbpy",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 125.6,
+      "height": 110.48,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 5264.490809878829,
+        "y": 7496.148628309585
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "c07s37kudksbcpjl55xgq9xv",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 2790.4431885108734,
+        "y": 6047.784876432914
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "devmds5bmriew5k0l1wczets",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 4000.855398936019,
+        "y": 6057.192225218601
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "hq5wkcafxr79yerg5x2jqdlt",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 8046.015376781705,
+        "y": 7904.168370141944
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "hgsj62l0tbwq2nnl0aet8cwk",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 10717.702431917,
+        "y": 7907.304153070507
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "hvwik9ueji0tfo53l9spranv",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 6923.405088356314,
+        "y": 7013.606018430179
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "yuz12lhqjv7awe747nv1pkba",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": -5901.947089464513,
+        "y": 6527.559671979274
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "ucz2jbo95qwu30y72frtah5u",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": -4622.547654610992,
+        "y": 6549.510152479212
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "m93czu45dqvjccwo6cy1e3ve",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": -6143.438749895025,
+        "y": 5614.3366623302345
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "cbb1lilfdl3j7mvzp6k84n04",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": -5906.74946154318,
+        "y": 7745.391818227225
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "ldoaquxffvv2ponxdvn6dlcq",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": -9597.546551848729,
+        "y": 7987.465661526686
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "iau3zp62oqunsp30do5tkjq2",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": -11563.982018651253,
+        "y": 7994.097821617074
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "euf4nka35rumc0mzgucrvzy8",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": -14236.742535080972,
+        "y": 7539.794855424941
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "lspsjeudo6skdgoez19dx4vm",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": -15672.605194651798,
+        "y": 6498.545721232724
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "e0lbk97f544b6icy1cv84s1s",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": -16120.276000753594,
+        "y": 7788.500858814808
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "evyntsf4l4kflfwep84gvbl1",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/ZombieSpawn",
+    "args": {
+      "width": 100,
+      "height": 100,
+      "cooldown": 60,
+      "zombieTypes": [
+        {
+          "width": 100,
+          "height": 200,
+          "maxHealth": 10,
+          "speed": 3,
+          "knockback": 1.25
+        }
+      ]
+    },
+    "transform": {
+      "position": {
+        "x": 7081.000065434273,
+        "y": 5401.135664140049
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "vs1c0ef8zjjtsf02bdqu4gq0",
     "tags": []
   },
   {
@@ -5281,6 +5834,23 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "jr6qfquehpmy88fpyrykd3pv",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 83.82,
+      "height": 3274.24
+    },
+    "transform": {
+      "position": {
+        "x": -1085.5007517118172,
+        "y": 3793.5777950825495
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "m89kzlj55u76x27c3ght27uk",
     "tags": []
   }
 ]
