@@ -186,7 +186,8 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
         return
 
       this.zombieSpawnParticleDefinition.transform.position = position
-      game("client")?.spawn(this.zombieSpawnParticleDefinition)
+      // TODO: investigate why this gets ran 32 times when the event is only called once...
+      // game("client")?.spawn(this.zombieSpawnParticleDefinition)
     }
 
     magicEvents("client")?.addListener(
