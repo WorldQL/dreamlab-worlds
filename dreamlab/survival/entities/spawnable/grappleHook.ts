@@ -1,14 +1,14 @@
-import type { RenderTime, SpawnableContext, Time } from '@dreamlab.gg/core'
-import { Solid, SolidArgs } from '@dreamlab.gg/core/dist/entities'
-import { camera, game } from '@dreamlab.gg/core/dist/labs'
-import { z } from '@dreamlab.gg/core/dist/sdk'
-import { distance, Vec } from '@dreamlab.gg/core/math'
-import type { Vector } from 'matter-js'
-import Matter from 'matter-js'
+import type { RenderTime, SpawnableContext, Time } from "@dreamlab.gg/core"
+import { Solid, SolidArgs } from "@dreamlab.gg/core/dist/entities"
+import { camera, game } from "@dreamlab.gg/core/dist/labs"
+import { z } from "@dreamlab.gg/core/dist/sdk"
+import { distance, Vec } from "@dreamlab.gg/core/math"
+import type { Vector } from "matter-js"
+import Matter from "matter-js"
 
 type Args = typeof ArgsSchema
 const ArgsSchema = SolidArgs.extend({
-  mustConnectWithBody: z.boolean(),
+  mustConnectWithBody: z.boolean()
 })
 
 export { ArgsSchema as GrappleHookArgs }
@@ -19,33 +19,37 @@ export class GrappleHook<A extends Args = Args> extends Solid<A> {
   public constructor(ctx: SpawnableContext<A>) {
     super(ctx)
 
+    if (!this.tags.includes("editor/doNotSave")) {
+      this.tags.push("editor/doNotSave")
+    }
+
     this.body.collisionFilter = {
       category: 0x0004,
-      mask: 0x0000,
+      mask: 0x0000
     }
     this.body.frictionAir = 0.2
-    this.body.label = 'grappleHook'
+    this.body.label = "grappleHook"
 
     if (!this.args.mustConnectWithBody) this.args.mustConnectWithBody = false
 
-    const $game = game('client')
+    const $game = game("client")
     if (!$game) return
 
-    $game.client?.render.container.addEventListener('pointerover', ev => () => {
+    $game.client?.render.container.addEventListener("pointerover", ev => () => {
       const screenPosition = Vec.create(ev.offsetX, ev.offsetY)
       this.cursorPosition = camera().screenToWorld(screenPosition)
     })
-    $game.client?.render.container.addEventListener('pointerout', () => {
+    $game.client?.render.container.addEventListener("pointerout", () => {
       this.cursorPosition = undefined
     })
-    $game.client?.render.container.addEventListener('pointermove', ev => () => {
+    $game.client?.render.container.addEventListener("pointermove", ev => () => {
       const screenPosition = Vec.create(ev.offsetX, ev.offsetY)
       this.cursorPosition = camera().screenToWorld(screenPosition)
     })
   }
 
   public override onPhysicsStep(_: Time): void {
-    const $game = game('client')
+    const $game = game("client")
     if (!$game) {
       return
     }
@@ -53,19 +57,19 @@ export class GrappleHook<A extends Args = Args> extends Solid<A> {
     Matter.Body.setAngle(this.body, 0)
     Matter.Body.setAngularVelocity(this.body, 0)
 
-    const playerBody = Matter.Composite.allBodies(
-      $game.physics.engine.world,
-    ).find(b => b.label === 'player')
+    const playerBody = Matter.Composite.allBodies($game.physics.engine.world).find(
+      b => b.label === "player"
+    )
     if (!playerBody) return
 
     const inputs = $game.client?.inputs
-    const isCrouching = inputs?.getInput('@cvz/hook') ?? false
+    const isCrouching = inputs?.getInput("@cvz/hook") ?? false
 
     if (isCrouching && this.cursorPosition) {
       if (this.args.mustConnectWithBody) {
         const bodiesAtCursor = Matter.Query.point(
           Matter.Composite.allBodies($game.physics.engine.world),
-          this.cursorPosition,
+          this.cursorPosition
         )
 
         if (bodiesAtCursor.length === 0) {
@@ -78,13 +82,10 @@ export class GrappleHook<A extends Args = Args> extends Solid<A> {
         this.body.render.visible = true
       }
 
-      const reachedTarget =
-        distance(this.body.position, this.cursorPosition) <= 1
+      const reachedTarget = distance(this.body.position, this.cursorPosition) <= 1
 
       if (!reachedTarget) {
-        const dir = Vec.normalise(
-          Vec.sub(this.cursorPosition, this.body.position),
-        )
+        const dir = Vec.normalise(Vec.sub(this.cursorPosition, this.body.position))
         const forceMagnitude = 0.005
         const force = Vec.mult(dir, forceMagnitude)
         Matter.Body.applyForce(this.body, this.body.position, force)
@@ -92,7 +93,7 @@ export class GrappleHook<A extends Args = Args> extends Solid<A> {
         this.hasReachedTarget = true
         Matter.Body.setVelocity(this.body, { x: 0, y: 0 })
         const playerToHookDirection = Vec.normalise(
-          Vec.sub(this.body.position, playerBody.position),
+          Vec.sub(this.body.position, playerBody.position)
         )
         const pullForceMagnitude = 1.5
         const pullForce = Vec.mult(playerToHookDirection, pullForceMagnitude)
@@ -106,7 +107,7 @@ export class GrappleHook<A extends Args = Args> extends Solid<A> {
   public override onRenderFrame(time: RenderTime) {
     super.onRenderFrame(time)
 
-    const $game = game('client')
+    const $game = game("client")
     if (!$game) {
       return
     }

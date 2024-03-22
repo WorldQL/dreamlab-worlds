@@ -29,6 +29,10 @@ export class Gold<A extends Args = Args> extends Solid<A> {
 
     const $game = game()
 
+    if (!this.tags.includes("editor/doNotSave")) {
+      this.tags.push("editor/doNotSave")
+    }
+
     magicEvent("client")?.addListener(
       "onPlayerCollisionStart",
       (this.onPlayerCollisionStart = ([_player, other]) => {

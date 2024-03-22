@@ -1473,7 +1473,7 @@ export const level: LooseSpawnableDefinition[] = [
         "y": 485.3930968114799
       },
       "rotation": 0,
-      "zIndex": 11
+      "zIndex": 19999
     },
     "uid": "h3pdiqjsgds2ok0zcua5pwdb",
     "tags": []
@@ -1895,7 +1895,7 @@ export const level: LooseSpawnableDefinition[] = [
         "y": 906.3568028804884
       },
       "rotation": 0,
-      "zIndex": -2
+      "zIndex": 20000
     },
     "uid": "iosovfvg4oio488rpe9hydu0",
     "tags": []
@@ -1915,7 +1915,7 @@ export const level: LooseSpawnableDefinition[] = [
         "y": 1694.0737386753028
       },
       "rotation": 0,
-      "zIndex": 11
+      "zIndex": 19999
     },
     "uid": "ts7jaer1lwt9nxb1v5cnn181",
     "tags": []
