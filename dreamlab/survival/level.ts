@@ -4604,6 +4604,46 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 573.0560807781403,
+      "height": 674.2992034265926,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/platform44-1703375415181.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": -7278.292999651755,
+        "y": 6511.52685908246
+      },
+      "rotation": 0,
+      "zIndex": -4
+    },
+    "uid": "k8z3ifhop8bl14kaklxnk68b",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 573.0560807781403,
+      "height": 674.2992034265926,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/platform44-1703375415181.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": -8163.152555506619,
+        "y": 6135.861604375398
+      },
+      "rotation": 0,
+      "zIndex": -4
+    },
+    "uid": "a6gq2sr2e1alqrv7icxe6u1g",
+    "tags": []
+  },
+  {
     "entity": "@dreamlab/Platform",
     "args": {
       "width": 2347.3879968897018,
@@ -5349,6 +5389,40 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "qsom9zkviertbwqyyt6n0ant",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 402.39577836411627,
+      "height": 58.86015831134591
+    },
+    "transform": {
+      "position": {
+        "x": -7233.413646222991,
+        "y": 6503.1119803145675
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "df9581i5lacy9rlizgvrri07",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Platform",
+    "args": {
+      "width": 402.39577836411627,
+      "height": 58.86015831134591
+    },
+    "transform": {
+      "position": {
+        "x": -8149.133596396563,
+        "y": 6127.446725607507
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "lpenwtt7nzcxx77kmbrb3hmj",
     "tags": []
   },
   {
