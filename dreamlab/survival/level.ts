@@ -893,6 +893,37 @@ export const level: LooseSpawnableDefinition[] = [
     "tags": []
   },
   {
+    "entity": "@cvz/InventoryItem",
+    "args": {
+      "width": 156.86,
+      "height": 170.12,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/portal-1710457677658.png"
+      },
+      "displayName": "Portal Stone",
+      "animationName": "idle",
+      "cost": 0,
+      "damage": 0,
+      "range": 0,
+      "lore": "The Portal Stone, an ancient relic, offers instant teleportation with a touch. Legend says it's guarded by spirits, granting only the worthy access to its power.",
+      "bone": "handRight",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "rotation": 0,
+      "speedMultiplier": 1
+    },
+    "transform": {
+      "position": {
+        "x": -18329.06890275511,
+        "y": 8198.063318252414
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "vd6uuej2pti5jawjs3yds34o",
+    "tags": []
+  },
+  {
     "entity": "@cvz/Prompt",
     "args": {
       "width": 348.64,
@@ -2482,7 +2513,9 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 20000
     },
     "uid": "iosovfvg4oio488rpe9hydu0",
-    "tags": []
+    "tags": [
+      "editor/locked"
+    ]
   },
   {
     "entity": "@dreamlab/Nonsolid",
@@ -2502,7 +2535,9 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 19999
     },
     "uid": "ts7jaer1lwt9nxb1v5cnn181",
-    "tags": []
+    "tags": [
+      "editor/locked"
+    ]
   },
   {
     "entity": "@dreamlab/Nonsolid",
@@ -4021,7 +4056,9 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 0
     },
     "uid": "paw9ce85ojgai88yol69b9ro",
-    "tags": []
+    "tags": [
+      "editor/locked"
+    ]
   },
   {
     "entity": "@dreamlab/Nonsolid",
@@ -5538,13 +5575,13 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Solid",
     "args": {
-      "width": 160.86516853932517,
-      "height": 7717.370923540696
+      "width": 144.88,
+      "height": 7736.19
     },
     "transform": {
       "position": {
-        "x": 11657.262103065324,
-        "y": 4492.568871139309
+        "x": 11663.997201273918,
+        "y": 4499.97840936896
       },
       "rotation": 0,
       "zIndex": 100
