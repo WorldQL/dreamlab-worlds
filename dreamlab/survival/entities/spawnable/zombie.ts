@@ -79,7 +79,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
   private zombieAnimations: Record<string, Texture<Resource>[]> = {}
   private mobData: SyncedValue<MobData> = syncedValue(this.uid, "mobData", {
     health: this.args.maxHealth,
-    direction: 1,
+    direction: Math.random() < 0.5 ? -1 : 1,
     hitCooldown: 0,
     patrolDistance: 0,
     currentAnimation: "walk" as zombieAnimations,
