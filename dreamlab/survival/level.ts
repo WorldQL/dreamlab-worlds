@@ -835,6 +835,9 @@ export const level: LooseSpawnableDefinition[] = [
     "args": {
       "width": 255.73,
       "height": 129.1,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/wagon-bed-1711133598364.png"
+      },
       "displayName": "Wagon-Bed",
       "animationName": "idle",
       "cost": 0,
@@ -845,10 +848,7 @@ export const level: LooseSpawnableDefinition[] = [
       "anchorX": 0.5,
       "anchorY": 0.5,
       "rotation": 0,
-      "speedMultiplier": 1,
-      "spriteSource": {
-        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/wagon-bed-1711133598364.png"
-      }
+      "speedMultiplier": 1
     },
     "transform": {
       "position": {
@@ -859,6 +859,37 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "dug05iq3uxvxqgo5ghoj7ayh",
+    "tags": []
+  },
+  {
+    "entity": "@cvz/InventoryItem",
+    "args": {
+      "width": 432.27,
+      "height": 149.68,
+      "displayName": "Wagon-Cover",
+      "animationName": "idle",
+      "cost": 0,
+      "damage": 0,
+      "range": 0,
+      "lore": "A missing wagon part.",
+      "bone": "handRight",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "rotation": 0,
+      "speedMultiplier": 1,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/wagon-cover-1711141278579.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 11492.716723591067,
+        "y": 4515.590099313024
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "qgzxgo1k1ffc8y1tldth796i",
     "tags": []
   },
   {
@@ -3298,8 +3329,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 11043.262365242195,
-        "y": -5194.709522453587
+        "x": 11084.993294642156,
+        "y": -5199.346292386916
       },
       "rotation": 0,
       "zIndex": -3
@@ -3310,8 +3341,8 @@ export const level: LooseSpawnableDefinition[] = [
   {
     "entity": "@dreamlab/Nonsolid",
     "args": {
-      "width": 10212.46,
-      "height": 16149.4,
+      "width": 10166.57,
+      "height": 16141.4,
       "spriteSource": {
         "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/sandstormXY-1703001923602.png",
         "tile": true
@@ -3319,8 +3350,8 @@ export const level: LooseSpawnableDefinition[] = [
     },
     "transform": {
       "position": {
-        "x": 16657.508235390018,
-        "y": -4417.639811155613
+        "x": 16681.45307863185,
+        "y": -4422.639811155613
       },
       "rotation": 0,
       "zIndex": -3
@@ -3466,7 +3497,9 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": -12
     },
     "uid": "lwpukbepq4az4vo98ls7t7ii",
-    "tags": []
+    "tags": [
+      "editor/locked"
+    ]
   },
   {
     "entity": "@dreamlab/Nonsolid",
@@ -4491,6 +4524,46 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 0
     },
     "uid": "h29i2zl4912ezuh3nwwydwey",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 425.12,
+      "height": 146.67,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/groundX-1703001868400.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 9827.171235337173,
+        "y": 5167.820796834781
+      },
+      "rotation": 0,
+      "zIndex": 0
+    },
+    "uid": "ypl6yk7z1tdjr21e2fbck8xc",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Nonsolid",
+    "args": {
+      "width": 187.91,
+      "height": 246.39,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/grave10-1703001859643.png"
+      }
+    },
+    "transform": {
+      "position": {
+        "x": 11468.609057496464,
+        "y": 4731.150119676467
+      },
+      "rotation": -87.07910136810611,
+      "zIndex": 0
+    },
+    "uid": "x1vktf8sp5mgsb6s3kc7cz6h",
     "tags": []
   },
   {
@@ -5851,6 +5924,40 @@ export const level: LooseSpawnableDefinition[] = [
       "zIndex": 100
     },
     "uid": "m89kzlj55u76x27c3ght27uk",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 427.69,
+      "height": 123.31
+    },
+    "transform": {
+      "position": {
+        "x": 9830.367987696522,
+        "y": 5154.828178965496
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "kjbgjrcduy247yb7552tf74b",
+    "tags": []
+  },
+  {
+    "entity": "@dreamlab/Solid",
+    "args": {
+      "width": 227.53,
+      "height": 38.61
+    },
+    "transform": {
+      "position": {
+        "x": 11472.71217586053,
+        "y": 4720.33710444345
+      },
+      "rotation": 0,
+      "zIndex": 100
+    },
+    "uid": "j7njivepped8otqten3txa7w",
     "tags": []
   }
 ]
