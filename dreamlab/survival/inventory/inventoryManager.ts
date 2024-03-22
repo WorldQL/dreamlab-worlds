@@ -10,6 +10,7 @@ export interface InventoryItem {
 }
 
 export type InventoryData = (InventoryItem | undefined)[]
+
 const TOTAL_SLOTS = 36
 
 class InventoryManager {
@@ -25,7 +26,6 @@ class InventoryManager {
     if (!InventoryManager.instance) {
       InventoryManager.instance = new InventoryManager()
     }
-
     return InventoryManager.instance
   }
 
@@ -67,8 +67,13 @@ class InventoryManager {
     for (const item of this.inventoryData) {
       if (item?.baseGear === baseGear) return item
     }
-
     return undefined
+  }
+
+  public hasItemInInventory(itemName: string): boolean {
+    return this.inventoryData.some(
+      inventoryItem => inventoryItem && inventoryItem.baseGear.displayName === itemName
+    )
   }
 }
 

@@ -30,7 +30,11 @@ export const ItemOverlay: FC<ItemPopupProps> = ({ game, item }) => {
       setCurrentItem(newItem)
       setPurchaseComplete(false)
       setAwaitingConfirmation(false)
-      setPrompt(`Press F to buy ${newItem?.baseGear?.displayName} for ${newItem?.value}🪙`)
+      setPrompt(
+        newItem?.value && newItem.value > 0
+          ? `Press F to buy ${newItem.baseGear?.displayName} for ${newItem.value}🪙`
+          : `Press F to pick up ${newItem?.baseGear?.displayName}`
+      )
     }
 
     const itemConfirmListener = (keyDown: boolean) => {
@@ -61,17 +65,28 @@ export const ItemOverlay: FC<ItemPopupProps> = ({ game, item }) => {
           if (playerManager.getGold() >= itemToPickup.value) {
             playerManager.removeGold(itemToPickup.value)
             inventoryManager.addItemToInventory(itemToPickup)
-            setPrompt("Item Purchased!")
             playerManager.updateQuestProgress("gatherPart", itemToPickup.baseGear.displayName)
+            setPrompt("Item Purchased!")
           } else {
             setPrompt("Not enough 🪙.")
           }
 
           setAwaitingConfirmation(false)
         } else {
-          if (!purchaseComplete) inventoryManager.addItemToInventory(itemToPickup)
-          setPrompt("Item Purchased!")
-          playerManager.updateQuestProgress("gatherPart", itemToPickup.baseGear.displayName)
+          if (!purchaseComplete) {
+            if (inventoryManager.hasItemInInventory(itemToPickup.baseGear.displayName)) {
+              setPurchaseComplete(true)
+              setPrompt("Item Already Gathered.")
+              return
+            }
+
+            inventoryManager.addItemToInventory(itemToPickup)
+            playerManager.updateQuestProgress("gatherPart", itemToPickup.baseGear.displayName)
+            setPurchaseComplete(true)
+            setPrompt(
+              itemToPickup.value && itemToPickup.value > 0 ? "Item Purchased!" : "Item Gathered!"
+            )
+          }
         }
       }
     }
