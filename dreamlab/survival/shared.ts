@@ -12,7 +12,7 @@ import {
   EnvironmentParticleArgs
 } from "./entities/spawnable/environmentParticle.ts"
 import { AnimatedNonSolid, AnimatedNonSolidArgs } from "./entities/spawnable/animatedNonsolid.ts"
-import { Quest, QuestArgs } from "./entities/spawnable/quest.ts"
+import { QuestEntity, QuestArgs } from "./entities/spawnable/quest.ts"
 import { GameManager } from "./entities/gameManager.ts"
 import { Gold, GoldArgs } from "./entities/spawnable/gold.ts"
 import { ZombieSpawn, ZombieSpawnArgs } from "./entities/spawnable/zombieSpawn.ts"
@@ -26,7 +26,7 @@ export const sharedInit: InitShared = async game => {
   game.register("@cvz/ZombieSpawn", ZombieSpawn, ZombieSpawnArgs)
   game.register("@cvz/InventoryItem", Item, InventoryItemArgs)
   game.register("@cvz/HealthItem", HealingItem, HealingItemArgs)
-  game.register("@cvz/Quest", Quest, QuestArgs)
+  game.register("@cvz/Quest", QuestEntity, QuestArgs)
   game.register("@cvz/Prompt", Prompt, PromptArgs)
   game.register("@cvz/Gold", Gold, GoldArgs)
 

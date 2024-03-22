@@ -5,6 +5,23 @@ import { Solid, SolidArgs } from "@dreamlab.gg/core/entities"
 import { z } from "@dreamlab.gg/core/sdk"
 import { events } from "../../events.ts"
 
+export type QuestType = "reachGold" | "reachKills" | "gatherPart"
+
+export type QuestGoal =
+  | { type: "reachGold"; amount: number }
+  | { type: "reachKills"; amount: number }
+  | { type: "gatherPart"; partName: string }
+
+export class Quest {
+  constructor(
+    public title: string,
+    public description: string,
+    public goal: QuestGoal,
+    public goldReward: number,
+    public completed: boolean = false
+  ) {}
+}
+
 type Args = typeof ArgsSchema
 const ArgsSchema = SolidArgs.extend({
   questTitle: z.string().default("Default Quest"),
@@ -23,7 +40,7 @@ type OnPlayerCollisionEnd = EventHandler<"onPlayerCollisionEnd">
 
 export { ArgsSchema as QuestArgs }
 
-export class Quest<A extends Args = Args> extends Solid<A> {
+export class QuestEntity<A extends Args = Args> extends Solid<A> {
   protected onPlayerCollisionStart: OnPlayerCollisionStart | undefined
   protected onPlayerCollisionEnd: OnPlayerCollisionEnd | undefined
 

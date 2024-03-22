@@ -751,10 +751,10 @@ export const level: LooseSpawnableDefinition[] = [
       "damage": 1,
       "range": 1,
       "lore": "Crafted by the legendary gunsmith 'Bullseye' Betty, this revolver's rapid bursts made it a favorite among cowboys holding the line in the great zombie sieges of the Old West.",
-      "bone": "handRight",
-      "anchorX": 0.5,
-      "anchorY": 0.5,
-      "rotation": 0,
+      "bone": "handLeft",
+      "anchorX": 0.27,
+      "anchorY": 0.6,
+      "rotation": 55,
       "speedMultiplier": 1
     },
     "transform": {
@@ -804,6 +804,9 @@ export const level: LooseSpawnableDefinition[] = [
     "args": {
       "width": 171.91,
       "height": 153.6,
+      "spriteSource": {
+        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/wagon-wheel-1710466316708.png"
+      },
       "displayName": "Wagon-Wheel",
       "animationName": "idle",
       "cost": 0,
@@ -814,10 +817,7 @@ export const level: LooseSpawnableDefinition[] = [
       "anchorX": 0.5,
       "anchorY": 0.5,
       "rotation": 0,
-      "speedMultiplier": 1,
-      "spriteSource": {
-        "url": "https://s3-assets.dreamlab.gg/uploaded-from-editor/wagon-wheel-1710466316708.png"
-      }
+      "speedMultiplier": 1
     },
     "transform": {
       "position": {

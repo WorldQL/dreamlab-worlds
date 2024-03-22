@@ -1,25 +1,9 @@
+import { Quest } from "./entities/spawnable/quest.ts"
 import { events } from "./events.ts"
 
 const MAX_HEALTH = 10
 const INITIAL_KILLS = 0
 const INITIAL_GOLD = 500
-
-export type QuestType = "reachGold" | "reachKills" | "gatherPart"
-
-export type QuestGoal =
-  | { type: "reachGold"; amount: number }
-  | { type: "reachKills"; amount: number }
-  | { type: "gatherPart"; partName: string }
-
-export class Quest {
-  constructor(
-    public title: string,
-    public description: string,
-    public goal: QuestGoal,
-    public goldReward: number,
-    public completed: boolean = false
-  ) {}
-}
 
 class PlayerManager {
   private static instance: PlayerManager
@@ -160,6 +144,7 @@ class PlayerManager {
   public updateQuestProgress(questType: string, progress: number | string): void {
     for (const quest of this.quests) {
       if (quest.goal.type === questType) {
+        if (quest.completed) return
         if (questType === "reachGold" || questType === "reachKills") {
           const goal = quest.goal as { type: "reachGold" | "reachKills"; amount: number }
           quest.completed = (questType === "reachGold" ? this.gold : this.kills) >= goal.amount

@@ -2,7 +2,8 @@ import type { FC } from "https://esm.sh/react@18.2.0"
 import { useEffect, useState } from "https://esm.sh/react@18.2.0"
 import { events } from "../../events.ts"
 import { game } from "@dreamlab.gg/core/dist/labs"
-import PlayerManager, { Quest, QuestType, QuestGoal } from "../../playerManager.ts"
+import PlayerManager from "../../playerManager.ts"
+import { Quest, QuestType, QuestGoal } from "../../entities/spawnable/quest.ts"
 
 export const QuestOverlay: FC = () => {
   const [currentQuest, setCurrentQuest] = useState<Quest | undefined>(undefined)
