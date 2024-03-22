@@ -89,9 +89,9 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
         lifetime: { min: 0.5, max: 3 },
         frequency: 0.001,
         spawnChance: 1,
-        particlesPerWave: 10,
+        particlesPerWave: 5,
         emitterLifetime: 3,
-        maxParticles: 250,
+        maxParticles: 150,
         addAtBack: false,
         autoUpdate: false,
         behaviors: [
@@ -133,8 +133,8 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
             config: {
               speed: {
                 list: [
-                  { value: 250, time: 0 },
-                  { value: 50, time: 1 }
+                  { value: 150, time: 0 },
+                  { value: 25, time: 1 }
                 ]
               }
             }
@@ -176,7 +176,7 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
     this.netClient = onlyNetClient(game())
 
     this.onHitClient = (_, data) => {
-      const { position } = data
+      const { position, regionId } = data
       if (
         typeof position !== "object" ||
         position === null ||
@@ -184,10 +184,10 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
         !("y" in position)
       )
         return
+      if (typeof regionId !== "string" || regionId !== this.uid) return
 
       this.zombieSpawnParticleDefinition.transform.position = position
-      // TODO: investigate why this gets ran 32 times when the event is only called once...
-      // game("client")?.spawn(this.zombieSpawnParticleDefinition)
+      game("client")?.spawn(this.zombieSpawnParticleDefinition)
     }
 
     magicEvents("client")?.addListener(
@@ -210,12 +210,14 @@ export class ZombieRegion<A extends Args = Args> extends Solid<A> {
 
     events.addListener(
       "onRegionZombieSpawning",
-      (this.onRegionZombieSpawning = async positions => {
+      (this.onRegionZombieSpawning = async (regionId, positions) => {
+        if (regionId !== this.uid) return
         this.regionData.value.positions = Array.isArray(positions) ? positions : undefined
 
         if (this.netServer && positions) {
           for (const position of positions) {
             await this.netServer.broadcastCustomMessage("@cvz/zombie/spawning", {
+              regionId,
               position
             })
           }

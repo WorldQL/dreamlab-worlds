@@ -1,7 +1,7 @@
 import type { Player } from "@dreamlab.gg/core/entities"
 import { EventEmitter } from "@dreamlab.gg/core/events"
 import type { InventoryItem } from "./inventory/inventoryManager.ts"
-import { Quest, QuestGoal, QuestType } from "./playerManager.ts"
+import { QuestType, QuestGoal, Quest } from "./entities/spawnable/quest.ts"
 
 interface WorldEvents {
   onPlayerKill: [{ x: number; y: number }]
@@ -22,7 +22,7 @@ interface WorldEvents {
   onRegionWaveStart: [string]
   onRegionCooldownStart: [string]
   onRegionCooldownEnd: [string]
-  onRegionZombieSpawning: [{ x: number; y: number }[]]
+  onRegionZombieSpawning: [string, { x: number; y: number }[]]
 
   onPromptTrigger: [string | undefined]
 

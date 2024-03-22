@@ -152,7 +152,7 @@ export class RegionManager extends Entity {
         positions.push(spawnPosition)
       }
 
-      events.emit("onRegionZombieSpawning", positions)
+      events.emit("onRegionZombieSpawning", region.uid, positions)
 
       await delay(3_000)
       const spawnPromises = positions.map(async spawnPosition => {
