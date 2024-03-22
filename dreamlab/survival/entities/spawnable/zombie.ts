@@ -74,7 +74,7 @@ export class Zombie<A extends Args = Args> extends SpawnableEntity<A> {
   protected netClient: NetClient | undefined
 
   private HIT_CHANNEL = "@cvz/Hittable/hit"
-  private patrolDistance = 300
+  private patrolDistance = Math.floor(Math.random() * (801 - 300)) + 300
   private hitCooldown = 0.5 // Second(s)
   private zombieAnimations: Record<string, Texture<Resource>[]> = {}
   private mobData: SyncedValue<MobData> = syncedValue(this.uid, "mobData", {
