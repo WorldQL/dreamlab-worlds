@@ -1,12 +1,80 @@
-import type { InitServer } from "@dreamlab.gg/core/sdk"
+import type { Game } from "@dreamlab.gg/core"
 import { isNetPlayer } from "@dreamlab.gg/core/entities"
+import type { InitServer } from "@dreamlab.gg/core/sdk"
+import pThrottle from "npm:p-throttle@6.1.0"
+import type { LoadToClientData } from "./network.ts"
+import {
+  LOAD_CHANNEL,
+  SYNC_HIGH_SCORES_CHANNEL,
+  SYNC_POINTS_CHANNEL,
+  SyncHighScoresToClientData,
+  SyncPointsToServerSchema
+} from "./network.ts"
 import { sharedInit } from "./shared.ts"
 
 export const init: InitServer = async game => {
   await sharedInit(game)
 
-  // Destroy all networked players
-  game.events.common.addListener("onInstantiate", entity => {
-    if (isNetPlayer(entity)) game.destroy(entity)
+  //  Track player names
+  const players = new Map<string, [playerId: string, name: string]>()
+
+  game.events.common.addListener("onPlayerJoin", player => {
+    players.set(player.connectionId, [player.playerId, player.nickname])
   })
+
+  game.events.common.addListener("onPlayerLeave", player => {
+    players.delete(player.connectionId)
+    syncHighScores(game, players)
+  })
+
+  const network = game.server.network
+  if (!network) throw new Error("no server networking")
+
+  network.addCustomMessageListener(LOAD_CHANNEL, async ({ connectionId, playerId }) => {
+    const kv = game.server.kv.player(playerId)
+    const points = Number.parseInt((await kv.get("points")) ?? "0", 10)
+    const perSecond = Number.parseInt((await kv.get("per-second")) ?? "0", 10)
+
+    const payload: LoadToClientData = { points, perSecond }
+    network.sendCustomMessage(connectionId, LOAD_CHANNEL, payload)
+
+    syncHighScores(game, players)
+  })
+
+  network.addCustomMessageListener(
+    SYNC_POINTS_CHANNEL,
+    async ({ connectionId, playerId }, _, payload) => {
+      const resp = SyncPointsToServerSchema.safeParse(payload)
+      if (!resp.success) return
+      const data = resp.data
+
+      const kv = game.server.kv.player(playerId)
+      await kv.set("points", data.points.toString())
+
+      throttledSyncHighScores(game, players)
+    }
+  )
 }
+
+const syncHighScores = async (
+  game: Game<true>,
+  players: Map<string, [playerId: string, name: string]>
+) => {
+  // TODO: Cache this maybe
+  const jobs = [...players.entries()].map(async ([connectionId, [playerId, name]]) => {
+    const kv = game.server.kv.player(playerId)
+    const points = Number.parseInt((await kv.get("points")) ?? "0", 10)
+
+    return { id: playerId, points, name }
+  })
+
+  const scores = await Promise.all(jobs)
+  scores.sort((a, b) => b.points - a.points)
+
+  const payload: SyncHighScoresToClientData = { scores }
+  const network = game.server.network!
+
+  network.broadcastCustomMessage(SYNC_HIGH_SCORES_CHANNEL, payload)
+}
+
+const throttledSyncHighScores = pThrottle({ limit: 1, interval: 1000 })(syncHighScores)

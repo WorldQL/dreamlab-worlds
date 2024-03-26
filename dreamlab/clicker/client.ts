@@ -1,6 +1,7 @@
 import type { InitClient } from "@dreamlab.gg/core/sdk"
 import { isPlayer, isNetPlayer } from "@dreamlab.gg/core/entities"
 import { sharedInit } from "./shared.ts"
+import { ClickerUi } from "./ui.tsx"
 
 export const init: InitClient = async game => {
   await sharedInit(game)
@@ -13,4 +14,6 @@ export const init: InitClient = async game => {
       game.client.render.camera.clearTarget()
     }
   })
+
+  game.instantiate(new ClickerUi())
 }
