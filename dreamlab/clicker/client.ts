@@ -15,5 +15,6 @@ export const init: InitClient = async game => {
     }
   })
 
+  // Setup React UI
   game.instantiate(new ClickerUi())
 }

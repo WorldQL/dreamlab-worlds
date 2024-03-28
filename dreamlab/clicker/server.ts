@@ -17,15 +17,21 @@ import { sharedInit } from "./shared.ts"
 export const init: InitServer = async game => {
   await sharedInit(game)
 
-  //  Track player names
+  // Track player names and IDs
   const players = new Map<string, [playerId: string, name: string]>()
+  //                        ^ connectionId
 
   game.events.common.addListener("onPlayerJoin", player => {
     players.set(player.connectionId, [player.playerId, player.nickname])
+
+    // We dont refresh scoreboard here yet because the connecting player hasn't loaded
+    // We do it in the LOAD_CHANNEL handler below
   })
 
   game.events.common.addListener("onPlayerLeave", player => {
     players.delete(player.connectionId)
+
+    // Refresh scoreboard if player leaves
     syncHighScores(game, players)
   })
 

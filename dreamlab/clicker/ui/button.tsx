@@ -5,24 +5,12 @@ import { atom } from "./_deps/jotai.ts"
 import { useSetAtom } from "./_deps/jotai.ts"
 import styled from "./_deps/styled.ts"
 import { pointsAtom } from "./root.tsx"
-import type { SyncPointsToServerData } from "../network.ts"
-import { SYNC_POINTS_CHANNEL } from "../network.ts"
 
 const incrementAtom = atom(null, (get, set, by: number = 1) => {
-  let value: number | undefined = undefined
   set(pointsAtom, points => {
     if (points === undefined) throw new Error("cannot increment, data hasnt loaded")
-    value = points + by
-
-    return value
+    return points + by
   })
-
-  // TODO: Make this less of a hack
-  if (value === undefined) {
-    throw new Error("failed to assign value")
-  }
-
-  return value
 })
 
 const ClickButton = styled.button`
@@ -69,10 +57,7 @@ export const Button = () => {
 
   const onClick = useCallback(() => {
     const by = 1
-    const value = increment(by)
-
-    // const payload: SyncPointsToServerData = { points: value }
-    // network.sendCustomMessage(SYNC_POINTS_CHANNEL, payload)
+    increment(by)
   }, [network, increment])
 
   return <ClickButton onClick={onClick} type="button" />

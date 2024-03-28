@@ -24,9 +24,10 @@ const Scores = styled.div`
 `
 
 export const RoomScores = () => {
+  const network: NetClient = useNetwork()
   const [scores, setScores] = useState<{ id: string; name: string; points: number }[]>([])
 
-  const network: NetClient = useNetwork()
+  // When we recieve new high score data, validate the packet and write to local state
   const onHighScores = useCallback(
     (_: string, payload: unknown) => {
       const resp = SyncHighScoresToClientSchema.safeParse(payload)
@@ -38,8 +39,10 @@ export const RoomScores = () => {
     [setScores]
   )
 
+  // Listen to custom network packets for high scores
   useEffect(() => {
     network.addCustomMessageListener(SYNC_HIGH_SCORES_CHANNEL, onHighScores)
+
     return () => {
       network.removeCustomMessageListener(SYNC_HIGH_SCORES_CHANNEL, onHighScores)
     }
@@ -50,7 +53,7 @@ export const RoomScores = () => {
       <Title>High Scores</Title>
 
       <Scores>
-        {/* TODO: Bold self */}
+        {/* TODO: Mark self as bold */}
         {scores.map(({ id, name, points }, idx) => (
           <Score key={id} idx={idx} name={name} points={points} />
         ))}
