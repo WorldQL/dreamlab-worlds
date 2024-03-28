@@ -6,22 +6,22 @@ export const LOAD_CHANNEL = "@clicker/load"
 export type LoadToClientData = z.infer<typeof LoadToClientSchema>
 export const LoadToClientSchema = z.object({
   points: z.number().min(0),
-  perSecond: z.number().min(0)
+  upgrades: z.number().min(0)
 })
 // #endregion
 
 // #region Sync State
 export const SYNC_POINTS_CHANNEL = "@clicker/sync-points"
-export const SYNC_PER_SECOND_CHANNEL = "@clicker/sync-per-second"
+export const SYNC_UPGRADES_CHANNEL = "@clicker/sync-upgrades"
 
 export type SyncPointsToServerData = z.infer<typeof SyncPointsToServerSchema>
 export const SyncPointsToServerSchema = z.object({
   points: z.number().min(0)
 })
 
-export type SyncPerSecondToServerData = z.infer<typeof SyncPerSecondToServerSchema>
-export const SyncPerSecondToServerSchema = z.object({
-  perSecond: z.number().min(0)
+export type SyncUpgradesToServerData = z.infer<typeof SyncUpgradesToServerSchema>
+export const SyncUpgradesToServerSchema = z.object({
+  upgrades: z.number().min(0)
 })
 // #endregion
 

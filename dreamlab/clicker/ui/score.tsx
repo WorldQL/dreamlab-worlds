@@ -1,7 +1,6 @@
 import { useAtomValue } from "./_deps/jotai.ts"
 import styled from "./_deps/styled.ts"
-import { perSecondAtom } from "./root.tsx"
-import { pointsAtom } from "./root.tsx"
+import { pointsAtom, perSecondAtom } from "./root.tsx"
 
 const Container = styled.div`
   position: absolute;
@@ -33,7 +32,7 @@ export const Score = () => {
 
   return (
     <Container>
-      <Points>Points: {points!.toLocaleString()}</Points>
+      <Points>Points: {points!.toLocaleString(undefined, { maximumFractionDigits: 0 })}</Points>
       <PerSecond>Points / Second: {perSecond.toLocaleString()}</PerSecond>
     </Container>
   )

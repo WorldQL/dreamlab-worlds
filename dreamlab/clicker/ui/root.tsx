@@ -7,13 +7,22 @@ import { atom, useAtomValue, useSetAtom } from "./_deps/jotai.ts"
 import { Button } from "./button.tsx"
 import { RoomScores } from "./room-scores.tsx"
 import { Score } from "./score.tsx"
+import { Upgrade } from "./upgrade.tsx"
 
 export const pointsAtom = atom<number | undefined>(0)
-export const perSecondAtom = atom<number>(0)
+export const upgradesAtom = atom<number>(0)
+
+export const perSecondAtom = atom(get => Math.floor((get(upgradesAtom) * 1.5) ** 1.03))
+
+const BASE_COST = 50
+const SCALE_FACTOR = 1.02
+export const upgradeCostAtom = atom(get =>
+  Math.floor((get(upgradesAtom) * BASE_COST) ** SCALE_FACTOR + BASE_COST)
+)
 
 const loadAtom = atom(null, (get, set, data: LoadToClientData) => {
   set(pointsAtom, data.points)
-  set(perSecondAtom, data.perSecond)
+  set(upgradesAtom, data.upgrades)
 })
 
 export const App = () => {
@@ -42,6 +51,7 @@ export const App = () => {
       <Score />
       <Button />
       <RoomScores />
+      <Upgrade />
     </>
   )
 }

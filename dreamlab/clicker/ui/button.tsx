@@ -71,8 +71,8 @@ export const Button = () => {
     const by = 1
     const value = increment(by)
 
-    const payload: SyncPointsToServerData = { points: value }
-    network.sendCustomMessage(SYNC_POINTS_CHANNEL, payload)
+    // const payload: SyncPointsToServerData = { points: value }
+    // network.sendCustomMessage(SYNC_POINTS_CHANNEL, payload)
   }, [network, increment])
 
   return <ClickButton onClick={onClick} type="button" />

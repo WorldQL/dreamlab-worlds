@@ -7,7 +7,9 @@ import {
   LOAD_CHANNEL,
   SYNC_HIGH_SCORES_CHANNEL,
   SYNC_POINTS_CHANNEL,
+  SYNC_UPGRADES_CHANNEL,
   SyncHighScoresToClientData,
+  SyncUpgradesToServerSchema,
   SyncPointsToServerSchema
 } from "./network.ts"
 import { sharedInit } from "./shared.ts"
@@ -33,9 +35,9 @@ export const init: InitServer = async game => {
   network.addCustomMessageListener(LOAD_CHANNEL, async ({ connectionId, playerId }) => {
     const kv = game.server.kv.player(playerId)
     const points = Number.parseInt((await kv.get("points")) ?? "0", 10)
-    const perSecond = Number.parseInt((await kv.get("per-second")) ?? "0", 10)
+    const upgrades = Number.parseInt((await kv.get("upgrades")) ?? "0", 10)
 
-    const payload: LoadToClientData = { points, perSecond }
+    const payload: LoadToClientData = { points, upgrades }
     network.sendCustomMessage(connectionId, LOAD_CHANNEL, payload)
 
     syncHighScores(game, players)
@@ -52,6 +54,18 @@ export const init: InitServer = async game => {
       await kv.set("points", data.points.toString())
 
       throttledSyncHighScores(game, players)
+    }
+  )
+
+  network.addCustomMessageListener(
+    SYNC_UPGRADES_CHANNEL,
+    async ({ connectionId, playerId }, _, payload) => {
+      const resp = SyncUpgradesToServerSchema.safeParse(payload)
+      if (!resp.success) return
+      const data = resp.data
+
+      const kv = game.server.kv.player(playerId)
+      await kv.set("upgrades", data.upgrades.toString())
     }
   )
 }
